@@ -1,31 +1,17 @@
 import { useState } from "react";
 import { AreaInterface } from "../interfaces/AreaInterface";
 import axios from "axios";
+import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
+import { AREA } from "../service/AreaService";
 
 const UseArea = () => {
-  //   const [dataAdd, setDataAdd] = useState(initialDatestoAdd);
-
-  //   const [dataUpdate, setDataUpdate] = useState(initialDatestoUpdate);
-
   const [dataArea, setDataArea] = useState<AreaInterface[]>([]);
 
   const findAll = async () => {
     try {
       const areas = await axios.post<{ registro: AreaInterface[] }>(
-        `http://localhost:5000/area/find_all`,
-        {
-          cantidad_max: "0",
-          Language: "ES",
-          filters: [
-            {
-              campo: "0",
-              operador: "",
-              tipo: "",
-              valor1: "",
-              valor2: "",
-            },
-          ],
-        }
+        `${VITE_API_URL_GDS+AREA.FIND_ALL}`,
+        filterBodyRequest
       );
       console.log(areas.data);
 
@@ -37,6 +23,7 @@ const UseArea = () => {
 
   return {
     dataArea,
+    setDataArea,
     findAll,
   };
 };

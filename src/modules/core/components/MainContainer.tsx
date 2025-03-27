@@ -3,10 +3,10 @@ import { useRef } from "react";
 import { Outlet } from "react-router-dom";
 
 type MainContainerProps = {
-    visible?: boolean,
-  };
+  visible?: boolean;
+};
 
-const MainContainer = ({visible}:MainContainerProps) => {
+const MainContainer = ({ visible }: MainContainerProps) => {
   const refMainContainer = useRef<Card>(null);
 
   return (

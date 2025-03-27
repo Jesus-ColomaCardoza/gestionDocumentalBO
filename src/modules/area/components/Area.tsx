@@ -8,131 +8,24 @@ import { InputIcon } from "primereact/inputicon";
 import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
-import {
-  useState,
-  useEffect,
-  useRef,
-  // ChangeEvent
-} from "react";
+import { useState, useEffect, useRef } from "react";
 import UseArea from "../hooks/UseArea";
 import { ColumnMeta } from "../../utils/Interfaces";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
 import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import { AreaInterface } from "../interfaces/AreaInterface";
 import { classNames } from "primereact/utils";
-// import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
-// import {
-//   InputNumber,
-//   InputNumberValueChangeEvent,
-// } from "primereact/inputnumber";
-import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
+import { columns, defaultFilters, emptyArea } from "../utils/Constants";
+import AreaCreateOrUpdate from "./AreaCreateOrUpdate";
+import AreaRemove from "./AreaRemove";
+import AreasRemove from "./AreasRemove";
 
 const Area = () => {
-  const columns: ColumnMeta[] = [
-    {
-      field: "IdArea",
-      header: "IdArea",
-      dataType: "numeric",
-      width: "5%",
-      show: true,
-      filterPlaceholder: "Buscar por IdArea",
-    },
-    {
-      field: "Descripcion",
-      header: "Descripcion",
-      dataType: "text",
-      width: "30%",
-      show: true,
-      filterPlaceholder: "Buscar por Descripcion",
-    },
-    {
-      field: "Activo",
-      header: "Activo",
-      dataType: "boolean",
-      width: "5%",
-      show: true,
-      filterPlaceholder: "Buscar por Activo",
-    },
-    {
-      field: "CreadoEl",
-      header: "CreadoEl",
-      dataType: "date",
-      width: "15%",
-      show: false,
-      filterPlaceholder: "Buscar por CreadoEl",
-    },
-    {
-      field: "CreadoPor",
-      header: "CreadoPor",
-      dataType: "text",
-      width: "10%",
-      show: false,
-      filterPlaceholder: "Buscar por CreadoPor",
-    },
-    {
-      field: "ModificadoEl",
-      header: "ModificadoEl",
-      dataType: "date",
-      width: "15%",
-      show: false,
-      filterPlaceholder: "Buscar por ModificadoEl ",
-    },
-    {
-      field: "ModificadoPor",
-      header: "ModificadoPor",
-      dataType: "text",
-      width: "10%",
-      show: false,
-      filterPlaceholder: "Buscar por ModificadoPor ",
-    },
-  ];
-
-  const defaultFilters: DataTableFilterMeta = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-
-    IdArea: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-    },
-    Descripcion: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-    },
-    Activo: { value: null, matchMode: FilterMatchMode.EQUALS },
-    CreadoEl: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
-    },
-    CreadoPor: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-    },
-    ModificadoEl: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
-    },
-    ModificadoPor: {
-      operator: FilterOperator.AND,
-      constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-    },
-  };
-
-  let emptyArea: AreaInterface = {
-    IdArea: 0,
-    Descripcion: "",
-    Activo: false,
-    CreadoEl: new Date(),
-    CreadoPor: "",
-    ModificadoEl: new Date(),
-    ModificadoPor: "",
-  };
-
   // custom hooks
-  const { dataArea, findAll } = UseArea();
+  const { dataArea, setDataArea, findAll } = UseArea();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -158,11 +51,16 @@ const Area = () => {
 
   const [selectedAreas, setSelectedAreas] = useState<AreaInterface[]>([]);
 
-  const [areaDialog, setAreaDialog] = useState<boolean>(false);
+  const [areaDialog, setAreaDialog] = useState<{
+    type?: "create" | "update" | undefined;
+    state: boolean;
+  }>({
+    state: false,
+  });
 
-  const [deleteAreaDialog, setDeleteAreaDialog] = useState<boolean>(false);
+  const [removeAreaDialog, setRemoveAreaDialog] = useState<boolean>(false);
 
-  const [deleteAreasDialog, setDeleteAreasDialog] = useState<boolean>(false);
+  const [removeAreasDialog, setRemoveAreasDialog] = useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -171,7 +69,7 @@ const Area = () => {
       icon: "pi pi-refresh",
     },
     {
-      label: "Delete",
+      label: "Remove",
       icon: "pi pi-times",
     },
   ];
@@ -198,32 +96,42 @@ const Area = () => {
     </>
   );
 
-  // templates to dialog
-
-  const openNew = () => {
-    setArea(emptyArea);
-    setSubmitted(false);
-    setAreaDialog(true);
+  // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllArea = () => {
+    findAll();
+    setLoading(false);
+    onGlobalFilterChange()//here 
   };
 
-  const hideDialog = () => {
-    setSubmitted(false);
-    setAreaDialog(false);
-  };
-
-  const hideDeleteAreaDialog = () => {
-    setDeleteAreaDialog(false);
-  };
-
-  const hideDeleteAreasDialog = () => {
-    setDeleteAreasDialog(false);
-  };
-
-  const saveArea = () => {
+  const createArea = () => {
     setSubmitted(true);
 
     if (area.Descripcion.trim()) {
-      let _areas = [...areas];
+      let _areas = [...dataArea];
+      let _area = { ...area };
+
+      _area.IdArea = +createId();
+      // _area.Descripcion = "area-placeholder.svg";
+      _areas.push(_area);
+      toast.current?.show({
+        severity: "success",
+        // summary: "Successful",
+        detail: "Área creada",
+        life: 3000,
+      });
+
+      // setAreas(_areas);
+      setDataArea(_areas);
+      setAreaDialog({ state: false });
+      setArea(emptyArea);
+    }
+  };
+
+  const updateArea = () => {
+    setSubmitted(true);
+
+    if (area.Descripcion.trim()) {
+      let _areas = [...dataArea];
       let _area = { ...area };
 
       if (area.IdArea) {
@@ -236,41 +144,22 @@ const Area = () => {
           detail: "Área actualizada",
           life: 3000,
         });
-      } else {
-        // _area.IdArea = createId();
-        // _area.image = "area-placeholder.svg";
-        _areas.push(_area);
-        toast.current?.show({
-          severity: "success",
-          // summary: "Successful",
-          detail: "Área creada",
-          life: 3000,
-        });
       }
 
-      setAreas(_areas);
-      setAreaDialog(false);
+      // setAreas(_areas);
+      setDataArea(_areas);
+      setAreaDialog({ state: false });
       setArea(emptyArea);
     }
   };
 
-  const editArea = (area: AreaInterface) => {
-    setArea({ ...area });
-    setAreaDialog(true);
-  };
-
-  const confirmDeleteArea = (area: AreaInterface) => {
-    setArea(area);
-    setDeleteAreaDialog(true);
-  };
-
-  const deleteArea = () => {
+  const removeArea = () => {
     let _areas = areas.filter(
       (val: AreaInterface) => val.IdArea !== area.IdArea
     );
 
     setAreas(_areas);
-    setDeleteAreaDialog(false);
+    setRemoveAreaDialog(false);
     setArea(emptyArea);
     toast.current?.show({
       severity: "error",
@@ -280,6 +169,57 @@ const Area = () => {
     });
   };
 
+  const removeSelectedAreas = () => {
+    let _areas = areas.filter(
+      (val: AreaInterface) => !selectedAreas.includes(val)
+    );
+
+    setAreas(_areas);
+    setRemoveAreasDialog(false);
+    setSelectedAreas([]);
+    toast.current?.show({
+      severity: "success",
+      summary: "Successful",
+      detail: "Areas Removed",
+      life: 3000,
+    });
+  };
+
+  // templates to dialogs
+  const hideDialog = () => {
+    setSubmitted(false);
+    setAreaDialog({ state: false });
+  };
+
+  const showCreateAreaDialog = () => {
+    setArea(emptyArea);
+    setSubmitted(false);
+    setAreaDialog({ type: "create", state: true });
+  };
+
+  const showUpdateAreaDialog = (area: AreaInterface) => {
+    setArea({ ...area });
+    setAreaDialog({ type: "update", state: true });
+  };
+
+  const hideRemoveAreaDialog = () => {
+    setRemoveAreaDialog(false);
+  };
+
+  const hideRemoveAreasDialog = () => {
+    setRemoveAreasDialog(false);
+  };
+
+  const confirmRemoveArea = (area: AreaInterface) => {
+    setArea(area);
+    setRemoveAreaDialog(true);
+  };
+
+  const confirmRemoveSelectedAreas = () => {
+    setRemoveAreasDialog(true);
+  };
+
+  // here
   const findIndexById = (id: string) => {
     let index = -1;
 
@@ -308,67 +248,7 @@ const Area = () => {
   const exportCSV = () => {
     dt.current?.exportCSV();
   };
-
-  const confirmDeleteSelected = () => {
-    setDeleteAreasDialog(true);
-  };
-
-  const deleteSelectedAreas = () => {
-    let _areas = areas.filter(
-      (val: AreaInterface) => !selectedAreas.includes(val)
-    );
-
-    setAreas(_areas);
-    setDeleteAreasDialog(false);
-    setSelectedAreas([]);
-    toast.current?.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Areas Deleted",
-      life: 3000,
-    });
-  };
-
-  const areaDialogFooter = (
-    <>
-      <Button label="Cancel" icon="pi pi-times" outlined onClick={hideDialog} />
-      <Button label="Save" icon="pi pi-check" onClick={saveArea} />
-    </>
-  );
-
-  const deleteAreaDialogFooter = (
-    <>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        outlined
-        onClick={hideDeleteAreaDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        severity="danger"
-        onClick={deleteArea}
-      />
-    </>
-  );
-
-  const deleteAreasDialogFooter = (
-    <>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        outlined
-        onClick={hideDeleteAreasDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        severity="danger"
-        onClick={deleteSelectedAreas}
-      />
-    </>
-  );
+  //here
 
   // const onCategoryChange = (e: RadioButtonChangeEvent) => {
   //   let _area = { ...area };
@@ -418,16 +298,16 @@ const Area = () => {
 
   // templates to component DataTable
   const initFilters = () => {
-    setFilters(defaultFilters);
-    setGlobalFilterValue("");
+    // setFilters({ ...defaultFilters });
+    onGlobalFilterChange();
   };
 
   const clearFilter = () => {
     initFilters();
   };
 
-  const onGlobalFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+  const onGlobalFilterChange = (e?: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target.value??"";
     let _filters = { ...filters };
 
     // @ts-ignore
@@ -439,7 +319,6 @@ const Area = () => {
 
   const onColumnToggle = (event: MultiSelectChangeEvent) => {
     let selectedColumns = event.value;
-    console.log(selectedColumns);
 
     let orderedSelectedColumns = columns.filter((col) =>
       selectedColumns.some((sCol: ColumnMeta) => sCol.field === col.field)
@@ -455,7 +334,7 @@ const Area = () => {
           type="button"
           icon="pi pi-plus"
           severity="success"
-          onClick={openNew}
+          onClick={showCreateAreaDialog}
           style={{
             width: "2rem",
             height: "2rem",
@@ -467,7 +346,7 @@ const Area = () => {
           type="button"
           icon="pi pi-refresh"
           severity="info"
-          onClick={findAll}
+          onClick={findAllArea}
           style={{
             width: "2rem",
             height: "2rem",
@@ -555,8 +434,8 @@ const Area = () => {
     );
   };
 
-  // templates to actions update and delete on dataTable
-  const actionBodyTemplate = (rowData: AreaInterface) => {
+  // templates to actions update and remove on dataTable
+  const actionsBodyTemplate = (rowData: AreaInterface) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
@@ -567,7 +446,7 @@ const Area = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => editArea(rowData)}
+          onClick={() => showUpdateAreaDialog(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -577,23 +456,21 @@ const Area = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => confirmDeleteArea(rowData)}
+          onClick={() => confirmRemoveArea(rowData)}
         />
       </div>
     );
-  };  
+  };
 
   //useEffects
   useEffect(() => {
-    findAll();
-    setLoading(false);
+    findAllArea();
+ 
   }, []);
 
   return (
     <div className="card">
-      <Toast ref={toast}  
-      position={"bottom-right"}
-      />
+      <Toast ref={toast} position={"bottom-right"} />
 
       <Toolbar
         style={{
@@ -641,7 +518,7 @@ const Area = () => {
                 header={col.header}
                 dataType={col.dataType}
                 sortable
-                style={{ width: col.width, padding:10 }}
+                style={{ width: col.width, padding: 10 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
                 body={activoBodyTemplate}
@@ -656,7 +533,7 @@ const Area = () => {
                 header={col.header}
                 dataType={col.dataType}
                 sortable
-                style={{ width: col.width, padding:10 }}
+                style={{ width: col.width, padding: 10 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
               />
@@ -664,177 +541,35 @@ const Area = () => {
           }
         })}
         <Column
-          body={actionBodyTemplate}
+          body={actionsBodyTemplate}
           exportable={false}
           style={{ width: "5%", padding: 10 }}
         ></Column>
       </DataTable>
 
-      <Dialog
-        visible={areaDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Área Detalles"
-        modal
-        className="p-fluid"
-        footer={areaDialogFooter}
-        onHide={hideDialog}
-      >
-        {/* {area.image && (
-          <img
-            src={`https://primefaces.org/cdn/primereact/images/area/${area.image}`}
-            alt={area.image}
-            className="area-image block m-auto pb-3"
-          />
-        )} */}
-        <div className="field">
-          <label htmlFor="Descripcion" className="font-bold">
-            Descripción
-          </label>
-          <InputText
-            id="Descripcion"
-            value={area.Descripcion}
-            onChange={(e) => onInputChange(e, "Descripcion")}
-            required
-            autoFocus
-            className={classNames({
-              "p-invalid": submitted && !area.Descripcion,
-            })}
-          />
-          {submitted && !area.Descripcion && (
-            <small className="p-error">Name is required.</small>
-          )}
-        </div>
-        {/* <div className="field">
-          <label htmlFor="description" className="font-bold">
-            Description
-          </label>
-          <InputTextarea
-            id="description"
-            value={area.description}
-            onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
-              onInputTextAreaChange(e, "description")
-            }
-            required
-            rows={3}
-            cols={20}
-          />
-        </div>
+      <AreaCreateOrUpdate
+        submitted={submitted}
+        area={area}
+        areaDialog={areaDialog}
+        hideDialog={hideDialog}
+        createArea={createArea}
+        updateArea={updateArea}
+        onInputChange={onInputChange}
+      />
 
-        <div className="field">
-          <label className="mb-3 font-bold">Category</label>
-          <div className="formgrid grid">
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category1"
-                name="category"
-                value="Accessories"
-                onChange={onCategoryChange}
-                checked={area.category === "Accessories"}
-              />
-              <label htmlFor="category1">Accessories</label>
-            </div>
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category2"
-                name="category"
-                value="Clothing"
-                onChange={onCategoryChange}
-                checked={area.category === "Clothing"}
-              />
-              <label htmlFor="category2">Clothing</label>
-            </div>
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category3"
-                name="category"
-                value="Electronics"
-                onChange={onCategoryChange}
-                checked={area.category === "Electronics"}
-              />
-              <label htmlFor="category3">Electronics</label>
-            </div>
-            <div className="field-radiobutton col-6">
-              <RadioButton
-                inputId="category4"
-                name="category"
-                value="Fitness"
-                onChange={onCategoryChange}
-                checked={area.category === "Fitness"}
-              />
-              <label htmlFor="category4">Fitness</label>
-            </div>
-          </div>
-        </div>
+      <AreaRemove
+        area={area}
+        removeAreaDialog={removeAreaDialog}
+        hideRemoveAreaDialog={hideRemoveAreaDialog}
+        removeArea={removeArea}
+      />
 
-        <div className="formgrid grid">
-          <div className="field col">
-            <label htmlFor="price" className="font-bold">
-              Price
-            </label>
-            <InputNumber
-              id="price"
-              value={area.price}
-              onValueChange={(e) => onInputNumberChange(e, "price")}
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-            />
-          </div>
-          <div className="field col">
-            <label htmlFor="quantity" className="font-bold">
-              Quantity
-            </label>
-            <InputNumber
-              id="quantity"
-              value={area.quantity}
-              onValueChange={(e) => onInputNumberChange(e, "quantity")}
-            />
-          </div>
-        </div> */}
-      </Dialog>
-
-      <Dialog
-        visible={deleteAreaDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Confirmación"
-        modal
-        footer={deleteAreaDialogFooter}
-        onHide={hideDeleteAreaDialog}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {area && (
-            <span>
-              Are you sure you want to delete <b>{area.Descripcion}</b>?
-            </span>
-          )}
-        </div>
-      </Dialog>
-
-      <Dialog
-        visible={deleteAreasDialog}
-        style={{ width: "32rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Confirmación"
-        modal
-        footer={deleteAreasDialogFooter}
-        onHide={hideDeleteAreasDialog}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {area && (
-            <span>Are you sure you want to delete the selected areas?</span>
-          )}
-        </div>
-      </Dialog>
+      <AreasRemove
+        area={area}
+        removeAreasDialog={removeAreasDialog}
+        hideRemoveAreasDialog={hideRemoveAreasDialog}
+        removeSelectedAreas={removeSelectedAreas}
+      />
     </div>
   );
 };
