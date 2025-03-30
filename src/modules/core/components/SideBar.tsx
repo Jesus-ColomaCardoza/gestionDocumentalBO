@@ -135,6 +135,7 @@ const SideBar = (props: SideBarProps) => {
         style={{
           marginTop: "1rem",
           maxHeight: "75vh",
+          minHeight: "60vh",
           overflowY: "auto",
         }}
       >
@@ -344,6 +345,7 @@ const SideBar = (props: SideBarProps) => {
             </ul>
           </li>
         </ul>
+
       </div>
 
       {/* Sidebar-footer */}
@@ -356,7 +358,7 @@ const SideBar = (props: SideBarProps) => {
         }}
       >
         <hr className="border-top-1 border-none surface-border" />
-        <a className="mx-3 flex align-items-center justify-content-center cursor-pointer p-3 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+        <a className="my-2 mx-3 flex align-items-center justify-content-center cursor-pointer p-1 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
           <Avatar
             image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
             shape="circle"
@@ -364,6 +366,7 @@ const SideBar = (props: SideBarProps) => {
           <span className="font-bold">Amy Elsner</span>
         </a>
       </div>
+
     </Card>
   );
 };

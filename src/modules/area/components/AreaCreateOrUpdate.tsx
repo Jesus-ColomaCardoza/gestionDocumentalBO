@@ -1,12 +1,13 @@
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
-import { AreaInterface } from "../interfaces/AreaInterface";
+import { AreaEntity } from "../interfaces/AreaInterface";
 import { Button } from "primereact/button";
+import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
 
 type AreaCreateOrUpdateProps = {
   submitted: boolean;
-  area: AreaInterface;
+  area: AreaEntity;
   areaDialog: {
     type?: "create" | "update" | undefined;
     state: boolean;
@@ -15,6 +16,8 @@ type AreaCreateOrUpdateProps = {
   createArea: () => void;
   updateArea: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
+  onCategoryChange: (e: RadioButtonChangeEvent) => void;
+  loadingAreaCreateOrUpdate: boolean;
 };
 
 const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
@@ -27,6 +30,7 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
         onClick={props.hideDialog}
       />
       <Button
+        loading={props.loadingAreaCreateOrUpdate}
         label="Save"
         icon="pi pi-check"
         onClick={
@@ -49,13 +53,6 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
       footer={areaDialogFooter}
       onHide={props.hideDialog}
     >
-      {/* {area.image && (
-              <img
-                src={`https://primefaces.org/cdn/primereact/images/area/${area.image}`}
-                alt={area.image}
-                className="area-image block m-auto pb-3"
-              />
-            )} */}
       <div className="field">
         <label htmlFor="Descripcion" className="font-bold">
           Descripción
@@ -64,7 +61,6 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
           id="Descripcion"
           value={props.area.Descripcion}
           onChange={(e) => props.onInputChange(e, "Descripcion")}
-          required
           autoFocus
           className={classNames({
             "p-invalid": props.submitted && !props.area.Descripcion,
@@ -74,7 +70,33 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
           <small className="p-error">Name is required.</small>
         )}
       </div>
-      {/* <div className="field">
+      <div className="field">
+        <label className="mb-3 font-bold">Activo</label>
+        <div className="formgrid grid">
+          <div className="field-radiobutton col-6">
+            <RadioButton
+              inputId="Activot"
+              name="Activot"
+              value={true}
+              onChange={props.onCategoryChange}
+              checked={props.area.Activo === true}
+            />
+            <label htmlFor="Activot">True</label>
+          </div>
+          <div className="field-radiobutton col-6">
+            <RadioButton
+              inputId="Activof"
+              name="Activof"
+              value={false}
+              onChange={props.onCategoryChange}
+              checked={props.area.Activo === false}
+            />
+            <label htmlFor="Activof">False</label>
+          </div>
+        </div>
+      </div>
+      {/* 
+      <div className="field">
               <label htmlFor="description" className="font-bold">
                 Description
               </label>

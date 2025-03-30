@@ -6,3 +6,12 @@ export interface ColumnMeta {
   show: boolean;
   filterPlaceholder?:string,
 }
+
+export interface Message {
+  msgId: number;
+  msgTxt: string;
+}
+
+export interface ErrorOut {
+  message : Message;
+}

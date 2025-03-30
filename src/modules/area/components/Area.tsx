@@ -15,22 +15,29 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import { AreaInterface } from "../interfaces/AreaInterface";
+import {
+  AreaCreate,
+  AreaEntity,
+  AreaOut,
+  AreasOut,
+} from "../interfaces/AreaInterface";
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
 import { columns, defaultFilters, emptyArea } from "../utils/Constants";
 import AreaCreateOrUpdate from "./AreaCreateOrUpdate";
 import AreaRemove from "./AreaRemove";
 import AreasRemove from "./AreasRemove";
+import { RadioButtonChangeEvent } from "primereact/radiobutton";
+import { reformatDate } from "../../utils/Methods";
 
 const Area = () => {
   // custom hooks
-  const { dataArea, setDataArea, findAll } = UseArea();
+  const { create, findAll, findOne, update, remove } = UseArea();
 
   //useRefs
   const toast = useRef<Toast>(null);
 
-  const dt = useRef<DataTable<AreaInterface[]>>(null);
+  const dt = useRef<DataTable<AreaEntity[]>>(null);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -43,13 +50,16 @@ const Area = () => {
     columns.filter((col: ColumnMeta) => col.show)
   );
 
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const [area, setArea] = useState<AreaInterface>(emptyArea);
+  const [loadingAreaCreateOrUpdate, setLoadingAreaCreateOrUpdate] =
+    useState<boolean>(false);
 
-  const [areas, setAreas] = useState<AreaInterface[]>([]);
+  const [area, setArea] = useState<AreaEntity>(emptyArea);
 
-  const [selectedAreas, setSelectedAreas] = useState<AreaInterface[]>([]);
+  const [areas, setAreas] = useState<AreaEntity[]>([]);
+
+  const [selectedAreas, setSelectedAreas] = useState<AreaEntity[]>([]);
 
   const [areaDialog, setAreaDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -97,81 +107,146 @@ const Area = () => {
   );
 
   // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
-  const findAllArea = () => {
-    findAll();
-    setLoading(false);
-    onGlobalFilterChange()//here 
-  };
+  const findAllArea = async () => {
+    const areasFindAll = await findAll();
 
-  const createArea = () => {
-    setSubmitted(true);
-
-    if (area.Descripcion.trim()) {
-      let _areas = [...dataArea];
-      let _area = { ...area };
-
-      _area.IdArea = +createId();
-      // _area.Descripcion = "area-placeholder.svg";
-      _areas.push(_area);
-      toast.current?.show({
-        severity: "success",
-        // summary: "Successful",
-        detail: "Área creada",
-        life: 3000,
-      });
-
-      // setAreas(_areas);
-      setDataArea(_areas);
-      setAreaDialog({ state: false });
-      setArea(emptyArea);
+    if (areasFindAll?.message.msgId == 0 && areasFindAll.registro) {
+      setAreas(
+        Array.isArray(areasFindAll.registro)
+          ? areasFindAll.registro?.map((af) => {
+              return {
+                ...af,
+                CreadoEl:
+                  af.CreadoEl != null ? reformatDate(af.CreadoEl) : af.CreadoEl,
+                ModificadoEl:
+                  af.ModificadoEl != null
+                    ? reformatDate(af.ModificadoEl)
+                    : af.ModificadoEl,
+              };
+            })
+          : []
+      );
+      //   toast.current?.show({
+      //     severity: "success",
+      //     detail: `${areasFindAll.message.msgTxt}`,
+      //     life: 3000,
+      //   });
+      // } else if (areasFindAll?.message.msgId == 1) {
+      //   toast.current?.show({
+      //     severity: "error",
+      //     detail: `${areasFindAll.message.msgTxt}`,
+      //     life: 3000,
+      //   });
     }
+
+    setLoading(false);
+    onGlobalFilterChange();
   };
 
-  const updateArea = () => {
+  const createArea = async () => {
     setSubmitted(true);
-
     if (area.Descripcion.trim()) {
-      let _areas = [...dataArea];
-      let _area = { ...area };
+      setLoadingAreaCreateOrUpdate(true);
+      let areaCreate = await create({
+        Descripcion: area.Descripcion,
+        Activo: area.Activo,
+      });
+      setLoadingAreaCreateOrUpdate(false);
 
-      if (area.IdArea) {
-        const index = findIndexById(area.IdArea.toString());
-
-        _areas[index] = _area;
+      if (areaCreate?.message.msgId == 0 && areaCreate.registro) {
+        areaCreate.registro.CreadoEl = reformatDate(
+          areaCreate.registro.CreadoEl
+        );
+        setAreas([...areas, areaCreate.registro]);
         toast.current?.show({
-          severity: "info",
-          // summary: "Successful",
-          detail: "Área actualizada",
+          severity: "success",
+          detail: `${areaCreate.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (areaCreate?.message.msgId == 1) {
+        toast.current?.show({
+          severity: "error",
+          detail: `${areaCreate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      // setAreas(_areas);
-      setDataArea(_areas);
       setAreaDialog({ state: false });
       setArea(emptyArea);
     }
   };
 
-  const removeArea = () => {
-    let _areas = areas.filter(
-      (val: AreaInterface) => val.IdArea !== area.IdArea
-    );
+  const updateArea = async () => {
+    setSubmitted(true);
+    if (area.IdArea) {
+      setLoadingAreaCreateOrUpdate(true);
+      let areaUpdate = await update(area.IdArea.toString(), {
+        Descripcion: area.Descripcion,
+        Activo: area.Activo,
+      });
+      setLoadingAreaCreateOrUpdate(false);
 
-    setAreas(_areas);
-    setRemoveAreaDialog(false);
-    setArea(emptyArea);
-    toast.current?.show({
-      severity: "error",
-      // summary: "Successful",
-      detail: "Área eliminada",
-      life: 3000,
-    });
+      if (areaUpdate?.message.msgId == 0 && areaUpdate.registro) {
+        areaUpdate.registro.CreadoEl = reformatDate(
+          areaUpdate.registro.CreadoEl
+        );
+        areaUpdate.registro.ModificadoEl = reformatDate(
+          areaUpdate.registro.ModificadoEl
+        );
+        setAreas(
+          areas?.map((area) =>
+            area.IdArea === areaUpdate?.registro?.IdArea
+              ? { ...area, ...areaUpdate.registro }
+              : area
+          )
+        );
+        toast.current?.show({
+          severity: "success",
+          detail: `${areaUpdate.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (areaUpdate?.message.msgId == 1) {
+        toast.current?.show({
+          severity: "error",
+          detail: `${areaUpdate.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setAreaDialog({ state: false });
+      setArea(emptyArea);
+    }
+  };
+
+  const removeArea = async () => {
+    if (area.IdArea) {
+      let areaRemove = await remove(area.IdArea.toString());
+
+      if (areaRemove?.message.msgId == 0 && areaRemove.registro) {
+        setAreas(
+          areas?.filter((area) => area.IdArea !== areaRemove?.registro?.IdArea)
+        );
+        toast.current?.show({
+          severity: "success",
+          detail: `${areaRemove.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (areaRemove?.message.msgId == 1) {
+        toast.current?.show({
+          severity: "error",
+          detail: `${areaRemove.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setRemoveAreaDialog(false);
+      setArea(emptyArea);
+    }
   };
 
   const removeSelectedAreas = () => {
     let _areas = areas.filter(
-      (val: AreaInterface) => !selectedAreas.includes(val)
+      (val: AreaEntity) => !selectedAreas.includes(val)
     );
 
     setAreas(_areas);
@@ -197,7 +272,7 @@ const Area = () => {
     setAreaDialog({ type: "create", state: true });
   };
 
-  const showUpdateAreaDialog = (area: AreaInterface) => {
+  const showUpdateAreaDialog = (area: AreaEntity) => {
     setArea({ ...area });
     setAreaDialog({ type: "update", state: true });
   };
@@ -210,7 +285,7 @@ const Area = () => {
     setRemoveAreasDialog(false);
   };
 
-  const confirmRemoveArea = (area: AreaInterface) => {
+  const confirmRemoveArea = (area: AreaEntity) => {
     setArea(area);
     setRemoveAreaDialog(true);
   };
@@ -250,12 +325,12 @@ const Area = () => {
   };
   //here
 
-  // const onCategoryChange = (e: RadioButtonChangeEvent) => {
-  //   let _area = { ...area };
+  const onCategoryChange = (e: RadioButtonChangeEvent) => {
+    let _area = { ...area };
 
-  //   _area["category"] = e.value;
-  //   setArea(_area);
-  // };
+    _area["Activo"] = e.value;
+    setArea(_area);
+  };
 
   const onInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -307,7 +382,7 @@ const Area = () => {
   };
 
   const onGlobalFilterChange = (e?: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e?.target.value??"";
+    const value = e?.target.value ?? "";
     let _filters = { ...filters };
 
     // @ts-ignore
@@ -404,7 +479,7 @@ const Area = () => {
   );
 
   // templates to column Activo
-  const activoBodyTemplate = (rowData: AreaInterface) => {
+  const activoBodyTemplate = (rowData: AreaEntity) => {
     return (
       <i
         className={classNames("pi", {
@@ -434,8 +509,32 @@ const Area = () => {
     );
   };
 
+  // templates to column Activo
+  const modifiadoElBodyTemplate = (rowData: AreaEntity) => {
+    return reformatDate(rowData.ModificadoEl);
+  };
+
+  const modifiadoElFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <div className="flex align-items-center justify-content-center gap-2">
+        <label htmlFor="verified-filter" className="font-bold">
+          Activo
+        </label>
+        <TriStateCheckbox
+          id="verified-filter"
+          value={options.value}
+          onChange={(e: TriStateCheckboxChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+        />
+      </div>
+    );
+  };
+
   // templates to actions update and remove on dataTable
-  const actionsBodyTemplate = (rowData: AreaInterface) => {
+  const actionsBodyTemplate = (rowData: AreaEntity) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
@@ -465,7 +564,6 @@ const Area = () => {
   //useEffects
   useEffect(() => {
     findAllArea();
- 
   }, []);
 
   return (
@@ -483,7 +581,7 @@ const Area = () => {
       />
 
       <DataTable
-        value={dataArea}
+        value={areas}
         sortMode="multiple"
         removableSort
         paginator
@@ -518,14 +616,29 @@ const Area = () => {
                 header={col.header}
                 dataType={col.dataType}
                 sortable
-                style={{ width: col.width, padding: 10 }}
+                style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
                 body={activoBodyTemplate}
                 filterElement={activoFilterTemplate}
               />
             );
-          } else {
+          }
+          // else
+          // if (col.field == "ModificadoEl") {
+          //   <Column
+          //     key={col.field}
+          //     field={col.field}
+          //     header={col.header}
+          //     dataType={col.dataType}
+          //     sortable
+          //     style={{ width: col.width, padding: 5 }}
+          //     filter
+          //     filterPlaceholder={col.filterPlaceholder}
+          //     body={modifiadoElBodyTemplate}
+          //   />;
+          // }
+          else {
             return (
               <Column
                 key={col.field}
@@ -533,7 +646,7 @@ const Area = () => {
                 header={col.header}
                 dataType={col.dataType}
                 sortable
-                style={{ width: col.width, padding: 10 }}
+                style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
               />
@@ -543,7 +656,7 @@ const Area = () => {
         <Column
           body={actionsBodyTemplate}
           exportable={false}
-          style={{ width: "5%", padding: 10 }}
+          style={{ width: "5%", padding: 5 }}
         ></Column>
       </DataTable>
 
@@ -555,6 +668,8 @@ const Area = () => {
         createArea={createArea}
         updateArea={updateArea}
         onInputChange={onInputChange}
+        onCategoryChange={onCategoryChange}
+        loadingAreaCreateOrUpdate={loadingAreaCreateOrUpdate}
       />
 
       <AreaRemove

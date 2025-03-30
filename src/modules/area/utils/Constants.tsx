@@ -1,7 +1,7 @@
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ColumnMeta } from "../../utils/Interfaces";
 import { DataTableFilterMeta } from "primereact/datatable";
-import { AreaInterface } from "../interfaces/AreaInterface";
+import { AreaEntity} from "../interfaces/AreaInterface";
 
 export const columns: ColumnMeta[] = [
   {
@@ -47,7 +47,7 @@ export const columns: ColumnMeta[] = [
   {
     field: "ModificadoEl",
     header: "ModificadoEl",
-    dataType: "date",
+    dataType: "text",
     width: "15%",
     show: false,
     filterPlaceholder: "Buscar por ModificadoEl ",
@@ -92,12 +92,12 @@ export const defaultFilters: DataTableFilterMeta = {
   },
 };
 
-export let emptyArea: AreaInterface = {
+export let emptyArea: AreaEntity = {
   IdArea: 0,
   Descripcion: "",
-  Activo: false,
+  Activo: true,
   CreadoEl: new Date(),
   CreadoPor: "",
-  ModificadoEl: new Date(),
+  ModificadoEl: new Date() ,
   ModificadoPor: "",
 };
