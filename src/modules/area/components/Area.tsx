@@ -28,7 +28,9 @@ import AreaCreateOrUpdate from "./AreaCreateOrUpdate";
 import AreaRemove from "./AreaRemove";
 import AreasRemove from "./AreasRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
-import { reformatDate } from "../../utils/Methods";
+import { formatDate } from "../../utils/Methods";
+import { Calendar } from "primereact/calendar";
+import EmptyMessageData from "../../utils/shared/emptyMessageData";
 
 const Area = () => {
   // custom hooks
@@ -108,7 +110,9 @@ const Area = () => {
 
   // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllArea = async () => {
+    setLoading(true);
     const areasFindAll = await findAll();
+    setLoading(false);
 
     if (areasFindAll?.message.msgId == 0 && areasFindAll.registro) {
       setAreas(
@@ -116,12 +120,10 @@ const Area = () => {
           ? areasFindAll.registro?.map((af) => {
               return {
                 ...af,
-                CreadoEl:
-                  af.CreadoEl != null ? reformatDate(af.CreadoEl) : af.CreadoEl,
-                ModificadoEl:
-                  af.ModificadoEl != null
-                    ? reformatDate(af.ModificadoEl)
-                    : af.ModificadoEl,
+                CreadoEl: af.CreadoEl ? new Date(af.CreadoEl) : null,
+                ModificadoEl: af.ModificadoEl
+                  ? new Date(af.ModificadoEl)
+                  : null,
               };
             })
           : []
@@ -154,9 +156,6 @@ const Area = () => {
       setLoadingAreaCreateOrUpdate(false);
 
       if (areaCreate?.message.msgId == 0 && areaCreate.registro) {
-        areaCreate.registro.CreadoEl = reformatDate(
-          areaCreate.registro.CreadoEl
-        );
         setAreas([...areas, areaCreate.registro]);
         toast.current?.show({
           severity: "success",
@@ -187,12 +186,6 @@ const Area = () => {
       setLoadingAreaCreateOrUpdate(false);
 
       if (areaUpdate?.message.msgId == 0 && areaUpdate.registro) {
-        areaUpdate.registro.CreadoEl = reformatDate(
-          areaUpdate.registro.CreadoEl
-        );
-        areaUpdate.registro.ModificadoEl = reformatDate(
-          areaUpdate.registro.ModificadoEl
-        );
         setAreas(
           areas?.map((area) =>
             area.IdArea === areaUpdate?.registro?.IdArea
@@ -474,10 +467,6 @@ const Area = () => {
     </div>
   );
 
-  const emptyMessageDataTable = (
-    <div style={{ width: "100%", textAlign: "center" }}>No hay registros</div>
-  );
-
   // templates to column Activo
   const activoBodyTemplate = (rowData: AreaEntity) => {
     return (
@@ -509,27 +498,57 @@ const Area = () => {
     );
   };
 
-  // templates to column Activo
+  // templates to column ModificadoEl
   const modifiadoElBodyTemplate = (rowData: AreaEntity) => {
-    return reformatDate(rowData.ModificadoEl);
+    return (
+      <p className="text-sm m-0">
+        {!rowData.ModificadoEl
+          ? "00/00/0000, 00:00 TM"
+          : formatDate(new Date(rowData.ModificadoEl))}
+      </p>
+    );
   };
 
   const modifiadoElFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <div className="flex align-items-center justify-content-center gap-2">
-        <label htmlFor="verified-filter" className="font-bold">
-          Activo
-        </label>
-        <TriStateCheckbox
-          id="verified-filter"
-          value={options.value}
-          onChange={(e: TriStateCheckboxChangeEvent) =>
-            options.filterCallback(e.value)
-          }
-        />
-      </div>
+      <Calendar
+        value={options.value ? new Date(options.value) : null}
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index);
+        }}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+        showIcon
+      />
+    );
+  };
+
+  // templates to column CreadoEl
+  const creadoElBodyTemplate = (rowData: AreaEntity) => {
+    return (
+      <p className="text-sm m-0">
+        {!rowData.CreadoEl ? "__" : formatDate(new Date(rowData.CreadoEl))}
+      </p>
+    );
+  };
+
+  const creadoElFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <Calendar
+        value={options.value ? new Date(options.value) : null}
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index);
+        }}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+        showIcon
+      />
     );
   };
 
@@ -603,9 +622,9 @@ const Area = () => {
           "ModificadoEl",
           "ModificadoPor",
         ]}
-        emptyMessage={emptyMessageDataTable}
+        emptyMessage={<EmptyMessageData loading={loading} />}
         selectionMode="single"
-        loading={loading}
+        // loading={loading}
       >
         {visibleColumns.map((col) => {
           if (col.field == "Activo") {
@@ -623,22 +642,39 @@ const Area = () => {
                 filterElement={activoFilterTemplate}
               />
             );
-          }
-          // else
-          // if (col.field == "ModificadoEl") {
-          //   <Column
-          //     key={col.field}
-          //     field={col.field}
-          //     header={col.header}
-          //     dataType={col.dataType}
-          //     sortable
-          //     style={{ width: col.width, padding: 5 }}
-          //     filter
-          //     filterPlaceholder={col.filterPlaceholder}
-          //     body={modifiadoElBodyTemplate}
-          //   />;
-          // }
-          else {
+          } else if (col.field == "CreadoEl") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.field}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={creadoElBodyTemplate}
+                filterElement={creadoElFilterTemplate}
+              />
+            );
+          } else if (col.field == "ModificadoEl") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.field}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={modifiadoElBodyTemplate}
+                filterElement={modifiadoElFilterTemplate}
+              />
+            );
+          } else {
             return (
               <Column
                 key={col.field}

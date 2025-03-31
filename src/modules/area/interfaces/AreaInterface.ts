@@ -1,6 +1,6 @@
 import { Message } from "../../utils/Interfaces";
 
-type Fecha = Date | string;
+type Fecha = Date | string | null;
 export interface AreaEntity {
   IdArea: number;
   Descripcion: string;

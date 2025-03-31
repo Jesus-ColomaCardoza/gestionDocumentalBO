@@ -12,7 +12,7 @@ type MenuBarProps = {
 };
 
 const MenuBar = (props: MenuBarProps) => {
-  const {  switchTheme } = useTheme();
+  const { switchTheme } = useTheme();
 
   const itemRenderer = (item: any) => (
     <Link className="flex align-items-center p-menuitem-link" to={"/dashboard"}>
@@ -30,12 +30,25 @@ const MenuBar = (props: MenuBarProps) => {
     </Link>
   );
 
+  const itemRenderer2 = (item: any) => (
+    <div
+      className="flex align-items-center p-menuitem-link p-2"
+      // style={{
+      //   marginLeft:"14rem"
+      // }}
+    >
+      <span className={item.icon} />
+    </div>
+  );
+
   const items: any[] = [
     {
-      label: "sidebar",
+      // label: "Opciones",
+      icon: "pi pi-angle-double-right",
       command: () => {
         props.setVisible(true);
       },
+      template: itemRenderer2,
     },
 
     {
@@ -101,12 +114,14 @@ const MenuBar = (props: MenuBarProps) => {
   ];
 
   const start = (
-    <img
-      alt="logo"
-      src="https://primefaces.org/cdn/primereact/images/logo.png"
-      height="40"
-      className="mr-2"
-    ></img>
+    <div className="flex align-items-center" style={{ width: "16rem" }}>
+      <img
+        alt="logo"
+        src="https://primefaces.org/cdn/primereact/images/logo.png"
+        height="40"
+        className="mr-2"
+      />
+    </div>
   );
 
   const end = (
@@ -134,12 +149,12 @@ const MenuBar = (props: MenuBarProps) => {
         <Button
           icon="pi pi-moon"
           className="mr-2"
-          onClick={() => switchTheme("lara-dark-blue","dark")}
+          onClick={() => switchTheme("lara-dark-blue", "dark")}
         ></Button>
         <Button
           icon="pi pi-sun"
           className="mr-2"
-          onClick={() => switchTheme("lara-light-blue","light")}
+          onClick={() => switchTheme("lara-light-blue", "light")}
         ></Button>
 
         <Avatar
@@ -154,7 +169,7 @@ const MenuBar = (props: MenuBarProps) => {
     <div
       style={{
         position: "sticky",
-        top:0,
+        top: 0,
         zIndex: 100,
       }}
     >

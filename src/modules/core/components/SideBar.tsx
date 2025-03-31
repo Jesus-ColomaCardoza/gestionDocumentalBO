@@ -122,20 +122,22 @@ const SideBar = (props: SideBarProps) => {
             onClick={() => {
               props.setVisible(false);
             }}
-            icon="pi pi-times"
-            rounded
+            icon="pi pi-angle-double-left"
+            
             outlined
             className="h-2rem w-2rem"
+            style={{
+              border:"none"
+            }}
           ></Button>
         </span>
       </div>
 
       {/* Sidebar-body */}
-      <div
+      <div 
         style={{
           marginTop: "1rem",
-          maxHeight: "75vh",
-          minHeight: "60vh",
+          height: "calc(100vh - 13rem)",
           overflowY: "auto",
         }}
       >
@@ -164,7 +166,7 @@ const SideBar = (props: SideBarProps) => {
                   to={"area"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
-                  <i className="pi pi-home mr-2"></i>
+                  <i className="pi pi-table mr-2"></i>
                   <span className="font-medium">Area</span>
                   <Ripple />
                 </Link>

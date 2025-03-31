@@ -47,7 +47,7 @@ export const columns: ColumnMeta[] = [
   {
     field: "ModificadoEl",
     header: "ModificadoEl",
-    dataType: "text",
+    dataType: "date",
     width: "15%",
     show: false,
     filterPlaceholder: "Buscar por ModificadoEl ",

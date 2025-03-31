@@ -34,10 +34,8 @@ export const printLog = (...args: any[]) => {
   }
 };
 
-export const reformatDate = (fechaISO: Date | string): string => {
-  const date = new Date(fechaISO);
-
-  const formatDate = new Intl.DateTimeFormat("es-PE", {
+export const formatDate = (value: Date) => {
+  return value.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -46,5 +44,4 @@ export const reformatDate = (fechaISO: Date | string): string => {
     // second: "2-digit",
     timeZone: "America/Lima",
   });
-  return formatDate.format(date);
 };
