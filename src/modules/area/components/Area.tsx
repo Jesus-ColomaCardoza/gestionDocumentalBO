@@ -30,7 +30,7 @@ import AreasRemove from "./AreasRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
-import EmptyMessageData from "../../utils/shared/emptyMessageData";
+import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 
 const Area = () => {
   // custom hooks

@@ -1,9 +1,9 @@
-import { AreaInterface } from "../interfaces/AreaInterface";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
+import { AreaEntity } from "../interfaces/AreaInterface";
 
 type AreaRemoveProps = {
-  area: AreaInterface;
+  area: AreaEntity;
   removeAreaDialog: boolean;
   hideRemoveAreaDialog: () => void;
   removeArea: () => void;
@@ -37,14 +37,15 @@ const AreaRemove = (props: AreaRemoveProps) => {
       footer={removeAreaDialogFooter}
       onHide={props.hideRemoveAreaDialog}
     >
-      <div className="confirmation-content">
+      <div className="flex confirmation-content">
         <i
           className="pi pi-exclamation-triangle mr-3"
           style={{ fontSize: "2rem" }}
         />
         {props.area && (
           <span>
-            Are you sure you want to remove <b>{props.area.Descripcion}</b>?
+            {/* Are you sure you want to remove <b>{props.area.Descripcion}</b>? */}
+            ¿Estás seguro de que quieres eliminar el área <b>{props.area.Descripcion}</b>?
           </span>
         )}
       </div>

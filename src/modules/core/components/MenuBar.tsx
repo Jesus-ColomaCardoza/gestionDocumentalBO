@@ -114,7 +114,7 @@ const MenuBar = (props: MenuBarProps) => {
   ];
 
   const start = (
-    <div className="flex align-items-center" style={{ width: "16rem" }}>
+    <div className="flex align-items-center" style={{ width: "16.7rem" }}>
       <img
         alt="logo"
         src="https://primefaces.org/cdn/primereact/images/logo.png"

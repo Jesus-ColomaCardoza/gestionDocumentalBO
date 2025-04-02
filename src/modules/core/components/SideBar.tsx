@@ -48,7 +48,7 @@ const SideBar = (props: SideBarProps) => {
       >
         <span className="inline-flex align-items-center gap-2">
           {/* logo */}
-          <svg
+          {/* <svg
             width="35"
             height="35"
             viewBox="0 0 35 35"
@@ -107,11 +107,11 @@ const SideBar = (props: SideBarProps) => {
               d="M12.1762 10.1789L8.4462 9.794L10.8145 7.09967H13.5378L12.1762 10.1789Z"
               fill="var(--primary-color)"
             />
-          </svg>
+          </svg> */}
 
           {/* text logo */}
           <span className="font-semibold text-2xl text-primary px-2">
-            Your Logo
+            MDSMF
           </span>
         </span>
 
