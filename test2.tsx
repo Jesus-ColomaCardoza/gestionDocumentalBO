@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, ChangeEvent } from "react";
 import { classNames } from "primereact/utils";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { ProductService } from "./service/ProductService";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
@@ -19,6 +18,7 @@ import {
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { Tag } from "primereact/tag";
+import { ProductService } from "./ProductService";
 
 interface Product {
   id: string | null;

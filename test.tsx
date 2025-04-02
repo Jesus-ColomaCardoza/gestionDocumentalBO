@@ -23,7 +23,7 @@ import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import { CustomerService } from "./service/CustomerService";
+import { CustomerService } from "./CustomerService";
 
 interface Representative {
   name: string;

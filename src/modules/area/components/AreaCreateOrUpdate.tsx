@@ -16,7 +16,7 @@ type AreaCreateOrUpdateProps = {
   createArea: () => void;
   updateArea: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
-  onCategoryChange: (e: RadioButtonChangeEvent) => void;
+  onActivoChange: (e: RadioButtonChangeEvent) => void;
   loadingAreaCreateOrUpdate: boolean;
 };
 
@@ -78,7 +78,7 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
               inputId="Activot"
               name="Activot"
               value={true}
-              onChange={props.onCategoryChange}
+              onChange={props.onActivoChange}
               checked={props.area.Activo === true}
             />
             <label htmlFor="Activot">True</label>
@@ -88,7 +88,7 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
               inputId="Activof"
               name="Activof"
               value={false}
-              onChange={props.onCategoryChange}
+              onChange={props.onActivoChange}
               checked={props.area.Activo === false}
             />
             <label htmlFor="Activof">False</label>

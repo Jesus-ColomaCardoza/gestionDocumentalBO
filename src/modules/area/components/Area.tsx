@@ -239,7 +239,7 @@ const Area = () => {
 
   const removeSelectedAreas = () => {
     let _areas = areas.filter(
-      (val: AreaEntity) => !selectedAreas.includes(val)
+      (val: AreaEntity) => !selectedAreas?.includes(val)
     );
 
     setAreas(_areas);
@@ -318,7 +318,7 @@ const Area = () => {
   };
   //here
 
-  const onCategoryChange = (e: RadioButtonChangeEvent) => {
+  const onActivoChange = (e: RadioButtonChangeEvent) => {
     let _area = { ...area };
 
     _area["Activo"] = e.value;
@@ -611,7 +611,7 @@ const Area = () => {
         scrollHeight="60vh"
         header={headerDataTable}
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
-        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
           "IdArea",
@@ -623,9 +623,22 @@ const Area = () => {
           "ModificadoPor",
         ]}
         emptyMessage={<EmptyMessageData loading={loading} />}
-        selectionMode="single"
+        selectionMode="multiple"
+        selection={selectedAreas}
+        onSelectionChange={(e) => {
+          if (Array.isArray(e.value)) {
+            setSelectedAreas(e.value);
+          }
+        }}
+        dataKey="IdArea"
+        selectionPageOnly
         // loading={loading}
       >
+        <Column
+          selectionMode="multiple"
+          exportable={false}
+          headerStyle={{ width: "0%" }}
+        />
         {visibleColumns.map((col) => {
           if (col.field == "Activo") {
             return (
@@ -704,7 +717,7 @@ const Area = () => {
         createArea={createArea}
         updateArea={updateArea}
         onInputChange={onInputChange}
-        onCategoryChange={onCategoryChange}
+        onActivoChange={onActivoChange}
         loadingAreaCreateOrUpdate={loadingAreaCreateOrUpdate}
       />
 
