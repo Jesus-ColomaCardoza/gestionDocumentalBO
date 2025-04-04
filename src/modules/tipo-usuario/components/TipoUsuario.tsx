@@ -9,37 +9,37 @@ import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useState, useEffect, useRef } from "react";
-import UseArea from "../hooks/UseArea";
+import UseTipoUsuario from "../hooks/UseTipoUsuario";
 import { ColumnMeta } from "../../utils/Interfaces";
 import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import {
-  AreaCreate,
-  AreaEntity,
-  AreaOut,
-  AreasOut,
-} from "../interfaces/AreaInterface";
+  TipoUsuarioCreate,
+  TipoUsuarioEntity,
+  TipoUsuarioOut,
+  TipoUsuariosOut,
+} from "../interfaces/TipoUsuarioInterface";
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyArea } from "../utils/Constants";
-import AreaCreateOrUpdate from "./AreaCreateOrUpdate";
-import AreaRemove from "./AreaRemove";
-import AreasRemove from "./AreasRemove";
+import { columns, defaultFilters, emptyTipoUsuario } from "../utils/Constants";
+import TipoUsuarioCreateOrUpdate from "./TipoUsuarioCreateOrUpdate";
+import TipoUsuarioRemove from "./TipoUsuarioRemove";
+import TipoUsuariosRemove from "./TipoUsuariosRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 
-const Area = () => {
+const TipoUsuario = () => {
   // custom hooks
-  const { create, findAll, findOne, update, remove } = UseArea();
+  const { create, findAll, findOne, update, remove } = UseTipoUsuario();
 
   //useRefs
   const toast = useRef<Toast>(null);
 
-  const dt = useRef<DataTable<AreaEntity[]>>(null);
+  const dt = useRef<DataTable<TipoUsuarioEntity[]>>(null);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -54,25 +54,25 @@ const Area = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingAreaCreateOrUpdate, setLoadingAreaCreateOrUpdate] =
+  const [loadingTipoUsuarioCreateOrUpdate, setLoadingTipoUsuarioCreateOrUpdate] =
     useState<boolean>(false);
 
-  const [area, setArea] = useState<AreaEntity>(emptyArea);
+  const [tipoUsuario, setTipoUsuario] = useState<TipoUsuarioEntity>(emptyTipoUsuario);
 
-  const [areas, setAreas] = useState<AreaEntity[]>([]);
+  const [tipoUsuarios, setTipoUsuarios] = useState<TipoUsuarioEntity[]>([]);
 
-  const [selectedAreas, setSelectedAreas] = useState<AreaEntity[]>([]);
+  const [selectedTipoUsuarios, setSelectedTipoUsuarios] = useState<TipoUsuarioEntity[]>([]);
 
-  const [areaDialog, setAreaDialog] = useState<{
+  const [tipoUsuarioDialog, setTipoUsuarioDialog] = useState<{
     type?: "create" | "update" | undefined;
     state: boolean;
   }>({
     state: false,
   });
 
-  const [removeAreaDialog, setRemoveAreaDialog] = useState<boolean>(false);
+  const [removeTipoUsuarioDialog, setRemoveTipoUsuarioDialog] = useState<boolean>(false);
 
-  const [removeAreasDialog, setRemoveAreasDialog] = useState<boolean>(false);
+  const [removeTipoUsuariosDialog, setRemoveTipoUsuariosDialog] = useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -88,7 +88,7 @@ const Area = () => {
 
   const startContent = (
     <div className="flex flex-column p-1 gap-2">
-      <h3 className="m-0">Mantenimiento de Áreas</h3>
+      <h3 className="m-0">Mantenimiento de Tipo Usuario</h3>
       {/* <div>
         <Button label="Nuevo" icon="pi pi-plus" className=" p-2 " outlined />
       </div> */}
@@ -109,15 +109,15 @@ const Area = () => {
   );
 
   // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
-  const findAllArea = async () => {
+  const findAllTipoUsuario = async () => {
     setLoading(true);
-    const areasFindAll = await findAll();
+    const tipoUsuariosFindAll = await findAll();
     setLoading(false);
 
-    if (areasFindAll?.message.msgId == 0 && areasFindAll.registro) {
-      setAreas(
-        Array.isArray(areasFindAll.registro)
-          ? areasFindAll.registro?.map((af) => {
+    if (tipoUsuariosFindAll?.message.msgId == 0 && tipoUsuariosFindAll.registro) {
+      setTipoUsuarios(
+        Array.isArray(tipoUsuariosFindAll.registro)
+          ? tipoUsuariosFindAll.registro?.map((af) => {
               return {
                 ...af,
                 CreadoEl: af.CreadoEl ? new Date(af.CreadoEl) : null,
@@ -130,13 +130,13 @@ const Area = () => {
       );
       //   toast.current?.show({
       //     severity: "success",
-      //     detail: `${areasFindAll.message.msgTxt}`,
+      //     detail: `${tipoUsuariosFindAll.message.msgTxt}`,
       //     life: 3000,
       //   });
-      // } else if (areasFindAll?.message.msgId == 1) {
+      // } else if (tipoUsuariosFindAll?.message.msgId == 1) {
       //   toast.current?.show({
       //     severity: "error",
-      //     detail: `${areasFindAll.message.msgTxt}`,
+      //     detail: `${tipoUsuariosFindAll.message.msgTxt}`,
       //     life: 3000,
       //   });
     }
@@ -145,110 +145,110 @@ const Area = () => {
     onGlobalFilterChange();
   };
 
-  const createArea = async () => {
+  const createTipoUsuario = async () => {
     setSubmitted(true);
-    if (area.Descripcion.trim()) {
-      setLoadingAreaCreateOrUpdate(true);
-      let areaCreate = await create({
-        Descripcion: area.Descripcion,
-        Activo: area.Activo,
+    if (tipoUsuario.Descripcion.trim()) {
+      setLoadingTipoUsuarioCreateOrUpdate(true);
+      let tipoUsuarioCreate = await create({
+        Descripcion: tipoUsuario.Descripcion,
+        Activo: tipoUsuario.Activo,
       });
-      setLoadingAreaCreateOrUpdate(false);
+      setLoadingTipoUsuarioCreateOrUpdate(false);
 
-      if (areaCreate?.message.msgId == 0 && areaCreate.registro) {
-        setAreas([...areas, areaCreate.registro]);
+      if (tipoUsuarioCreate?.message.msgId == 0 && tipoUsuarioCreate.registro) {
+        setTipoUsuarios([...tipoUsuarios, tipoUsuarioCreate.registro]);
         toast.current?.show({
           severity: "success",
-          detail: `${areaCreate.message.msgTxt}`,
+          detail: `${tipoUsuarioCreate.message.msgTxt}`,
           life: 3000,
         });
-      } else if (areaCreate?.message.msgId == 1) {
+      } else if (tipoUsuarioCreate?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${areaCreate.message.msgTxt}`,
+          detail: `${tipoUsuarioCreate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setAreaDialog({ state: false });
-      setArea(emptyArea);
+      setTipoUsuarioDialog({ state: false });
+      setTipoUsuario(emptyTipoUsuario);
     }
   };
 
-  const updateArea = async () => {
+  const updateTipoUsuario = async () => {
     setSubmitted(true);
-    if (area.IdArea) {
-      setLoadingAreaCreateOrUpdate(true);
-      let areaUpdate = await update(area.IdArea.toString(), {
-        Descripcion: area.Descripcion,
-        Activo: area.Activo,
+    if (tipoUsuario.IdTipoUsuario) {
+      setLoadingTipoUsuarioCreateOrUpdate(true);
+      let tipoUsuarioUpdate = await update(tipoUsuario.IdTipoUsuario.toString(), {
+        Descripcion: tipoUsuario.Descripcion,
+        Activo: tipoUsuario.Activo,
       });
-      setLoadingAreaCreateOrUpdate(false);
+      setLoadingTipoUsuarioCreateOrUpdate(false);
 
-      if (areaUpdate?.message.msgId == 0 && areaUpdate.registro) {
-        setAreas(
-          areas?.map((area) =>
-            area.IdArea === areaUpdate?.registro?.IdArea
-              ? { ...area, ...areaUpdate.registro }
-              : area
+      if (tipoUsuarioUpdate?.message.msgId == 0 && tipoUsuarioUpdate.registro) {
+        setTipoUsuarios(
+          tipoUsuarios?.map((tipoUsuario) =>
+            tipoUsuario.IdTipoUsuario === tipoUsuarioUpdate?.registro?.IdTipoUsuario
+              ? { ...tipoUsuario, ...tipoUsuarioUpdate.registro }
+              : tipoUsuario
           )
         );
         toast.current?.show({
           severity: "success",
-          detail: `${areaUpdate.message.msgTxt}`,
+          detail: `${tipoUsuarioUpdate.message.msgTxt}`,
           life: 3000,
         });
-      } else if (areaUpdate?.message.msgId == 1) {
+      } else if (tipoUsuarioUpdate?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${areaUpdate.message.msgTxt}`,
+          detail: `${tipoUsuarioUpdate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setAreaDialog({ state: false });
-      setArea(emptyArea);
+      setTipoUsuarioDialog({ state: false });
+      setTipoUsuario(emptyTipoUsuario);
     }
   };
 
-  const removeArea = async () => {
-    if (area.IdArea) {
-      let areaRemove = await remove(area.IdArea.toString());
+  const removeTipoUsuario = async () => {
+    if (tipoUsuario.IdTipoUsuario) {
+      let tipoUsuarioRemove = await remove(tipoUsuario.IdTipoUsuario.toString());
 
-      if (areaRemove?.message.msgId == 0 && areaRemove.registro) {
-        setAreas(
-          areas?.filter((area) => area.IdArea !== areaRemove?.registro?.IdArea)
+      if (tipoUsuarioRemove?.message.msgId == 0 && tipoUsuarioRemove.registro) {
+        setTipoUsuarios(
+          tipoUsuarios?.filter((tipoUsuario) => tipoUsuario.IdTipoUsuario !== tipoUsuarioRemove?.registro?.IdTipoUsuario)
         );
         toast.current?.show({
           severity: "success",
-          detail: `${areaRemove.message.msgTxt}`,
+          detail: `${tipoUsuarioRemove.message.msgTxt}`,
           life: 3000,
         });
-      } else if (areaRemove?.message.msgId == 1) {
+      } else if (tipoUsuarioRemove?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${areaRemove.message.msgTxt}`,
+          detail: `${tipoUsuarioRemove.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setRemoveAreaDialog(false);
-      setArea(emptyArea);
+      setRemoveTipoUsuarioDialog(false);
+      setTipoUsuario(emptyTipoUsuario);
     }
   };
 
-  const removeSelectedAreas = () => {
-    let _areas = areas.filter(
-      (val: AreaEntity) => !selectedAreas?.includes(val)
+  const removeSelectedTipoUsuarios = () => {
+    let _tipoUsuarios = tipoUsuarios.filter(
+      (val: TipoUsuarioEntity) => !selectedTipoUsuarios?.includes(val)
     );
 
-    setAreas(_areas);
-    setRemoveAreasDialog(false);
-    setSelectedAreas([]);
+    setTipoUsuarios(_tipoUsuarios);
+    setRemoveTipoUsuariosDialog(false);
+    setSelectedTipoUsuarios([]);
     toast.current?.show({
       severity: "success",
       summary: "Successful",
-      detail: "Areas Removed",
+      detail: "TipoUsuarios Removed",
       life: 3000,
     });
   };
@@ -256,43 +256,43 @@ const Area = () => {
   // templates to dialogs
   const hideDialog = () => {
     setSubmitted(false);
-    setAreaDialog({ state: false });
+    setTipoUsuarioDialog({ state: false });
   };
 
-  const showCreateAreaDialog = () => {
-    setArea(emptyArea);
+  const showCreateTipoUsuarioDialog = () => {
+    setTipoUsuario(emptyTipoUsuario);
     setSubmitted(false);
-    setAreaDialog({ type: "create", state: true });
+    setTipoUsuarioDialog({ type: "create", state: true });
   };
 
-  const showUpdateAreaDialog = (area: AreaEntity) => {
-    setArea({ ...area });
-    setAreaDialog({ type: "update", state: true });
+  const showUpdateTipoUsuarioDialog = (tipoUsuario: TipoUsuarioEntity) => {
+    setTipoUsuario({ ...tipoUsuario });
+    setTipoUsuarioDialog({ type: "update", state: true });
   };
 
-  const hideRemoveAreaDialog = () => {
-    setRemoveAreaDialog(false);
+  const hideRemoveTipoUsuarioDialog = () => {
+    setRemoveTipoUsuarioDialog(false);
   };
 
-  const hideRemoveAreasDialog = () => {
-    setRemoveAreasDialog(false);
+  const hideRemoveTipoUsuariosDialog = () => {
+    setRemoveTipoUsuariosDialog(false);
   };
 
-  const confirmRemoveArea = (area: AreaEntity) => {
-    setArea(area);
-    setRemoveAreaDialog(true);
+  const confirmRemoveTipoUsuario = (tipoUsuario: TipoUsuarioEntity) => {
+    setTipoUsuario(tipoUsuario);
+    setRemoveTipoUsuarioDialog(true);
   };
 
-  const confirmRemoveSelectedAreas = () => {
-    setRemoveAreasDialog(true);
+  const confirmRemoveSelectedTipoUsuarios = () => {
+    setRemoveTipoUsuariosDialog(true);
   };
 
   // here
   const findIndexById = (id: string) => {
     let index = -1;
 
-    for (let i = 0; i < areas.length; i++) {
-      if (areas[i].IdArea.toString() === id) {
+    for (let i = 0; i < tipoUsuarios.length; i++) {
+      if (tipoUsuarios[i].IdTipoUsuario.toString() === id) {
         index = i;
         break;
       }
@@ -319,10 +319,10 @@ const Area = () => {
   //here
 
   const onActivoChange = (e: RadioButtonChangeEvent) => {
-    let _area = { ...area };
+    let _tipoUsuario = { ...tipoUsuario };
 
-    _area["Activo"] = e.value;
-    setArea(_area);
+    _tipoUsuario["Activo"] = e.value;
+    setTipoUsuario(_tipoUsuario);
   };
 
   const onInputChange = (
@@ -330,25 +330,25 @@ const Area = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _area = { ...area };
+    let _tipoUsuario = { ...tipoUsuario };
 
     // @ts-ignore
-    _area[name] = val;
+    _tipoUsuario[name] = val;
 
-    setArea(_area);
+    setTipoUsuario(_tipoUsuario);
   };
 
-  // const onInputTextAreaChange = (
-  //   e: React.ChangeEvent<HTMLTextAreaElement>,
+  // const onInputTextTipoUsuarioChange = (
+  //   e: React.ChangeEvent<HTMLTextTipoUsuarioElement>,
   //   name: string
   // ) => {
   //   const val = (e.target && e.target.value) || "";
-  //   let _area = { ...area };
+  //   let _tipoUsuario = { ...tipoUsuario };
 
   //   // @ts-ignore
-  //   _area[name] = val;
+  //   _tipoUsuario[name] = val;
 
-  //   setArea(_area);
+  //   setTipoUsuario(_tipoUsuario);
   // };
 
   // const onInputNumberChange = (
@@ -356,12 +356,12 @@ const Area = () => {
   //   name: string
   // ) => {
   //   const val = e.value ?? 0;
-  //   let _area = { ...area };
+  //   let _tipoUsuario = { ...tipoUsuario };
 
   //   // @ts-ignore
-  //   _area[name] = val;
+  //   _tipoUsuario[name] = val;
 
-  //   setArea(_area);
+  //   setTipoUsuario(_tipoUsuario);
   // };
 
   // templates to component DataTable
@@ -402,7 +402,7 @@ const Area = () => {
           type="button"
           icon="pi pi-plus"
           severity="success"
-          onClick={showCreateAreaDialog}
+          onClick={showCreateTipoUsuarioDialog}
           style={{
             width: "2rem",
             height: "2rem",
@@ -414,7 +414,7 @@ const Area = () => {
           type="button"
           icon="pi pi-refresh"
           severity="info"
-          onClick={findAllArea}
+          onClick={findAllTipoUsuario}
           style={{
             width: "2rem",
             height: "2rem",
@@ -468,7 +468,7 @@ const Area = () => {
   );
 
   // templates to column Activo
-  const activoBodyTemplate = (rowData: AreaEntity) => {
+  const activoBodyTemplate = (rowData: TipoUsuarioEntity) => {
     return (
       <i
         className={classNames("pi", {
@@ -499,7 +499,7 @@ const Area = () => {
   };
 
   // templates to column ModificadoEl
-  const modifiadoElBodyTemplate = (rowData: AreaEntity) => {
+  const modifiadoElBodyTemplate = (rowData: TipoUsuarioEntity) => {
     return (
       <p className="text-sm m-0">
         {!rowData.ModificadoEl
@@ -527,7 +527,7 @@ const Area = () => {
   };
 
   // templates to column CreadoEl
-  const creadoElBodyTemplate = (rowData: AreaEntity) => {
+  const creadoElBodyTemplate = (rowData: TipoUsuarioEntity) => {
     return (
       <p className="text-sm m-0">
         {!rowData.CreadoEl ? "__" : formatDate(new Date(rowData.CreadoEl))}
@@ -553,7 +553,7 @@ const Area = () => {
   };
 
   // templates to actions update and remove on dataTable
-  const actionsBodyTemplate = (rowData: AreaEntity) => {
+  const actionsBodyTemplate = (rowData: TipoUsuarioEntity) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
@@ -564,7 +564,7 @@ const Area = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => showUpdateAreaDialog(rowData)}
+          onClick={() => showUpdateTipoUsuarioDialog(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -574,7 +574,7 @@ const Area = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => confirmRemoveArea(rowData)}
+          onClick={() => confirmRemoveTipoUsuario(rowData)}
         />
       </div>
     );
@@ -582,7 +582,7 @@ const Area = () => {
 
   //useEffects
   useEffect(() => {
-    findAllArea();
+    findAllTipoUsuario();
   }, []);
 
   return (
@@ -600,7 +600,7 @@ const Area = () => {
       />
 
       <DataTable
-        value={areas}
+        value={tipoUsuarios}
         sortMode="multiple"
         removableSort
         paginator
@@ -614,7 +614,7 @@ const Area = () => {
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
-          "IdArea",
+          "IdTipoUsuario",
           "Descripcion",
           "Activo",
           "CreadoEl",
@@ -624,13 +624,13 @@ const Area = () => {
         ]}
         emptyMessage={<EmptyMessageData loading={loading} />}
         selectionMode="multiple"
-        selection={selectedAreas}
+        selection={selectedTipoUsuarios}
         onSelectionChange={(e) => {
           if (Array.isArray(e.value)) {
-            setSelectedAreas(e.value);
+            setSelectedTipoUsuarios(e.value);
           }
         }}
-        dataKey="IdArea"
+        dataKey="IdTipoUsuario"
         selectionPageOnly
         // loading={loading}
       >
@@ -709,33 +709,33 @@ const Area = () => {
         ></Column>
       </DataTable>
 
-      <AreaCreateOrUpdate
+      <TipoUsuarioCreateOrUpdate
         submitted={submitted}
-        area={area}
-        areaDialog={areaDialog}
+        tipoUsuario={tipoUsuario}
+        tipoUsuarioDialog={tipoUsuarioDialog}
         hideDialog={hideDialog}
-        createArea={createArea}
-        updateArea={updateArea}
+        createTipoUsuario={createTipoUsuario}
+        updateTipoUsuario={updateTipoUsuario}
         onInputChange={onInputChange}
         onActivoChange={onActivoChange}
-        loadingAreaCreateOrUpdate={loadingAreaCreateOrUpdate}
+        loadingTipoUsuarioCreateOrUpdate={loadingTipoUsuarioCreateOrUpdate}
       />
 
-      <AreaRemove
-        area={area}
-        removeAreaDialog={removeAreaDialog}
-        hideRemoveAreaDialog={hideRemoveAreaDialog}
-        removeArea={removeArea}
+      <TipoUsuarioRemove
+        tipoUsuario={tipoUsuario}
+        removeTipoUsuarioDialog={removeTipoUsuarioDialog}
+        hideRemoveTipoUsuarioDialog={hideRemoveTipoUsuarioDialog}
+        removeTipoUsuario={removeTipoUsuario}
       />
 
-      <AreasRemove
-        area={area}
-        removeAreasDialog={removeAreasDialog}
-        hideRemoveAreasDialog={hideRemoveAreasDialog}
-        removeSelectedAreas={removeSelectedAreas}
+      <TipoUsuariosRemove
+        tipoUsuario={tipoUsuario}
+        removeTipoUsuariosDialog={removeTipoUsuariosDialog}
+        hideRemoveTipoUsuariosDialog={hideRemoveTipoUsuariosDialog}
+        removeSelectedTipoUsuarios={removeSelectedTipoUsuarios}
       />
     </div>
   );
 };
 
-export default Area;
+export default TipoUsuario;

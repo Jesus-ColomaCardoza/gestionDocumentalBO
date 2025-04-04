@@ -3,6 +3,7 @@ import Dashboard from "./Dashboard";
 import Area from "../../area/components/Area";
 import Cargo from "../../cargo/components/Cargo";
 import Rol from "../../rol/components/Rol";
+import TipoUsuario from "../../tipo-usuario/components/TipoUsuario";
 
 const AllRoutes = () => {
   return (
@@ -11,8 +12,10 @@ const AllRoutes = () => {
         <Routes>
           <Route path="/dashboard" element={<Dashboard />}>
             <Route path="area" element={<Area />}></Route>
-            <Route path="cargo" element={<Cargo />}></Route>
-            <Route path="rol" element={<Rol />}></Route>
+            <Route path="tipo_usuario" element={<TipoUsuario />}></Route>
+
+            {/* <Route path="cargo" element={<Cargo />}></Route>
+            <Route path="rol" element={<Rol />}></Route> */}
           </Route>
         </Routes>
       </BrowserRouter>
