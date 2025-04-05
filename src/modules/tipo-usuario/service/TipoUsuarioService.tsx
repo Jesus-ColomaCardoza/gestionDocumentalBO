@@ -1,4 +1,4 @@
-export const AREA = {
+export const TIPO_USUARIO = {
   CREATE: "/tipo_usuario/create/",
   FIND_ALL: "/tipo_usuario/find_all/",
   FIND_ONE: "/tipo_usuario/find_one/",

@@ -6,8 +6,8 @@ import {
 } from "../interfaces/TipoUsuarioInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
-import { AREA } from "../service/TipoUsuarioService";
 import { Menssage } from "../../utils/menssage";
+import { TIPO_USUARIO } from "../service/TipoUsuarioService";
 
 const UseTipoUsuario = () => {
   let message = new Menssage();
@@ -17,7 +17,7 @@ const UseTipoUsuario = () => {
   ): Promise<TipoUsuarioOut | undefined> => {
     try {
       const tipoUsuario = await axios.post<TipoUsuarioOut>(
-        `${VITE_API_URL_GDS + AREA.CREATE}`,
+        `${VITE_API_URL_GDS + TIPO_USUARIO.CREATE}`,
         tipoUsuarioCreate
       );
       return tipoUsuario.data;
@@ -31,7 +31,7 @@ const UseTipoUsuario = () => {
   const findAll = async (): Promise<TipoUsuariosOut | undefined> => {
     try {
       const tipoUsuarios = await axios.post<TipoUsuariosOut>(
-        `${VITE_API_URL_GDS + AREA.FIND_ALL}`,
+        `${VITE_API_URL_GDS + TIPO_USUARIO.FIND_ALL}`,
         filterBodyRequest
       );
       return tipoUsuarios.data;
@@ -43,7 +43,7 @@ const UseTipoUsuario = () => {
   const findOne = async (id: string): Promise<TipoUsuarioOut | undefined> => {
     try {
       const tipoUsuario = await axios.get<TipoUsuarioOut>(
-        `${VITE_API_URL_GDS + AREA.FIND_ONE + id}`
+        `${VITE_API_URL_GDS + TIPO_USUARIO.FIND_ONE + id}`
       );
       return tipoUsuario.data;
     } catch (error) {
@@ -57,7 +57,7 @@ const UseTipoUsuario = () => {
   ): Promise<TipoUsuarioOut | undefined> => {
     try {
       const tipoUsuario = await axios.patch<TipoUsuarioOut>(
-        `${VITE_API_URL_GDS + AREA.UPDATE + id}`,
+        `${VITE_API_URL_GDS + TIPO_USUARIO.UPDATE + id}`,
         tipoUsuarioUpdate
       );
       return tipoUsuario.data;
@@ -69,7 +69,7 @@ const UseTipoUsuario = () => {
   const remove = async (id: string): Promise<TipoUsuarioOut | undefined> => {
     try {
       const tipoUsuario = await axios.post<TipoUsuarioOut>(
-        `${VITE_API_URL_GDS + AREA.REMOVE + id}`
+        `${VITE_API_URL_GDS + TIPO_USUARIO.REMOVE + id}`
       );
       return tipoUsuario.data;
     } catch (error) {

@@ -183,6 +183,16 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
+                  to={"tipo_documento"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-table mr-2"></i>
+                  <span className="font-medium">Tipo Documento</span>
+                  <Ripple />
+                </Link>
+              </li>
+              <li>
+                <Link
                   to={"cargo"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
