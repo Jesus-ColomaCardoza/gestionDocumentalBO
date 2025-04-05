@@ -9,37 +9,37 @@ import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useState, useEffect, useRef } from "react";
-import UseCargo from "../hooks/UseCargo";
+import UseTipoTramite from "../hooks/UseTipoTramite";
 import { ColumnMeta } from "../../utils/Interfaces";
 import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import {
-  CargoCreate,
-  CargoEntity,
-  CargoOut,
-  CargosOut,
-} from "../interfaces/CargoInterface";
+  TipoTramiteCreate,
+  TipoTramiteEntity,
+  TipoTramiteOut,
+  TipoTramitesOut,
+} from "../interfaces/TipoTramiteInterface";
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyCargo } from "../utils/Constants";
-import CargoCreateOrUpdate from "./CargoCreateOrUpdate";
-import CargoRemove from "./CargoRemove";
-import CargosRemove from "./CargosRemove";
+import { columns, defaultFilters, emptyTipoTramite } from "../utils/Constants";
+import TipoTramiteCreateOrUpdate from "./TipoTramiteCreateOrUpdate";
+import TipoTramiteRemove from "./TipoTramiteRemove";
+import TipoTramitesRemove from "./TipoTramitesRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 
-const Cargo = () => {
+const TipoTramite = () => {
   // custom hooks
-  const { create, findAll, findOne, update, remove } = UseCargo();
+  const { create, findAll, findOne, update, remove } = UseTipoTramite();
 
   //useRefs
   const toast = useRef<Toast>(null);
 
-  const dt = useRef<DataTable<CargoEntity[]>>(null);
+  const dt = useRef<DataTable<TipoTramiteEntity[]>>(null);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -54,25 +54,25 @@ const Cargo = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingCargoCreateOrUpdate, setLoadingCargoCreateOrUpdate] =
+  const [loadingTipoTramiteCreateOrUpdate, setLoadingTipoTramiteCreateOrUpdate] =
     useState<boolean>(false);
 
-  const [cargo, setCargo] = useState<CargoEntity>(emptyCargo);
+  const [tipoTramite, setTipoTramite] = useState<TipoTramiteEntity>(emptyTipoTramite);
 
-  const [cargos, setCargos] = useState<CargoEntity[]>([]);
+  const [tipoTramites, setTipoTramites] = useState<TipoTramiteEntity[]>([]);
 
-  const [selectedCargos, setSelectedCargos] = useState<CargoEntity[]>([]);
+  const [selectedTipoTramites, setSelectedTipoTramites] = useState<TipoTramiteEntity[]>([]);
 
-  const [cargoDialog, setCargoDialog] = useState<{
+  const [tipoTramiteDialog, setTipoTramiteDialog] = useState<{
     type?: "create" | "update" | undefined;
     state: boolean;
   }>({
     state: false,
   });
 
-  const [removeCargoDialog, setRemoveCargoDialog] = useState<boolean>(false);
+  const [removeTipoTramiteDialog, setRemoveTipoTramiteDialog] = useState<boolean>(false);
 
-  const [removeCargosDialog, setRemoveCargosDialog] = useState<boolean>(false);
+  const [removeTipoTramitesDialog, setRemoveTipoTramitesDialog] = useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -88,7 +88,7 @@ const Cargo = () => {
 
   const startContent = (
     <div className="flex flex-column p-1 gap-2">
-      <h3 className="m-0">Mantenimiento de Cargos</h3>
+      <h3 className="m-0">Mantenimiento de Tipo Trámite</h3>
       {/* <div>
         <Button label="Nuevo" icon="pi pi-plus" className=" p-2 " outlined />
       </div> */}
@@ -109,15 +109,15 @@ const Cargo = () => {
   );
 
   // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
-  const findAllCargo = async () => {
+  const findAllTipoTramite = async () => {
     setLoading(true);
-    const cargosFindAll = await findAll();
+    const tipoTramitesFindAll = await findAll();
     setLoading(false);
 
-    if (cargosFindAll?.message.msgId == 0 && cargosFindAll.registro) {
-      setCargos(
-        Array.isArray(cargosFindAll.registro)
-          ? cargosFindAll.registro?.map((af) => {
+    if (tipoTramitesFindAll?.message.msgId == 0 && tipoTramitesFindAll.registro) {
+      setTipoTramites(
+        Array.isArray(tipoTramitesFindAll.registro)
+          ? tipoTramitesFindAll.registro?.map((af) => {
               return {
                 ...af,
                 CreadoEl: af.CreadoEl ? new Date(af.CreadoEl) : null,
@@ -130,13 +130,13 @@ const Cargo = () => {
       );
       //   toast.current?.show({
       //     severity: "success",
-      //     detail: `${cargosFindAll.message.msgTxt}`,
+      //     detail: `${tipoTramitesFindAll.message.msgTxt}`,
       //     life: 3000,
       //   });
-      // } else if (cargosFindAll?.message.msgId == 1) {
+      // } else if (tipoTramitesFindAll?.message.msgId == 1) {
       //   toast.current?.show({
       //     severity: "error",
-      //     detail: `${cargosFindAll.message.msgTxt}`,
+      //     detail: `${tipoTramitesFindAll.message.msgTxt}`,
       //     life: 3000,
       //   });
     }
@@ -145,110 +145,110 @@ const Cargo = () => {
     onGlobalFilterChange();
   };
 
-  const createCargo = async () => {
+  const createTipoTramite = async () => {
     setSubmitted(true);
-    if (cargo.Descripcion.trim()) {
-      setLoadingCargoCreateOrUpdate(true);
-      let cargoCreate = await create({
-        Descripcion: cargo.Descripcion,
-        Activo: cargo.Activo,
+    if (tipoTramite.Descripcion.trim()) {
+      setLoadingTipoTramiteCreateOrUpdate(true);
+      let tipoTramiteCreate = await create({
+        Descripcion: tipoTramite.Descripcion,
+        Activo: tipoTramite.Activo,
       });
-      setLoadingCargoCreateOrUpdate(false);
+      setLoadingTipoTramiteCreateOrUpdate(false);
 
-      if (cargoCreate?.message.msgId == 0 && cargoCreate.registro) {
-        setCargos([...cargos, cargoCreate.registro]);
+      if (tipoTramiteCreate?.message.msgId == 0 && tipoTramiteCreate.registro) {
+        setTipoTramites([...tipoTramites, tipoTramiteCreate.registro]);
         toast.current?.show({
           severity: "success",
-          detail: `${cargoCreate.message.msgTxt}`,
+          detail: `${tipoTramiteCreate.message.msgTxt}`,
           life: 3000,
         });
-      } else if (cargoCreate?.message.msgId == 1) {
+      } else if (tipoTramiteCreate?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${cargoCreate.message.msgTxt}`,
+          detail: `${tipoTramiteCreate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setCargoDialog({ state: false });
-      setCargo(emptyCargo);
+      setTipoTramiteDialog({ state: false });
+      setTipoTramite(emptyTipoTramite);
     }
   };
 
-  const updateCargo = async () => {
+  const updateTipoTramite = async () => {
     setSubmitted(true);
-    if (cargo.IdCargo) {
-      setLoadingCargoCreateOrUpdate(true);
-      let cargoUpdate = await update(cargo.IdCargo.toString(), {
-        Descripcion: cargo.Descripcion,
-        Activo: cargo.Activo,
+    if (tipoTramite.IdTipoTramite) {
+      setLoadingTipoTramiteCreateOrUpdate(true);
+      let tipoTramiteUpdate = await update(tipoTramite.IdTipoTramite.toString(), {
+        Descripcion: tipoTramite.Descripcion,
+        Activo: tipoTramite.Activo,
       });
-      setLoadingCargoCreateOrUpdate(false);
+      setLoadingTipoTramiteCreateOrUpdate(false);
 
-      if (cargoUpdate?.message.msgId == 0 && cargoUpdate.registro) {
-        setCargos(
-          cargos?.map((cargo) =>
-            cargo.IdCargo === cargoUpdate?.registro?.IdCargo
-              ? { ...cargo, ...cargoUpdate.registro }
-              : cargo
+      if (tipoTramiteUpdate?.message.msgId == 0 && tipoTramiteUpdate.registro) {
+        setTipoTramites(
+          tipoTramites?.map((tipoTramite) =>
+            tipoTramite.IdTipoTramite === tipoTramiteUpdate?.registro?.IdTipoTramite
+              ? { ...tipoTramite, ...tipoTramiteUpdate.registro }
+              : tipoTramite
           )
         );
         toast.current?.show({
           severity: "success",
-          detail: `${cargoUpdate.message.msgTxt}`,
+          detail: `${tipoTramiteUpdate.message.msgTxt}`,
           life: 3000,
         });
-      } else if (cargoUpdate?.message.msgId == 1) {
+      } else if (tipoTramiteUpdate?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${cargoUpdate.message.msgTxt}`,
+          detail: `${tipoTramiteUpdate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setCargoDialog({ state: false });
-      setCargo(emptyCargo);
+      setTipoTramiteDialog({ state: false });
+      setTipoTramite(emptyTipoTramite);
     }
   };
 
-  const removeCargo = async () => {
-    if (cargo.IdCargo) {
-      let cargoRemove = await remove(cargo.IdCargo.toString());
+  const removeTipoTramite = async () => {
+    if (tipoTramite.IdTipoTramite) {
+      let tipoTramiteRemove = await remove(tipoTramite.IdTipoTramite.toString());
 
-      if (cargoRemove?.message.msgId == 0 && cargoRemove.registro) {
-        setCargos(
-          cargos?.filter((cargo) => cargo.IdCargo !== cargoRemove?.registro?.IdCargo)
+      if (tipoTramiteRemove?.message.msgId == 0 && tipoTramiteRemove.registro) {
+        setTipoTramites(
+          tipoTramites?.filter((tipoTramite) => tipoTramite.IdTipoTramite !== tipoTramiteRemove?.registro?.IdTipoTramite)
         );
         toast.current?.show({
           severity: "success",
-          detail: `${cargoRemove.message.msgTxt}`,
+          detail: `${tipoTramiteRemove.message.msgTxt}`,
           life: 3000,
         });
-      } else if (cargoRemove?.message.msgId == 1) {
+      } else if (tipoTramiteRemove?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${cargoRemove.message.msgTxt}`,
+          detail: `${tipoTramiteRemove.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setRemoveCargoDialog(false);
-      setCargo(emptyCargo);
+      setRemoveTipoTramiteDialog(false);
+      setTipoTramite(emptyTipoTramite);
     }
   };
 
-  const removeSelectedCargos = () => {
-    let _cargos = cargos.filter(
-      (val: CargoEntity) => !selectedCargos?.includes(val)
+  const removeSelectedTipoTramites = () => {
+    let _tipoTramites = tipoTramites.filter(
+      (val: TipoTramiteEntity) => !selectedTipoTramites?.includes(val)
     );
 
-    setCargos(_cargos);
-    setRemoveCargosDialog(false);
-    setSelectedCargos([]);
+    setTipoTramites(_tipoTramites);
+    setRemoveTipoTramitesDialog(false);
+    setSelectedTipoTramites([]);
     toast.current?.show({
       severity: "success",
       summary: "Successful",
-      detail: "Cargos Removed",
+      detail: "TipoTramites Removed",
       life: 3000,
     });
   };
@@ -256,43 +256,43 @@ const Cargo = () => {
   // templates to dialogs
   const hideDialog = () => {
     setSubmitted(false);
-    setCargoDialog({ state: false });
+    setTipoTramiteDialog({ state: false });
   };
 
-  const showCreateCargoDialog = () => {
-    setCargo(emptyCargo);
+  const showCreateTipoTramiteDialog = () => {
+    setTipoTramite(emptyTipoTramite);
     setSubmitted(false);
-    setCargoDialog({ type: "create", state: true });
+    setTipoTramiteDialog({ type: "create", state: true });
   };
 
-  const showUpdateCargoDialog = (cargo: CargoEntity) => {
-    setCargo({ ...cargo });
-    setCargoDialog({ type: "update", state: true });
+  const showUpdateTipoTramiteDialog = (tipoTramite: TipoTramiteEntity) => {
+    setTipoTramite({ ...tipoTramite });
+    setTipoTramiteDialog({ type: "update", state: true });
   };
 
-  const hideRemoveCargoDialog = () => {
-    setRemoveCargoDialog(false);
+  const hideRemoveTipoTramiteDialog = () => {
+    setRemoveTipoTramiteDialog(false);
   };
 
-  const hideRemoveCargosDialog = () => {
-    setRemoveCargosDialog(false);
+  const hideRemoveTipoTramitesDialog = () => {
+    setRemoveTipoTramitesDialog(false);
   };
 
-  const confirmRemoveCargo = (cargo: CargoEntity) => {
-    setCargo(cargo);
-    setRemoveCargoDialog(true);
+  const confirmRemoveTipoTramite = (tipoTramite: TipoTramiteEntity) => {
+    setTipoTramite(tipoTramite);
+    setRemoveTipoTramiteDialog(true);
   };
 
-  const confirmRemoveSelectedCargos = () => {
-    setRemoveCargosDialog(true);
+  const confirmRemoveSelectedTipoTramites = () => {
+    setRemoveTipoTramitesDialog(true);
   };
 
   // here
   const findIndexById = (id: string) => {
     let index = -1;
 
-    for (let i = 0; i < cargos.length; i++) {
-      if (cargos[i].IdCargo.toString() === id) {
+    for (let i = 0; i < tipoTramites.length; i++) {
+      if (tipoTramites[i].IdTipoTramite.toString() === id) {
         index = i;
         break;
       }
@@ -319,10 +319,10 @@ const Cargo = () => {
   //here
 
   const onActivoChange = (e: RadioButtonChangeEvent) => {
-    let _cargo = { ...cargo };
+    let _tipoTramite = { ...tipoTramite };
 
-    _cargo["Activo"] = e.value;
-    setCargo(_cargo);
+    _tipoTramite["Activo"] = e.value;
+    setTipoTramite(_tipoTramite);
   };
 
   const onInputChange = (
@@ -330,25 +330,25 @@ const Cargo = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _cargo = { ...cargo };
+    let _tipoTramite = { ...tipoTramite };
 
     // @ts-ignore
-    _cargo[name] = val;
+    _tipoTramite[name] = val;
 
-    setCargo(_cargo);
+    setTipoTramite(_tipoTramite);
   };
 
-  // const onInputTextCargoChange = (
-  //   e: React.ChangeEvent<HTMLTextCargoElement>,
+  // const onInputTextTipoTramiteChange = (
+  //   e: React.ChangeEvent<HTMLTextTipoTramiteElement>,
   //   name: string
   // ) => {
   //   const val = (e.target && e.target.value) || "";
-  //   let _cargo = { ...cargo };
+  //   let _tipoTramite = { ...tipoTramite };
 
   //   // @ts-ignore
-  //   _cargo[name] = val;
+  //   _tipoTramite[name] = val;
 
-  //   setCargo(_cargo);
+  //   setTipoTramite(_tipoTramite);
   // };
 
   // const onInputNumberChange = (
@@ -356,12 +356,12 @@ const Cargo = () => {
   //   name: string
   // ) => {
   //   const val = e.value ?? 0;
-  //   let _cargo = { ...cargo };
+  //   let _tipoTramite = { ...tipoTramite };
 
   //   // @ts-ignore
-  //   _cargo[name] = val;
+  //   _tipoTramite[name] = val;
 
-  //   setCargo(_cargo);
+  //   setTipoTramite(_tipoTramite);
   // };
 
   // templates to component DataTable
@@ -402,7 +402,7 @@ const Cargo = () => {
           type="button"
           icon="pi pi-plus"
           severity="success"
-          onClick={showCreateCargoDialog}
+          onClick={showCreateTipoTramiteDialog}
           style={{
             width: "2rem",
             height: "2rem",
@@ -414,7 +414,7 @@ const Cargo = () => {
           type="button"
           icon="pi pi-refresh"
           severity="info"
-          onClick={findAllCargo}
+          onClick={findAllTipoTramite}
           style={{
             width: "2rem",
             height: "2rem",
@@ -468,7 +468,7 @@ const Cargo = () => {
   );
 
   // templates to column Activo
-  const activoBodyTemplate = (rowData: CargoEntity) => {
+  const activoBodyTemplate = (rowData: TipoTramiteEntity) => {
     return (
       <i
         className={classNames("pi", {
@@ -499,7 +499,7 @@ const Cargo = () => {
   };
 
   // templates to column ModificadoEl
-  const modifiadoElBodyTemplate = (rowData: CargoEntity) => {
+  const modifiadoElBodyTemplate = (rowData: TipoTramiteEntity) => {
     return (
       <p className="text-sm m-0">
         {!rowData.ModificadoEl
@@ -527,7 +527,7 @@ const Cargo = () => {
   };
 
   // templates to column CreadoEl
-  const creadoElBodyTemplate = (rowData: CargoEntity) => {
+  const creadoElBodyTemplate = (rowData: TipoTramiteEntity) => {
     return (
       <p className="text-sm m-0">
         {!rowData.CreadoEl ? "__" : formatDate(new Date(rowData.CreadoEl))}
@@ -553,7 +553,7 @@ const Cargo = () => {
   };
 
   // templates to actions update and remove on dataTable
-  const actionsBodyTemplate = (rowData: CargoEntity) => {
+  const actionsBodyTemplate = (rowData: TipoTramiteEntity) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
@@ -564,7 +564,7 @@ const Cargo = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => showUpdateCargoDialog(rowData)}
+          onClick={() => showUpdateTipoTramiteDialog(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -574,7 +574,7 @@ const Cargo = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => confirmRemoveCargo(rowData)}
+          onClick={() => confirmRemoveTipoTramite(rowData)}
         />
       </div>
     );
@@ -582,7 +582,7 @@ const Cargo = () => {
 
   //useEffects
   useEffect(() => {
-    findAllCargo();
+    findAllTipoTramite();
   }, []);
 
   return (
@@ -600,7 +600,7 @@ const Cargo = () => {
       />
 
       <DataTable
-        value={cargos}
+        value={tipoTramites}
         sortMode="multiple"
         removableSort
         paginator
@@ -614,7 +614,7 @@ const Cargo = () => {
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
-          "IdCargo",
+          "IdTipoTramite",
           "Descripcion",
           "Activo",
           "CreadoEl",
@@ -624,13 +624,13 @@ const Cargo = () => {
         ]}
         emptyMessage={<EmptyMessageData loading={loading} />}
         selectionMode="multiple"
-        selection={selectedCargos}
+        selection={selectedTipoTramites}
         onSelectionChange={(e) => {
           if (Array.isArray(e.value)) {
-            setSelectedCargos(e.value);
+            setSelectedTipoTramites(e.value);
           }
         }}
-        dataKey="IdCargo"
+        dataKey="IdTipoTramite"
         selectionPageOnly
         // loading={loading}
       >
@@ -709,33 +709,33 @@ const Cargo = () => {
         ></Column>
       </DataTable>
 
-      <CargoCreateOrUpdate
+      <TipoTramiteCreateOrUpdate
         submitted={submitted}
-        cargo={cargo}
-        cargoDialog={cargoDialog}
+        tipoTramite={tipoTramite}
+        tipoTramiteDialog={tipoTramiteDialog}
         hideDialog={hideDialog}
-        createCargo={createCargo}
-        updateCargo={updateCargo}
+        createTipoTramite={createTipoTramite}
+        updateTipoTramite={updateTipoTramite}
         onInputChange={onInputChange}
         onActivoChange={onActivoChange}
-        loadingCargoCreateOrUpdate={loadingCargoCreateOrUpdate}
+        loadingTipoTramiteCreateOrUpdate={loadingTipoTramiteCreateOrUpdate}
       />
 
-      <CargoRemove
-        cargo={cargo}
-        removeCargoDialog={removeCargoDialog}
-        hideRemoveCargoDialog={hideRemoveCargoDialog}
-        removeCargo={removeCargo}
+      <TipoTramiteRemove
+        tipoTramite={tipoTramite}
+        removeTipoTramiteDialog={removeTipoTramiteDialog}
+        hideRemoveTipoTramiteDialog={hideRemoveTipoTramiteDialog}
+        removeTipoTramite={removeTipoTramite}
       />
 
-      <CargosRemove
-        cargo={cargo}
-        removeCargosDialog={removeCargosDialog}
-        hideRemoveCargosDialog={hideRemoveCargosDialog}
-        removeSelectedCargos={removeSelectedCargos}
+      <TipoTramitesRemove
+        tipoTramite={tipoTramite}
+        removeTipoTramitesDialog={removeTipoTramitesDialog}
+        hideRemoveTipoTramitesDialog={hideRemoveTipoTramitesDialog}
+        removeSelectedTipoTramites={removeSelectedTipoTramites}
       />
     </div>
   );
 };
 
-export default Cargo;
+export default TipoTramite;

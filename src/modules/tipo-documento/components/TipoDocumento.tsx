@@ -88,7 +88,7 @@ const TipoDocumento = () => {
 
   const startContent = (
     <div className="flex flex-column p-1 gap-2">
-      <h3 className="m-0">Mantenimiento de Tipo Usuario</h3>
+      <h3 className="m-0">Mantenimiento de Tipo Documentos</h3>
       {/* <div>
         <Button label="Nuevo" icon="pi pi-plus" className=" p-2 " outlined />
       </div> */}
