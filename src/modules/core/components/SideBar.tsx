@@ -173,6 +173,16 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
+                  to={"esquema_estado"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-table mr-2"></i>
+                  <span className="font-medium">Esquema Estado</span>
+                  <Ripple />
+                </Link>
+              </li>
+              <li>
+                <Link
                   to={"cargo"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
@@ -211,7 +221,16 @@ const SideBar = (props: SideBarProps) => {
                   <Ripple />
                 </Link>
               </li>
-              
+              <li>
+                <Link
+                  to={"tipo_identificacion"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-table mr-2"></i>
+                  <span className="font-medium">Tipo Identificacion</span>
+                  <Ripple />
+                </Link>
+              </li>
               <li>
                 <Link
                   to={"rol"}
