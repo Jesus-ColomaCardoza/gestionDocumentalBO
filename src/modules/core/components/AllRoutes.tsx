@@ -8,6 +8,7 @@ import Cargo from "../../cargo/components/Cargo";
 import TipoTramite from "../../tipo-tramite/components/TipoTramite";
 import TipoIdentificacion from "../../tipo-identificacion/components/TipoIdentificacion";
 import EsquemaEstado from "../../esquema-estado/components/EsquemaEstado";
+import Estado from "../../estado/components/Estado";
 
 const AllRoutes = () => {
   return (
@@ -22,6 +23,7 @@ const AllRoutes = () => {
             <Route path="tipo_tramite" element={<TipoTramite />}></Route>
             <Route path="tipo_identificacion" element={<TipoIdentificacion />}></Route>
             <Route path="esquema_estado" element={<EsquemaEstado />}></Route>
+            <Route path="estado" element={<Estado />}></Route>
 
             {/* <Route path="rol" element={<Rol />}></Route> */}
           </Route>
