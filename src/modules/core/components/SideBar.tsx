@@ -173,11 +173,11 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"esquema_estado"}
+                  to={"cargo"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Esquema Estado</span>
+                  <span className="font-medium">Cargo</span>
                   <Ripple />
                 </Link>
               </li>
@@ -193,11 +193,22 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"cargo"}
+                  to={"esquema_estado"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Cargo</span>
+                  <span className="font-medium">Esquema Estado</span>
+                  <Ripple />
+                </Link>
+              </li>
+              
+              <li>
+                <Link
+                  to={"rol"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-table mr-2"></i>
+                  <span className="font-medium">Rol</span>
                   <Ripple />
                 </Link>
               </li>
@@ -241,16 +252,7 @@ const SideBar = (props: SideBarProps) => {
                   <Ripple />
                 </Link>
               </li>
-              <li>
-                <Link
-                  to={"rol"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-home mr-2"></i>
-                  <span className="font-medium ">Rol</span>
-                  <Ripple />
-                </Link>
-              </li>
+              
               <li>
                 <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                   <i className="pi pi-bookmark mr-2"></i>
