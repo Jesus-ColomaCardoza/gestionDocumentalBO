@@ -9,7 +9,7 @@ import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useState, useEffect, useRef } from "react";
-import UseEsquemaEstado from "../hooks/UseEsquemaEstado";
+// import UseEsquemaEstado from "../hooks/UseEsquemaEstado";
 import { ColumnMeta } from "../../utils/Interfaces";
 import {
   TriStateCheckbox,
@@ -31,6 +31,7 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { UseEsquemaEstado } from "../hooks/UseEsquemaEstado";
 
 const EsquemaEstado = () => {
   // custom hooks

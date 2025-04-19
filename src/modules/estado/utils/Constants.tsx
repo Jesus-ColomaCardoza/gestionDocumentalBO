@@ -1,11 +1,12 @@
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ColumnMeta } from "../../utils/Interfaces";
 import { DataTableFilterMeta } from "primereact/datatable";
-import { EstadoEntity} from "../interfaces/EstadoInterface";
+import { EstadoEntity } from "../interfaces/EstadoInterface";
 
 export const columns: ColumnMeta[] = [
   {
     field: "IdEstado",
+    filterField: "IdEstado",
     header: "IdEstado",
     dataType: "numeric",
     width: "5%",
@@ -14,11 +15,21 @@ export const columns: ColumnMeta[] = [
   },
   {
     field: "Descripcion",
+    filterField: "Descripcion",
     header: "Descripcion",
     dataType: "text",
-    width: "30%",
+    width: "20%",
     show: true,
     filterPlaceholder: "Buscar por Descripcion",
+  },
+  {
+    field: "EsquemaEstado",
+    filterField: "EsquemaEstado.Descripcion",
+    header: "EsquemaEstado",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Esquema Estado",
   },
   {
     field: "Activo",
@@ -73,6 +84,10 @@ export const defaultFilters: DataTableFilterMeta = {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
+  "EsquemaEstado.Descripcion": {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
+  },
   Activo: { value: null, matchMode: FilterMatchMode.EQUALS },
   CreadoEl: {
     operator: FilterOperator.AND,
@@ -95,9 +110,14 @@ export const defaultFilters: DataTableFilterMeta = {
 export let emptyEstado: EstadoEntity = {
   IdEstado: 0,
   Descripcion: "",
+  IdEsquemaEstado: 0,
+  EsquemaEstado: {
+    IdEsquemaEstado: 0,
+    Descripcion: "",
+  },
   Activo: true,
   CreadoEl: new Date(),
   CreadoPor: "",
-  ModificadoEl: new Date() ,
+  ModificadoEl: new Date(),
   ModificadoPor: "",
 };

@@ -1,5 +1,6 @@
 export interface ColumnMeta {
   field: string;
+  filterField?: string;
   header: string;
   dataType?: 'text' | 'numeric' | 'date' | string | undefined;
   width: string;

@@ -17,6 +17,7 @@ const SideBar = (props: SideBarProps) => {
   const btnRef2 = useRef<any>(null);
   const btnRef3 = useRef<any>(null);
   const btnRef4 = useRef<any>(null);
+  const btnRef5 = useRef<any>(null);
 
   const refSideBar = useRef<Card>(null);
 
@@ -123,25 +124,24 @@ const SideBar = (props: SideBarProps) => {
               props.setVisible(false);
             }}
             icon="pi pi-angle-double-left"
-            
             outlined
             className="h-2rem w-2rem"
             style={{
-              border:"none"
+              border: "none",
             }}
           ></Button>
         </span>
       </div>
 
       {/* Sidebar-body */}
-      <div 
+      <div
         style={{
           marginTop: "1rem",
           height: "calc(100vh - 13rem)",
           overflowY: "auto",
         }}
       >
-        <ul className="list-none px-2 ">
+        <ul className="list-none px-2">
           <li>
             <StyleClass
               nodeRef={btnRef1}
@@ -155,7 +155,40 @@ const SideBar = (props: SideBarProps) => {
                 ref={btnRef1}
                 className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
               >
-                <span className="font-medium">MANTENIMIENTO</span>
+                <span className="font-medium">Firma Digital</span>
+                <i className="pi pi-chevron-down"></i>
+                <Ripple />
+              </div>
+            </StyleClass>
+            <ul className="list-none p-0 m-0 overflow-hidden">
+              <li>
+                <Link
+                  to={"file_manager"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-file mr-2"></i>
+                  <span className="font-medium text-sm">Archivos digitales</span>
+                  <Ripple />
+                </Link>
+              </li>
+            </ul>
+          </li>
+        </ul>
+        <ul className="list-none px-2 ">
+          <li>
+            <StyleClass
+              nodeRef={btnRef2}
+              selector="@next"
+              enterFromClassName="hidden"
+              enterActiveClassName="slidedown"
+              leaveToClassName="hidden"
+              leaveActiveClassName="slideup"
+            >
+              <div
+                ref={btnRef2}
+                className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
+              >
+                <span className="font-medium">Mantenimiento</span>
                 <i className="pi pi-chevron-down"></i>
                 <Ripple />
               </div>
@@ -167,7 +200,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Area</span>
+                  <span className="font-medium text-sm">Area</span>
                   <Ripple />
                 </Link>
               </li>
@@ -201,14 +234,13 @@ const SideBar = (props: SideBarProps) => {
                   <Ripple />
                 </Link>
               </li>
-              
               <li>
                 <Link
                   to={"rol"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Rol</span>
+                  <span className="font-medium text-sm">Rol</span>
                   <Ripple />
                 </Link>
               </li>
@@ -228,7 +260,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Tipo Usuario</span>
+                  <span className="font-medium text-sm">Tipo Usuario</span>
                   <Ripple />
                 </Link>
               </li>
@@ -248,11 +280,10 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Tipo Identificacion</span>
+                  <span className="font-medium text-sm">Tipo Identificacion</span>
                   <Ripple />
                 </Link>
               </li>
-              
               <li>
                 <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                   <i className="pi pi-bookmark mr-2"></i>
@@ -262,7 +293,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <StyleClass
-                  nodeRef={btnRef2}
+                  nodeRef={btnRef3}
                   selector="@next"
                   enterFromClassName="hidden"
                   enterActiveClassName="slidedown"
@@ -270,7 +301,7 @@ const SideBar = (props: SideBarProps) => {
                   leaveActiveClassName="slideup"
                 >
                   <a
-                    ref={btnRef2}
+                    ref={btnRef3}
                     className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                   >
                     <i className="pi pi-chart-line mr-2"></i>
@@ -282,7 +313,7 @@ const SideBar = (props: SideBarProps) => {
                 <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
                   <li>
                     <StyleClass
-                      nodeRef={btnRef3}
+                      nodeRef={btnRef4}
                       selector="@next"
                       enterFromClassName="hidden"
                       enterActiveClassName="slidedown"
@@ -290,7 +321,7 @@ const SideBar = (props: SideBarProps) => {
                       leaveActiveClassName="slideup"
                     >
                       <a
-                        ref={btnRef3}
+                        ref={btnRef4}
                         className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                       >
                         <i className="pi pi-chart-line mr-2"></i>
@@ -368,7 +399,7 @@ const SideBar = (props: SideBarProps) => {
         <ul className="list-none px-2">
           <li>
             <StyleClass
-              nodeRef={btnRef4}
+              nodeRef={btnRef5}
               selector="@next"
               enterFromClassName="hidden"
               enterActiveClassName="slidedown"
@@ -376,7 +407,7 @@ const SideBar = (props: SideBarProps) => {
               leaveActiveClassName="slideup"
             >
               <div
-                ref={btnRef4}
+                ref={btnRef5}
                 className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
               >
                 <span className="font-medium">APPLICATION</span>
@@ -409,7 +440,6 @@ const SideBar = (props: SideBarProps) => {
             </ul>
           </li>
         </ul>
-
       </div>
 
       {/* Sidebar-footer */}
@@ -430,7 +460,6 @@ const SideBar = (props: SideBarProps) => {
           <span className="font-bold">Amy Elsner</span>
         </a>
       </div>
-
     </Card>
   );
 };

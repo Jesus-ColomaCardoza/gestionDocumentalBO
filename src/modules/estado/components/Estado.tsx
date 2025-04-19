@@ -31,10 +31,15 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { UseEsquemaEstado } from "../../esquema-estado/hooks/UseEsquemaEstado";
+import { EsquemaEstadoEntity } from "../../esquema-estado/interfaces/EsquemaEstadoInterface";
+import { DropdownChangeEvent } from "primereact/dropdown";
 
 const Estado = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseEstado();
+
+  const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -63,6 +68,10 @@ const Estado = () => {
 
   const [selectedEstados, setSelectedEstados] = useState<EstadoEntity[]>([]);
 
+  const [esquemaEstados, setEsquemaEstados] = useState<
+    Pick<EsquemaEstadoEntity, "IdEsquemaEstado" | "Descripcion">[]
+  >([]);
+
   const [estadoDialog, setEstadoDialog] = useState<{
     type?: "create" | "update" | undefined;
     state: boolean;
@@ -72,7 +81,8 @@ const Estado = () => {
 
   const [removeEstadoDialog, setRemoveEstadoDialog] = useState<boolean>(false);
 
-  const [removeEstadosDialog, setRemoveEstadosDialog] = useState<boolean>(false);
+  const [removeEstadosDialog, setRemoveEstadosDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -108,7 +118,7 @@ const Estado = () => {
     </>
   );
 
-  // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  // actions CRUD - Estado (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEstado = async () => {
     setLoading(true);
     const estadosFindAll = await findAll();
@@ -147,10 +157,11 @@ const Estado = () => {
 
   const createEstado = async () => {
     setSubmitted(true);
-    if (estado.Descripcion.trim()) {
+    if (estado.Descripcion.trim() && estado.IdEsquemaEstado != 0) {
       setLoadingEstadoCreateOrUpdate(true);
       let estadoCreate = await create({
         Descripcion: estado.Descripcion,
+        IdEsquemaEstado: estado.IdEsquemaEstado,
         Activo: estado.Activo,
       });
       setLoadingEstadoCreateOrUpdate(false);
@@ -181,6 +192,7 @@ const Estado = () => {
       setLoadingEstadoCreateOrUpdate(true);
       let estadoUpdate = await update(estado.IdEstado.toString(), {
         Descripcion: estado.Descripcion,
+        IdEsquemaEstado: estado.IdEsquemaEstado,
         Activo: estado.Activo,
       });
       setLoadingEstadoCreateOrUpdate(false);
@@ -217,7 +229,9 @@ const Estado = () => {
 
       if (estadoRemove?.message.msgId == 0 && estadoRemove.registro) {
         setEstados(
-          estados?.filter((estado) => estado.IdEstado !== estadoRemove?.registro?.IdEstado)
+          estados?.filter(
+            (estado) => estado.IdEstado !== estadoRemove?.registro?.IdEstado
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -251,6 +265,29 @@ const Estado = () => {
       detail: "Estados Removed",
       life: 3000,
     });
+  };
+
+  // actions CRUD - Esquema Estado (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllEsquemaEstadoCombox = async () => {
+    setLoading(true);
+    const esquemaEstadosFindAll = await findAllEsquemaEstado();
+    setLoading(false);
+
+    if (
+      esquemaEstadosFindAll?.message.msgId == 0 &&
+      esquemaEstadosFindAll.registro
+    ) {
+      setEsquemaEstados(
+        Array.isArray(esquemaEstadosFindAll.registro)
+          ? esquemaEstadosFindAll.registro?.map((af) => {
+              return {
+                IdEsquemaEstado: af.IdEsquemaEstado,
+                Descripcion: af.Descripcion,
+              };
+            })
+          : []
+      );
+    }
   };
 
   // templates to dialogs
@@ -330,10 +367,25 @@ const Estado = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _estado = { ...estado };
 
-    // @ts-ignore
+    let _estado: any = { ...estado };
+
     _estado[name] = val;
+
+    setEstado(_estado);
+  };
+
+  const onDropdownChange = (
+    e: DropdownChangeEvent,
+    nameFK: string,
+    nameObj: string
+  ) => {
+    const val = (e.target && e.target.value) || "";
+
+    let _estado: any = { ...estado };
+
+    _estado[nameFK] = val[nameFK];
+    _estado[nameObj] = { ...val };
 
     setEstado(_estado);
   };
@@ -467,6 +519,32 @@ const Estado = () => {
     </div>
   );
 
+  // templates to column EsquemaEstado
+  const esquemaEstadoBodyTemplate = (rowData: EstadoEntity) => {
+    return (
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">{rowData.EsquemaEstado.Descripcion}</p>
+      </div>
+    );
+  };
+
+  const esquemaEstadoFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <Calendar
+        value={options.value ? new Date(options.value) : null}
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index);
+        }}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+        showIcon
+      />
+    );
+  };
+
   // templates to column Activo
   const activoBodyTemplate = (rowData: EstadoEntity) => {
     return (
@@ -483,7 +561,7 @@ const Estado = () => {
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <div className="flex align-items-center justify-content-center gap-2">
+      <div className="flex align-items-center justify-content-center gap-2 w-12rem">
         <label htmlFor="verified-filter" className="font-bold">
           Activo
         </label>
@@ -583,6 +661,7 @@ const Estado = () => {
   //useEffects
   useEffect(() => {
     findAllEstado();
+    findAllEsquemaEstadoCombox();
   }, []);
 
   return (
@@ -616,6 +695,7 @@ const Estado = () => {
         globalFilterFields={[
           "IdEstado",
           "Descripcion",
+          "EsquemaEstado.Descripcion",
           "Activo",
           "CreadoEl",
           "CreadoPor",
@@ -640,7 +720,24 @@ const Estado = () => {
           headerStyle={{ width: "0%" }}
         />
         {visibleColumns.map((col) => {
-          if (col.field == "Activo") {
+          if (col.field == "EsquemaEstado") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={esquemaEstadoBodyTemplate}
+                // filterElement={creadoElFilterTemplate}
+              />
+            );
+          } else if (col.field == "Activo") {
             return (
               <Column
                 key={col.field}
@@ -712,11 +809,13 @@ const Estado = () => {
       <EstadoCreateOrUpdate
         submitted={submitted}
         estado={estado}
+        esquemaEstados={esquemaEstados}
         estadoDialog={estadoDialog}
         hideDialog={hideDialog}
         createEstado={createEstado}
         updateEstado={updateEstado}
         onInputChange={onInputChange}
+        onDropdownChange={onDropdownChange}
         onActivoChange={onActivoChange}
         loadingEstadoCreateOrUpdate={loadingEstadoCreateOrUpdate}
       />

@@ -1,3 +1,8 @@
 body {
   margin: 0;
 }
+
+/* overwrite - custom header to all tables */
+.p-datatable .p-datatable-header {
+  padding: 1rem 0rem;
+}

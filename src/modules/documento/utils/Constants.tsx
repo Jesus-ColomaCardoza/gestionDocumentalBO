@@ -1,0 +1,27 @@
+import { DocumentoEntity } from "../interfaces/DocumentoInterface";
+
+export let emptyDocumento: DocumentoEntity = {
+  IdDocumento: 0,
+  CodigoReferencia: "",
+  Titulo: "",
+  Descripcion: "",
+  Folios: 0,
+  FechaEmision: "",
+  FormatoDocumento: "",
+  NombreDocumento: "",
+  UrlDocumento: "",
+  SizeDocumento: 0,
+  UrlBase: "",
+  IdTipoDocumento: 0,
+  IdTramite: 0,
+  FirmaDigital: false,
+  IdCarpeta: 0,
+  Categoria: "MF",
+  IdEstado: 0,
+  IdUsuario: 0,
+  Activo: true,
+  CreadoEl: new Date(),
+  CreadoPor: "",
+  ModificadoEl: new Date(),
+  ModificadoPor: "",
+};

@@ -5,7 +5,7 @@ import SideBar from "./SideBar";
 import MainContainer from "./MainContainer";
 
 const Dashboard = () => {
-  const [visible, setVisible] = useState<boolean>(true);
+  const [visible, setVisible] = useState<boolean>(false);
 
   return (
     <>

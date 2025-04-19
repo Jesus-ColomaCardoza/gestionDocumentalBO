@@ -1,52 +1,42 @@
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { classNames } from "primereact/utils";
-import { EstadoEntity } from "../interfaces/EstadoInterface";
 import { Button } from "primereact/button";
 import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
-import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
-import { EsquemaEstadoEntity } from "../../esquema-estado/interfaces/EsquemaEstadoInterface";
+import { CarpetaEntity } from "../interfaces/CarpetaInterface";
 
-type EstadoCreateOrUpdateProps = {
+type CarpetaCreateOrUpdateProps = {
   submitted: boolean;
-  estado: EstadoEntity;
-  esquemaEstados:  Pick<EsquemaEstadoEntity, "IdEsquemaEstado" | "Descripcion">[];
-  estadoDialog: {
+  carpeta: CarpetaEntity;
+  carpetaDialog: {
     type?: "create" | "update" | undefined;
     state: boolean;
   };
   hideDialog: () => void;
-  createEstado: () => void;
-  updateEstado: () => void;
+  createCarpeta: () => void;
+  updateCarpeta: () => void;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>, name: string) => void;
-  onDropdownChange: (
-    e: DropdownChangeEvent,
-    nameFK: string,
-    nameObj: string
-  ) => void;
   onActivoChange: (e: RadioButtonChangeEvent) => void;
-  loadingEstadoCreateOrUpdate: boolean;
+  loadingCarpetaCreateOrUpdate: boolean;
 };
 
-const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
-  const estadoDialogFooter = (
+const CarpetaCreateOrUpdate = (props: CarpetaCreateOrUpdateProps) => {
+  const carpetaDialogFooter = (
     <>
       <Button
         label="Cancel"
         icon="pi pi-times"
         outlined
-        onClick={() => {
-          props.hideDialog();
-        }}
+        onClick={props.hideDialog}
       />
       <Button
-        loading={props.loadingEstadoCreateOrUpdate}
+        loading={props.loadingCarpetaCreateOrUpdate}
         label="Save"
         icon="pi pi-check"
         onClick={
-          props.estadoDialog.type == "create"
-            ? props.createEstado
-            : props.updateEstado
+          props.carpetaDialog.type == "create"
+            ? props.createCarpeta
+            : props.updateCarpeta
         }
       />
     </>
@@ -54,13 +44,13 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
 
   return (
     <Dialog
-      visible={props.estadoDialog.state}
+      visible={props.carpetaDialog.state}
       style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Área Detalles"
+      header="Carpeta"
       modal
       className="p-fluid"
-      footer={estadoDialogFooter}
+      footer={carpetaDialogFooter}
       onHide={props.hideDialog}
     >
       <div className="field">
@@ -69,34 +59,15 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
         </label>
         <InputText
           id="Descripcion"
-          value={props.estado.Descripcion}
+          value={props.carpeta.Descripcion}
           onChange={(e) => props.onInputChange(e, "Descripcion")}
           autoFocus
           className={classNames({
-            "p-invalid": props.submitted && !props.estado.Descripcion,
+            "p-invalid": props.submitted && !props.carpeta.Descripcion,
           })}
         />
-        {props.submitted && !props.estado.Descripcion && (
+        {props.submitted && !props.carpeta.Descripcion && (
           <small className="p-error">Name is required.</small>
-        )}
-      </div>
-      <div className="field">
-        <label htmlFor="EsquemaEstado" className="font-bold">
-          Esquema Estado
-        </label>
-        <Dropdown
-          value={props.estado.EsquemaEstado}
-          onChange={(e) => {
-            props.onDropdownChange(e, "IdEsquemaEstado", "EsquemaEstado");
-          }}
-          options={props.esquemaEstados}
-          optionLabel="Descripcion"
-          filter
-          placeholder="Select Cities"
-          className="w-full"
-        />
-        {props.submitted && !props.estado.IdEsquemaEstado && (
-          <small className="p-error">EsquemaEstado is required.</small>
         )}
       </div>
       <div className="field">
@@ -108,7 +79,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
               name="Activot"
               value={true}
               onChange={props.onActivoChange}
-              checked={props.estado.Activo === true}
+              checked={props.carpeta.Activo === true}
             />
             <label htmlFor="Activot">True</label>
           </div>
@@ -118,7 +89,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
               name="Activof"
               value={false}
               onChange={props.onActivoChange}
-              checked={props.estado.Activo === false}
+              checked={props.carpeta.Activo === false}
             />
             <label htmlFor="Activof">False</label>
           </div>
@@ -129,11 +100,11 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
               <label htmlFor="description" className="font-bold">
                 Description
               </label>
-              <InputTextestado
+              <InputTextcarpeta
                 id="description"
-                value={estado.description}
-                onChange={(e: ChangeEvent<HTMLTextEstadoElement>) =>
-                  onInputTextEstadoChange(e, "description")
+                value={carpeta.description}
+                onChange={(e: ChangeEvent<HTMLTextCarpetaElement>) =>
+                  onInputTextCarpetaChange(e, "description")
                 }
                 required
                 rows={3}
@@ -150,7 +121,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
                     name="category"
                     value="Accessories"
                     onChange={onCategoryChange}
-                    checked={estado.category === "Accessories"}
+                    checked={carpeta.category === "Accessories"}
                   />
                   <label htmlFor="category1">Accessories</label>
                 </div>
@@ -160,7 +131,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
                     name="category"
                     value="Clothing"
                     onChange={onCategoryChange}
-                    checked={estado.category === "Clothing"}
+                    checked={carpeta.category === "Clothing"}
                   />
                   <label htmlFor="category2">Clothing</label>
                 </div>
@@ -170,7 +141,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
                     name="category"
                     value="Electronics"
                     onChange={onCategoryChange}
-                    checked={estado.category === "Electronics"}
+                    checked={carpeta.category === "Electronics"}
                   />
                   <label htmlFor="category3">Electronics</label>
                 </div>
@@ -180,7 +151,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
                     name="category"
                     value="Fitness"
                     onChange={onCategoryChange}
-                    checked={estado.category === "Fitness"}
+                    checked={carpeta.category === "Fitness"}
                   />
                   <label htmlFor="category4">Fitness</label>
                 </div>
@@ -194,7 +165,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
                 </label>
                 <InputNumber
                   id="price"
-                  value={estado.price}
+                  value={carpeta.price}
                   onValueChange={(e) => onInputNumberChange(e, "price")}
                   mode="currency"
                   currency="USD"
@@ -207,7 +178,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
                 </label>
                 <InputNumber
                   id="quantity"
-                  value={estado.quantity}
+                  value={carpeta.quantity}
                   onValueChange={(e) => onInputNumberChange(e, "quantity")}
                 />
               </div>
@@ -216,4 +187,4 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
   );
 };
 
-export default EstadoCreateOrUpdate;
+export default CarpetaCreateOrUpdate;

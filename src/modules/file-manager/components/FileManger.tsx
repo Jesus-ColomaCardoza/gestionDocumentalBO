@@ -1,0 +1,1279 @@
+import { Toolbar } from "primereact/toolbar";
+import { Button } from "primereact/button";
+import { MenuItem, MenuItemCommandEvent } from "primereact/menuitem";
+import { InputText } from "primereact/inputtext";
+import { IconField } from "primereact/iconfield";
+import { InputIcon } from "primereact/inputicon";
+import { DataTable, DataTableFilterMeta } from "primereact/datatable";
+import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
+import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
+import { useState, useEffect, useRef } from "react";
+import UseFileManager from "../hooks/UseFileManger";
+import { ColumnMeta } from "../../utils/Interfaces";
+import {
+  TriStateCheckbox,
+  TriStateCheckboxChangeEvent,
+} from "primereact/tristatecheckbox";
+import {
+  FileManagerEntity,
+  FileManagerGetFilesArea,
+  FileManagerGetMyFiles,
+} from "../interfaces/FileMangerInterface";
+import { Toast } from "primereact/toast";
+import { columns, defaultFilters } from "../utils/Constants";
+import { RadioButtonChangeEvent } from "primereact/radiobutton";
+import { formatDate } from "../../utils/Methods";
+import { Calendar } from "primereact/calendar";
+import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { Menu } from "primereact/menu";
+import { BreadCrumb } from "primereact/breadcrumb";
+import { emptyCarpeta } from "../../carpeta/utils/Constants";
+import { CarpetaEntity } from "../../carpeta/interfaces/CarpetaInterface";
+import CarpetaCreateOrUpdate from "../../carpeta/components/CarpetaCreateOrUpdate";
+import CarpetaRemove from "../../carpeta/components/CarpetaRemove";
+import { emptyDocumento } from "../../documento/utils/Constants";
+import { DocumentoEntity } from "../../documento/interfaces/DocumentoInterface";
+import DocumentoCreateOrUpdate from "../../documento/components/DocumentoCreateOrUpdate";
+import DocumentoRemove from "../../documento/components/DocumentoRemove";
+import UseFile from "../../file/hooks/UseFile";
+import { InputSwitchChangeEvent } from "primereact/inputswitch";
+
+const FileManager = () => {
+  const userTest = {
+    IdUsuario: 1,
+    IdArea: 1,
+  };
+
+  // custom hooks
+  const {
+    createCarpeta,
+    createDocumento,
+    findAllMyFiles,
+    findAllFilesArea,
+    updateCarpeta,
+    updateDocumento,
+    removeCarpeta,
+    removeDocumento,
+  } = UseFileManager();
+
+  const { create } = UseFile();
+
+  //useRefs
+  const toastx = useRef<Toast>(null);
+
+  const menuAddFM = useRef<Menu>(null);
+
+  const menuActionsFM = useRef<Menu>(null);
+
+  //useStates
+  const [selectedFilesUpload, setSelectedFilesUpload] = useState<File[]>([]);
+
+  const [totalSizeFilesUpload, setTotalSizeFilesUpload] = useState<number>(0);
+
+  const [itemsMenuActionsFM, setItemsMenuActionsFM] = useState<MenuItem[]>([]);
+
+  const [submitted, setSubmitted] = useState<boolean>(false);
+
+  const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
+
+  const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
+
+  const [visibleColumns, setVisibleColumns] = useState<ColumnMeta[]>(
+    columns.filter((col: ColumnMeta) => col.show)
+  );
+
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [loadingCarpetaCreateOrUpdate, setLoadingCarpetaCreateOrUpdate] =
+    useState<boolean>(false);
+
+  const [loadingDocumentoCreateOrUpdate, setLoadingDocumentoCreateOrUpdate] =
+    useState<boolean>(false);
+
+  const [carpeta, setCarpeta] = useState<CarpetaEntity>(emptyCarpeta);
+
+  const [documento, setDocumento] = useState<DocumentoEntity>(emptyDocumento);
+
+  const [fileManagers, setFileManagers] = useState<FileManagerEntity[]>([]);
+
+  const [selectedFileManagers, setSelectedFileManagers] = useState<
+    FileManagerEntity[]
+  >([]);
+
+  const [carpetaDialog, setCarpetaDialog] = useState<{
+    type?: "create" | "update" | undefined;
+    state: boolean;
+  }>({
+    state: false,
+  });
+
+  const [documentoDialog, setDocumentoDialog] = useState<{
+    type?: "create" | "update" | undefined;
+    state: boolean;
+  }>({
+    state: false,
+  });
+
+  const [removeCarpetaDialog, setRemoveCarpetaDialog] =
+    useState<boolean>(false);
+
+  const [removeDocumentoDialog, setRemoveDocumentoDialog] =
+    useState<boolean>(false);
+
+  const [itemBreadCrumbs, setItemBreadCrumbs] = useState<MenuItem[]>([]);
+
+  const [lastItemBreadCrumbMF, setLastItemBreadCrumbMF] =
+    useState<FileManagerGetMyFiles>({
+      IdUsuario: userTest.IdUsuario,
+      IdCarpeta: null,
+      Categoria: "MF",
+    });
+
+  const [lastItemBreadCrumbFA, setLastItemBreadCrumbFA] =
+    useState<FileManagerGetFilesArea>({
+      IdCarpeta: null,
+      IdArea: userTest.IdArea,
+      Categoria: "FA",
+    });
+
+  const [titleFM, setTitleFM] = useState<{
+    id: "MF" | "FA" | "FS";
+    title: string | undefined;
+  }>();
+
+  // templates to component Toolbar
+  const items: MenuItem[] = [
+    {
+      label: "Update",
+      icon: "pi pi-refresh",
+    },
+    {
+      label: "Remove",
+      icon: "pi pi-times",
+    },
+  ];
+
+  const startContent = (
+    <div className="flex flex-column p-1 gap-2">
+      <h3 className="m-0">{titleFM?.title}</h3>
+    </div>
+  );
+
+  // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllMyFilesFileManager = async (
+    fileManagerGetMyFiles: FileManagerGetMyFiles
+  ) => {
+    setLoading(true);
+    const fileManagersFindAll = await findAllMyFiles(fileManagerGetMyFiles);
+    setLoading(false);
+
+    if (
+      fileManagersFindAll?.message.msgId == 0 &&
+      fileManagersFindAll.registro
+    ) {
+      setFileManagers(
+        Array.isArray(fileManagersFindAll.registro)
+          ? fileManagersFindAll.registro?.map((af) => {
+              return {
+                ...af,
+                Usuario: {
+                  ...af.Usuario,
+                  NombreCompleto:
+                    af.Usuario.Nombres +
+                    " " +
+                    af.Usuario.ApellidoPaterno +
+                    " " +
+                    af.Usuario.ApellidoMaterno,
+                },
+              };
+            })
+          : []
+      );
+    }
+
+    setLoading(false);
+    onGlobalFilterChange();
+  };
+
+  const findAllFilesAreaFileManager = async (
+    fileManagerGetFilesArea: FileManagerGetFilesArea
+  ) => {
+    setLoading(true);
+    const fileManagersFindAll = await findAllFilesArea(fileManagerGetFilesArea);
+    setLoading(false);
+
+    if (
+      fileManagersFindAll?.message.msgId == 0 &&
+      fileManagersFindAll.registro
+    ) {
+      setFileManagers(
+        Array.isArray(fileManagersFindAll.registro)
+          ? fileManagersFindAll.registro?.map((af) => {
+              return {
+                ...af,
+                Usuario: {
+                  ...af.Usuario,
+                  NombreCompleto:
+                    af.Usuario.Nombres +
+                    " " +
+                    af.Usuario.ApellidoPaterno +
+                    " " +
+                    af.Usuario.ApellidoMaterno,
+                },
+              };
+            })
+          : []
+      );
+    }
+
+    setLoading(false);
+    onGlobalFilterChange();
+  };
+
+  const createCarpetaFileManager = async () => {
+    setSubmitted(true);
+    if (carpeta.Descripcion.trim()) {
+      setLoadingCarpetaCreateOrUpdate(true);
+      let carpetaCreate = await createCarpeta({
+        Descripcion: carpeta.Descripcion,
+        IdCarpetaPadre:
+          titleFM?.id == "MF"
+            ? lastItemBreadCrumbMF.IdCarpeta
+            : lastItemBreadCrumbFA.IdCarpeta,
+        IdUsuario: userTest.IdUsuario, //
+        Activo: carpeta.Activo,
+        Categoria: titleFM?.id,
+      });
+      setLoadingCarpetaCreateOrUpdate(false);
+
+      if (carpetaCreate?.message.msgId == 0 && carpetaCreate.registro) {
+        setFileManagers([...fileManagers, carpetaCreate.registro]);
+        toastx.current?.show({
+          severity: "success",
+          detail: `${carpetaCreate.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (carpetaCreate?.message.msgId == 1) {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${carpetaCreate.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setCarpetaDialog({ state: false });
+      setCarpeta(emptyCarpeta);
+    }
+  };
+
+  const updateCarpetaFileManager = async () => {
+    setSubmitted(true);
+    if (carpeta.IdCarpeta) {
+      setLoadingCarpetaCreateOrUpdate(true);
+      let carpetaUpdate = await updateCarpeta(carpeta.IdCarpeta.toString(), {
+        Descripcion: carpeta.Descripcion,
+        Activo: carpeta.Activo,
+      });
+      setLoadingCarpetaCreateOrUpdate(false);
+
+      if (carpetaUpdate?.message.msgId == 0 && carpetaUpdate.registro) {
+        setFileManagers(
+          fileManagers?.map((fileManager) =>
+            fileManager.IdFM === carpetaUpdate?.registro?.IdFM
+              ? { ...fileManager, ...carpetaUpdate.registro }
+              : fileManager
+          )
+        );
+        toastx.current?.show({
+          severity: "success",
+          detail: `${carpetaUpdate.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (carpetaUpdate?.message.msgId == 1) {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${carpetaUpdate.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setCarpetaDialog({ state: false });
+      setCarpeta(emptyCarpeta);
+    }
+  };
+
+  const removeCarpetaFileManager = async () => {
+    if (carpeta.IdCarpeta) {
+      let carpetaRemove = await removeCarpeta(carpeta.IdCarpeta.toString());
+      if (carpetaRemove?.message.msgId == 0 && carpetaRemove.registro) {
+        setFileManagers(
+          fileManagers?.filter(
+            (fileManager) => fileManager.IdFM !== carpetaRemove?.registro?.IdFM
+          )
+        );
+        toastx.current?.show({
+          severity: "success",
+          detail: `${carpetaRemove.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (carpetaRemove?.message.msgId == 1) {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${carpetaRemove.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+      setRemoveCarpetaDialog(false);
+      setCarpeta(emptyCarpeta);
+    }
+  };
+
+  const createDocumentoFileManager = async () => {
+    setSubmitted(true);
+    if (selectedFilesUpload.length != 0) {
+      setLoadingDocumentoCreateOrUpdate(true);
+
+      const formData = new FormData();
+
+      selectedFilesUpload.forEach((fileUpload) => {
+        formData.append("file", fileUpload);
+      });
+
+      const fileUpload = await create(formData);
+      // console.log(fileUpload);
+
+      if (fileUpload?.message.msgId == 0) {
+        let documentoCreate = await createDocumento({
+          FormatoDocumento: fileUpload.registro?.mimetype,
+          NombreDocumento: fileUpload.registro?.filename,
+          UrlDocumento: fileUpload.registro?.url,
+          SizeDocumento: fileUpload.registro?.size,
+          UrlBase: fileUpload.registro?.path,
+
+          Titulo: fileUpload.registro?.parseoriginalname,
+          Descripcion: documento.Descripcion,
+          IdUsuario: userTest.IdUsuario, //
+          FirmaDigital: documento.FirmaDigital,
+          IdCarpeta:
+            titleFM?.id == "MF"
+              ? lastItemBreadCrumbMF.IdCarpeta
+              : lastItemBreadCrumbFA.IdCarpeta,
+          Categoria: titleFM?.id,
+          IdEstado: 1, // set at diagram state
+          Activo: documento.Activo,
+        });
+
+        setLoadingDocumentoCreateOrUpdate(false);
+
+        if (documentoCreate?.message.msgId == 0 && documentoCreate.registro) {
+          setFileManagers([...fileManagers, documentoCreate.registro]);
+
+          toastx.current?.show({
+            severity: "success",
+            detail: `${documentoCreate.message.msgTxt}`,
+            life: 3000,
+          });
+        } else {
+          toastx.current?.show({
+            severity: "error",
+            detail: `${fileUpload?.message.msgTxt}`,
+            life: 3000,
+          });
+        }
+      } else {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${fileUpload?.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setSelectedFilesUpload([]);
+      setTotalSizeFilesUpload(0);
+      setDocumentoDialog({ state: false });
+      setDocumento(emptyDocumento);
+    }
+  };
+
+  const updateDocumentoFileManager = async () => {
+    setSubmitted(true);
+    if (documento.IdDocumento) {
+      setLoadingDocumentoCreateOrUpdate(true);
+      let documentoUpdate = await updateDocumento(
+        documento.IdDocumento.toString(),
+        {
+          Descripcion: documento.Descripcion,
+          Activo: documento.Activo,
+        }
+      );
+      setLoadingDocumentoCreateOrUpdate(false);
+
+      if (documentoUpdate?.message.msgId == 0 && documentoUpdate.registro) {
+        setFileManagers(
+          fileManagers?.map((fileManager) =>
+            fileManager.IdFM === documentoUpdate?.registro?.IdFM
+              ? { ...fileManager, ...documentoUpdate.registro }
+              : fileManager
+          )
+        );
+        toastx.current?.show({
+          severity: "success",
+          detail: `${documentoUpdate.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (documentoUpdate?.message.msgId == 1) {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${documentoUpdate.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setDocumentoDialog({ state: false });
+      setDocumento(emptyDocumento);
+    }
+  };
+
+  const removeDocumentoFileManager = async () => {
+    if (documento.IdDocumento) {
+      let documentoRemove = await removeDocumento(
+        documento.IdDocumento.toString()
+      );
+      if (documentoRemove?.message.msgId == 0 && documentoRemove.registro) {
+        setFileManagers(
+          fileManagers?.filter(
+            (fileManager) =>
+              fileManager.IdFM !== documentoRemove?.registro?.IdFM
+          )
+        );
+        toastx.current?.show({
+          severity: "success",
+          detail: `${documentoRemove.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (documentoRemove?.message.msgId == 1) {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${documentoRemove.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+      setRemoveDocumentoDialog(false);
+      setDocumento(emptyDocumento);
+    }
+  };
+
+  // templates to dialogs
+  const hideCarpetaDialog = () => {
+    setSubmitted(false);
+    setCarpetaDialog({ state: false });
+  };
+
+  const showCreateCarpetaDialog = () => {
+    setCarpeta(emptyCarpeta);
+    setSubmitted(false);
+    setCarpetaDialog({ type: "create", state: true });
+  };
+
+  const showUpdateCarpetaDialog = (carpeta: CarpetaEntity) => {
+    setCarpeta({ ...carpeta });
+    setCarpetaDialog({ type: "update", state: true });
+  };
+
+  const hideRemoveCarpetaDialog = () => {
+    setRemoveCarpetaDialog(false);
+  };
+
+  const confirmRemoveCarpeta = (carpeta: CarpetaEntity) => {
+    setCarpeta({ ...carpeta });
+    setRemoveCarpetaDialog(true);
+  };
+
+  const hideDocumentoDialog = () => {
+    setSubmitted(false);
+    setDocumentoDialog({ state: false });
+    setSelectedFilesUpload([]);
+    setTotalSizeFilesUpload(0);
+  };
+
+  const showCreateDocumentoDialog = () => {
+    setDocumento(emptyDocumento);
+    setSubmitted(false);
+    setDocumentoDialog({ type: "create", state: true });
+  };
+
+  const showUpdateDocumentoDialog = (carpeta: DocumentoEntity) => {
+    setDocumento({ ...carpeta });
+    setDocumentoDialog({ type: "update", state: true });
+  };
+
+  const hideRemoveDocumentoDialog = () => {
+    setRemoveDocumentoDialog(false);
+  };
+
+  const confirmRemoveDocumento = (carpeta: DocumentoEntity) => {
+    setDocumento({ ...carpeta });
+    setRemoveDocumentoDialog(true);
+  };
+
+  // events change
+  const onActivoChangeCarpeta = (e: RadioButtonChangeEvent) => {
+    let _carpeta = { ...carpeta };
+    _carpeta["Activo"] = e.value;
+    setCarpeta(_carpeta);
+  };
+
+  const onInputChangeCarpeta = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const val = (e.target && e.target.value) || "";
+    let _carpeta = { ...carpeta };
+
+    // @ts-ignore
+    _carpeta[name] = val;
+
+    setCarpeta(_carpeta);
+  };
+
+  const onSwitchChangeDocumento = (e: InputSwitchChangeEvent) => {
+    let _documento = { ...documento };
+    _documento["FirmaDigital"] = e.value;
+    setDocumento(_documento);
+  };
+
+  const onInputTextAreaChangeDocumento = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    name: string
+  ) => {
+    const val = (e.target && e.target.value) || "";
+    let _documento = { ...documento };
+
+    // @ts-ignore
+    _documento[name] = val;
+
+    setDocumento(_documento);
+  };
+
+  // templates to component DataTable
+  const initFilters = () => {
+    // setFilters({ ...defaultFilters });
+    onGlobalFilterChange();
+  };
+
+  const clearFilter = () => {
+    initFilters();
+  };
+
+  const onGlobalFilterChange = (e?: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e?.target.value ?? "";
+    let _filters = { ...filters };
+
+    // @ts-ignore
+    _filters["global"].value = value;
+
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
+
+  const onColumnToggle = (event: MultiSelectChangeEvent) => {
+    let selectedColumns = event.value;
+
+    let orderedSelectedColumns = columns.filter((col) =>
+      selectedColumns.some((sCol: ColumnMeta) => sCol.field === col.field)
+    );
+    setVisibleColumns(orderedSelectedColumns);
+  };
+
+  const headerDataTable = (
+    <div>
+      <div className="flex flex-wrap justify-content-between gap-2 m-0 p-0">
+        <div className="flex justify-content-between gap-2 align-items-center">
+          <Button
+            type="button"
+            icon="pi pi-refresh"
+            severity="info"
+            onClick={() => {
+              if (titleFM?.id == "MF") {
+                findAllMyFilesFileManager(lastItemBreadCrumbMF);
+              } else if (titleFM?.id == "FA") {
+                findAllFilesAreaFileManager(lastItemBreadCrumbFA);
+              }
+              // findAllMyFilesFileManager({
+              //   IdUsuario: 1,
+              //   IdCarpeta: null,
+              // });
+              // setItemBreadCrumbs([]);
+            }}
+            style={{
+              width: "2rem",
+              height: "2rem",
+              margin: "auto 0",
+              color: "#fff",
+            }}
+          />
+          <Button
+            type="button"
+            icon="pi pi-filter-slash"
+            severity="secondary"
+            onClick={clearFilter}
+            style={{
+              width: "2rem",
+              height: "2rem",
+              margin: "auto 0",
+              color: "#fff",
+            }}
+          />
+        </div>
+
+        <div className="flex justify-content-between gap-2">
+          <IconField iconPosition="left">
+            <InputIcon className="pi pi-search" />
+            <InputText
+              style={{
+                paddingTop: "1.2rem",
+                paddingBottom: "1.2rem",
+                paddingLeft: "2.5rem",
+                width: "18rem",
+                height: "2rem",
+              }}
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Buscar en todos los campos"
+            />
+          </IconField>
+          <MultiSelect
+            value={visibleColumns}
+            options={columns}
+            optionLabel="header"
+            onChange={onColumnToggle}
+            display="comma"
+            style={{
+              width: "3rem",
+              height: "2.4rem",
+            }}
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap justify-content-between m-0 pt-2">
+        <BreadCrumb
+          className="p-2 w-full surface-section"
+          model={itemBreadCrumbs}
+          home={{
+            label: " : ",
+            icon: "pi pi-home pr-1",
+            command: () => {
+              if (titleFM?.id == "MF") {
+                setLastItemBreadCrumbMF({
+                  IdUsuario: userTest.IdUsuario,
+                  IdCarpeta: null,
+                  Categoria: "MF",
+                });
+                findAllMyFilesFileManager({
+                  IdUsuario: userTest.IdUsuario,
+                  IdCarpeta: null,
+                  Categoria: "MF",
+                });
+              } else if (titleFM?.id == "FA") {
+                setLastItemBreadCrumbFA({
+                  IdCarpeta: null,
+                  IdArea: userTest.IdArea,
+                  Categoria: "FA",
+                });
+                findAllFilesAreaFileManager({
+                  IdCarpeta: null,
+                  IdArea: userTest.IdArea,
+                  Categoria: "FA",
+                });
+              }
+              setItemBreadCrumbs([]);
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+
+  // templates to column Descripcion
+  const descripcionBodyTemplate = (rowData: FileManagerEntity) => {
+    const typeElement = rowData.IdFM.split("_")[0];
+    return (
+      <div className="flex flex-row gap-2">
+        {/* icon */}
+        <div className="flex align-items-center justify-content-center pr-1">
+          {typeElement == "c" ? (
+            <i
+              className="pi pi-folder-open"
+              style={{ color: "orange", fontSize: "1.5rem" }}
+            ></i>
+          ) : (
+            <i
+              className="pi pi-file-pdf"
+              style={{ color: "#e55", fontSize: "1.5rem" }}
+            ></i>
+          )}
+        </div>
+        {/* descripcion */}
+        <div className="flex flex-column gap-2">
+          {typeElement == "c" ? (
+            <span
+              className="hover:underline hover:text-orange-500"
+              onClick={() => {
+                if (titleFM?.id == "MF") {
+                  setLastItemBreadCrumbMF({
+                    IdUsuario: userTest.IdUsuario,
+                    IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                    Categoria: "MF",
+                  });
+                  findAllMyFilesFileManager({
+                    IdUsuario: userTest.IdUsuario,
+                    IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                    Categoria: "MF",
+                  });
+                } else if (titleFM?.id == "FA") {
+                  setLastItemBreadCrumbFA({
+                    IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                    IdArea: userTest.IdArea,
+                    Categoria: "FA",
+                  });
+                  findAllFilesAreaFileManager({
+                    IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                    IdArea: userTest.IdArea,
+                    Categoria: "FA",
+                  });
+                }
+
+                setItemBreadCrumbs([
+                  ...itemBreadCrumbs,
+                  {
+                    label: rowData.Descripcion,
+                    icon: "pi pi-home",
+                    command: (event: MenuItemCommandEvent) => {
+                      if (titleFM?.id == "MF") {
+                        setLastItemBreadCrumbMF({
+                          IdUsuario: userTest.IdUsuario,
+                          IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                          Categoria: "MF",
+                        });
+                        findAllMyFilesFileManager({
+                          IdUsuario: userTest.IdUsuario,
+                          IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                          Categoria: "MF",
+                        });
+                      } else if (titleFM?.id == "FA") {
+                        setLastItemBreadCrumbFA({
+                          IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                          IdArea: userTest.IdArea,
+                          Categoria: "FA",
+                        });
+                        findAllFilesAreaFileManager({
+                          IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                          IdArea: userTest.IdArea,
+                          Categoria: "FA",
+                        });
+                      }
+
+                      setItemBreadCrumbs([
+                        ...itemBreadCrumbs,
+                        {
+                          label: event.item.label,
+                          icon: event.item.icon,
+                          command: event.item.command,
+                        },
+                      ]);
+                    },
+                  },
+                ]);
+              }}
+            >
+              {rowData.Descripcion}
+            </span>
+          ) : (
+            <a
+              className="hover:underline hover:text-red-300"
+              style={{ textDecoration: "none", color: "var(--text-color)" }}
+              href={`${rowData.UrlFM}`}
+              target="_blank"
+            >
+              {rowData.Descripcion}
+            </a>
+          )}
+          <span className="text-xs m-0">
+            {formatDate(new Date(rowData.FechaEmision))}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
+  const descripcionFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <div className="flex align-items-center justify-content-center gap-2">
+        <label htmlFor="verified-filter" className="font-bold">
+          Activo
+        </label>
+        <TriStateCheckbox
+          id="verified-filter"
+          value={options.value}
+          onChange={(e: TriStateCheckboxChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+        />
+      </div>
+    );
+  };
+
+  // templates to column Estado
+  const estadoBodyTemplate = (rowData: FileManagerEntity) => {
+    return <p className="text-sm m-0">{rowData.Estado?.Descripcion}</p>;
+  };
+
+  const estadoFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <Calendar
+        value={options.value ? new Date(options.value) : null}
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index);
+        }}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+        showIcon
+      />
+    );
+  };
+
+  // templates to column Usuario
+  const usuarioBodyTemplate = (rowData: FileManagerEntity) => {
+    return (
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">
+          {rowData.Usuario.Nombres +
+            " " +
+            rowData.Usuario.ApellidoPaterno +
+            " " +
+            rowData.Usuario.ApellidoMaterno}
+        </p>
+        <span className="text-xs text-color-secondary m-0">
+          {rowData.Usuario.Area.Descripcion}
+        </span>
+      </div>
+    );
+  };
+
+  const usuarioFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <Calendar
+        value={options.value ? new Date(options.value) : null}
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index);
+        }}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+        showIcon
+      />
+    );
+  };
+
+  // templates to actions update and remove on dataTable
+  const getItemsMenuActionsFM = (rowData: FileManagerEntity): MenuItem[] => {
+    const isOwner = rowData.Usuario.IdUsuario === userTest.IdUsuario;
+    const typeElement = rowData.IdFM.split("_")[0];
+    const isSigned = rowData.FirmaDigital;
+
+    if (typeElement === "c") {
+      return isOwner
+        ? [
+            {
+              label: "Editar",
+              icon: "pi pi-pencil",
+              command: () => {
+                showUpdateCarpetaDialog({
+                  IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                  IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+                  Descripcion: rowData.Descripcion,
+                  CreadoEl: rowData.FechaEmision,
+                  Categoria: rowData.Categoria,
+                  IdUsuario: rowData.Usuario.IdUsuario,
+                  Activo: rowData.Activo,
+                });
+              },
+            },
+            {
+              label: "Eliminar",
+              icon: "pi pi-trash",
+              command: () => {
+                confirmRemoveCarpeta({
+                  IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                  IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+                  Descripcion: rowData.Descripcion,
+                  CreadoEl: rowData.FechaEmision,
+                  Categoria: rowData.Categoria,
+                  IdUsuario: rowData.Usuario.IdUsuario,
+                  Activo: rowData.Activo,
+                });
+              },
+            },
+            { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
+          ]
+        : [{ label: "Compartir", icon: "pi pi-user-plus", disabled: true }];
+    }
+
+    if (!isSigned) {
+      return isOwner
+        ? [
+            {
+              label: "Eliminar",
+              icon: "pi pi-trash",
+              command: () => {
+                confirmRemoveCarpeta({
+                  IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                  IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+                  Descripcion: rowData.Descripcion,
+                  CreadoEl: rowData.FechaEmision,
+                  Categoria: rowData.Categoria,
+                  IdUsuario: rowData.Usuario.IdUsuario,
+                  Activo: rowData.Activo,
+                });
+              },
+            },
+            { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
+          ]
+        : [{ label: "Compartir", icon: "pi pi-user-plus", disabled: true }];
+    } else {
+      return isOwner
+        ? [
+            {
+              label: "Eliminar",
+              icon: "pi pi-trash",
+              command: () => {
+                confirmRemoveCarpeta({
+                  IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+                  IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+                  Descripcion: rowData.Descripcion,
+                  CreadoEl: rowData.FechaEmision,
+                  Categoria: rowData.Categoria,
+                  IdUsuario: rowData.Usuario.IdUsuario,
+                  Activo: rowData.Activo,
+                });
+              },
+            },
+            { label: "Firmar", icon: "pi pi-pen-to-square", disabled: true },
+            { label: "Ver Firmas", icon: "pi pi-list-check", disabled: true },
+            { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
+          ]
+        : [
+            { label: "Firmar", icon: "pi pi-pen-to-square", disabled: true },
+            { label: "Ver Firmas", icon: "pi pi-list-check", disabled: true },
+            { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
+          ];
+    }
+  };
+
+  const actionsBodyTemplate = (rowData: FileManagerEntity) => {
+    return (
+      <>
+        <Menu
+          model={itemsMenuActionsFM}
+          popup
+          ref={menuActionsFM}
+          id="popup_menu_right"
+          popupAlignment="right"
+        />
+        <Button
+          icon="pi pi-bars"
+          className="mr-2"
+          onClick={(event) => {
+            setItemsMenuActionsFM(getItemsMenuActionsFM(rowData));
+            menuActionsFM.current?.toggle(event);
+          }}
+          aria-controls="popup_menu_right"
+          aria-haspopup
+          text
+          size="small"
+          severity="secondary"
+        />
+      </>
+    );
+  };
+
+  //useEffects
+  useEffect(() => {
+    setTitleFM({ id: "MF", title: "Mis archivos" });
+    findAllMyFilesFileManager({
+      IdUsuario: userTest.IdUsuario,
+      IdCarpeta: null,
+      Categoria: "MF",
+    });
+  }, []);
+
+  return (
+    <div className="">
+      <Toast ref={toastx} position={"bottom-right"} />
+
+      <div className="flex flex-row flex-wrap justify-content-between">
+        <div
+          className="flex flex-column flex-wrap gap-3"
+          style={{ width: "18%" }}
+        >
+          <Menu
+            model={[
+              {
+                label: "Subir archivo",
+                icon: "pi pi-file",
+                command: showCreateDocumentoDialog,
+              },
+              {
+                label: "Nueva Carpeta",
+                icon: "pi pi-folder",
+                command: showCreateCarpetaDialog,
+              },
+            ]}
+            popup
+            ref={menuAddFM}
+            id="popup_menu_right"
+            popupAlignment="right"
+          />
+          <Button
+            label="Agregar"
+            icon="pi pi-plus"
+            className="mr-2"
+            onClick={(event) => menuAddFM.current?.toggle(event)}
+            aria-controls="popup_menu_right"
+            aria-haspopup
+            text
+            raised
+            size="small"
+          />
+
+          <Menu
+            className="w-full surface-section"
+            model={[
+              {
+                label: "Ubicación",
+                items: [
+                  {
+                    label: "Mis archivos",
+                    icon: "pi pi-desktop",
+                    command: (event: MenuItemCommandEvent) => {
+                      setTitleFM({ id: "MF", title: event.item.label });
+                      setLastItemBreadCrumbMF({
+                        IdUsuario: userTest.IdUsuario,
+                        IdCarpeta: null,
+                        Categoria: "MF",
+                      });
+                      findAllMyFilesFileManager({
+                        IdCarpeta: null,
+                        IdUsuario: userTest.IdUsuario,
+                        Categoria: "MF",
+                      });
+                      setItemBreadCrumbs([]);
+                    },
+                  },
+                  {
+                    label: "Archivos de área",
+                    icon: "pi pi-building",
+                    command: (event: MenuItemCommandEvent) => {
+                      setTitleFM({ id: "FA", title: event.item.label });
+                      setLastItemBreadCrumbFA({
+                        IdCarpeta: null,
+                        IdArea: userTest.IdArea,
+                        Categoria: "FA",
+                      });
+                      findAllFilesAreaFileManager({
+                        IdCarpeta: null,
+                        IdArea: userTest.IdArea,
+                        Categoria: "FA",
+                      });
+                      setItemBreadCrumbs([]);
+                    },
+                  },
+                  {
+                    label: "Compartidos conmigo",
+                    icon: "pi pi-share-alt",
+                    disabled: true,
+                    command: (event: MenuItemCommandEvent) => {
+                      setTitleFM({ id: "FS", title: event.item.label });
+                    },
+                  },
+                ],
+              },
+            ]}
+          />
+        </div>
+
+        <div style={{ width: "80%" }}>
+          <Toolbar
+            style={{
+              margin: "0",
+              padding: "0.4em .5em",
+            }}
+            start={startContent}
+          />
+
+          <DataTable
+            value={fileManagers}
+            sortMode="multiple"
+            removableSort
+            paginator
+            rows={10}
+            rowsPerPageOptions={[5, 10, 25, 50]}
+            scrollable
+            scrollHeight="60vh"
+            header={headerDataTable}
+            paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+            currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
+            paginatorClassName="p-1"
+            filters={filters}
+            globalFilterFields={[
+              "IdFM",
+              "Descripcion",
+              "Usuario.NombreCompleto",
+              "Estado.Descripcion",
+            ]}
+            emptyMessage={<EmptyMessageData loading={loading} />}
+            selectionMode="checkbox"
+            selection={selectedFileManagers}
+            onSelectionChange={(e) => {
+              if (Array.isArray(e.value)) {
+                setSelectedFileManagers(e.value);
+              }
+            }}
+            dataKey="IdFM"
+            selectionPageOnly
+            // loading={loading}
+          >
+            <Column
+              selectionMode="multiple"
+              exportable={false}
+              headerStyle={{ width: "0%" }}
+            />
+            {visibleColumns.map((col) => {
+              if (col.field == "Descripcion") {
+                return (
+                  <Column
+                    key={col.field}
+                    field={col.field}
+                    filterField={col.filterField}
+                    sortField={col.filterField}
+                    header={col.header}
+                    dataType={col.dataType}
+                    sortable
+                    style={{ width: col.width, padding: 5 }}
+                    filter
+                    filterPlaceholder={col.filterPlaceholder}
+                    body={descripcionBodyTemplate}
+                    // filterElement={creadoElFilterTemplate}
+                  />
+                );
+              } else if (col.field == "Usuario") {
+                return (
+                  <Column
+                    key={col.field}
+                    field={col.field}
+                    filterField={col.filterField}
+                    sortField={col.filterField}
+                    header={col.header}
+                    dataType={col.dataType}
+                    sortable
+                    style={{ width: col.width, padding: 5 }}
+                    filter
+                    filterPlaceholder={col.filterPlaceholder}
+                    body={usuarioBodyTemplate}
+                    // filterElement={creadoElFilterTemplate}
+                  />
+                );
+              } else if (col.field == "Estado") {
+                return (
+                  <Column
+                    key={col.field}
+                    field={col.field}
+                    filterField={col.filterField}
+                    sortField={col.filterField}
+                    header={col.header}
+                    dataType={col.dataType}
+                    sortable
+                    style={{ width: col.width, padding: 5 }}
+                    filter
+                    filterPlaceholder={col.filterPlaceholder}
+                    body={estadoBodyTemplate}
+                    // filterElement={modifiadoElFilterTemplate}
+                  />
+                );
+              } else {
+                return (
+                  <Column
+                    key={col.field}
+                    field={col.field}
+                    header={col.header}
+                    dataType={col.dataType}
+                    sortable
+                    style={{ width: col.width, padding: 5 }}
+                    filter
+                    filterPlaceholder={col.filterPlaceholder}
+                  />
+                );
+              }
+            })}
+            <Column
+              body={actionsBodyTemplate}
+              exportable={false}
+              style={{ width: "5%", padding: 5 }}
+            ></Column>
+          </DataTable>
+        </div>
+      </div>
+
+      <CarpetaCreateOrUpdate
+        submitted={submitted}
+        carpeta={carpeta}
+        carpetaDialog={carpetaDialog}
+        hideDialog={hideCarpetaDialog}
+        createCarpeta={createCarpetaFileManager}
+        updateCarpeta={updateCarpetaFileManager}
+        onInputChange={onInputChangeCarpeta}
+        onActivoChange={onActivoChangeCarpeta}
+        loadingCarpetaCreateOrUpdate={loadingCarpetaCreateOrUpdate}
+      />
+
+      <CarpetaRemove
+        carpeta={carpeta}
+        removeCarpetaDialog={removeCarpetaDialog}
+        hideRemoveCarpetaDialog={hideRemoveCarpetaDialog}
+        removeCarpeta={removeCarpetaFileManager}
+      />
+
+      <DocumentoCreateOrUpdate
+        submitted={submitted}
+        documento={documento}
+        documentoDialog={documentoDialog}
+        hideDialog={hideDocumentoDialog}
+        createDocumento={createDocumentoFileManager}
+        updateDocumento={updateDocumentoFileManager}
+        onInputTextAreaChange={onInputTextAreaChangeDocumento}
+        onSwitchChange={onSwitchChangeDocumento}
+        loadingDocumentoCreateOrUpdate={loadingDocumentoCreateOrUpdate}
+        selectedFilesUpload={selectedFilesUpload}
+        setSelectedFilesUpload={setSelectedFilesUpload}
+        totalSizeFilesUpload={totalSizeFilesUpload}
+        setTotalSizeFilesUpload={setTotalSizeFilesUpload}
+      />
+
+      <DocumentoRemove
+        documento={documento}
+        removeDocumentoDialog={removeDocumentoDialog}
+        hideRemoveDocumentoDialog={hideRemoveDocumentoDialog}
+        removeDocumento={removeDocumentoFileManager}
+      />
+    </div>
+  );
+};
+
+export default FileManager;

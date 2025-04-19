@@ -86,4 +86,4 @@ const UseEsquemaEstado = () => {
   };
 };
 
-export default UseEsquemaEstado;
+export  {UseEsquemaEstado};
