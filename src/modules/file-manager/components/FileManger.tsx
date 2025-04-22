@@ -56,7 +56,7 @@ const FileManager = () => {
     removeDocumento,
   } = UseFileManager();
 
-  const { create } = UseFile();
+  const { create, remove } = UseFile();
 
   //useRefs
   const toastx = useRef<Toast>(null);
@@ -176,6 +176,7 @@ const FileManager = () => {
           ? fileManagersFindAll.registro?.map((af) => {
               return {
                 ...af,
+                FechaEmision:af.FechaEmision ? new Date(af.FechaEmision) : null,
                 Usuario: {
                   ...af.Usuario,
                   NombreCompleto:
@@ -211,6 +212,7 @@ const FileManager = () => {
           ? fileManagersFindAll.registro?.map((af) => {
               return {
                 ...af,
+                FechaEmision:af.FechaEmision ? new Date(af.FechaEmision) : null,
                 Usuario: {
                   ...af.Usuario,
                   NombreCompleto:
@@ -349,7 +351,6 @@ const FileManager = () => {
           UrlDocumento: fileUpload.registro?.url,
           SizeDocumento: fileUpload.registro?.size,
           UrlBase: fileUpload.registro?.path,
-
           Titulo: fileUpload.registro?.parseoriginalname,
           Descripcion: documento.Descripcion,
           IdUsuario: userTest.IdUsuario, //
@@ -436,34 +437,46 @@ const FileManager = () => {
 
   const removeDocumentoFileManager = async () => {
     if (documento.IdDocumento) {
-      let documentoRemove = await removeDocumento(
-        documento.IdDocumento.toString()
-      );
-      if (documentoRemove?.message.msgId == 0 && documentoRemove.registro) {
-        setFileManagers(
-          fileManagers?.filter(
-            (fileManager) =>
-              fileManager.IdFM !== documentoRemove?.registro?.IdFM
-          )
+      const fileRemoved = await remove({ PublicUrl: documento.UrlDocumento });
+
+      if (fileRemoved?.message.msgId == 0) {
+        let documentoRemove = await removeDocumento(
+          documento.IdDocumento.toString()
         );
-        toastx.current?.show({
-          severity: "success",
-          detail: `${documentoRemove.message.msgTxt}`,
-          life: 3000,
-        });
-      } else if (documentoRemove?.message.msgId == 1) {
+        if (documentoRemove?.message.msgId == 0 && documentoRemove.registro) {
+          setFileManagers(
+            fileManagers?.filter(
+              (fileManager) =>
+                fileManager.IdFM !== documentoRemove?.registro?.IdFM
+            )
+          );
+          toastx.current?.show({
+            severity: "success",
+            detail: `${documentoRemove.message.msgTxt}`,
+            life: 3000,
+          });
+        } else if (documentoRemove?.message.msgId == 1) {
+          toastx.current?.show({
+            severity: "error",
+            detail: `${documentoRemove.message.msgTxt}`,
+            life: 3000,
+          });
+        }
+      } else {
         toastx.current?.show({
           severity: "error",
-          detail: `${documentoRemove.message.msgTxt}`,
+          detail: `${fileRemoved?.message.msgTxt}`,
           life: 3000,
         });
       }
+
       setRemoveDocumentoDialog(false);
       setDocumento(emptyDocumento);
     }
   };
 
   // templates to dialogs
+  // carpeta
   const hideCarpetaDialog = () => {
     setSubmitted(false);
     setCarpetaDialog({ state: false });
@@ -489,6 +502,7 @@ const FileManager = () => {
     setRemoveCarpetaDialog(true);
   };
 
+  //documento
   const hideDocumentoDialog = () => {
     setSubmitted(false);
     setDocumentoDialog({ state: false });
@@ -502,8 +516,8 @@ const FileManager = () => {
     setDocumentoDialog({ type: "create", state: true });
   };
 
-  const showUpdateDocumentoDialog = (carpeta: DocumentoEntity) => {
-    setDocumento({ ...carpeta });
+  const showUpdateDocumentoDialog = (documento: DocumentoEntity) => {
+    setDocumento({ ...documento });
     setDocumentoDialog({ type: "update", state: true });
   };
 
@@ -511,8 +525,8 @@ const FileManager = () => {
     setRemoveDocumentoDialog(false);
   };
 
-  const confirmRemoveDocumento = (carpeta: DocumentoEntity) => {
-    setDocumento({ ...carpeta });
+  const confirmRemoveDocumento = (documento: DocumentoEntity) => {
+    setDocumento({ ...documento });
     setRemoveDocumentoDialog(true);
   };
 
@@ -799,7 +813,7 @@ const FileManager = () => {
             </a>
           )}
           <span className="text-xs m-0">
-            {formatDate(new Date(rowData.FechaEmision))}
+          {rowData.FechaEmision ? formatDate(new Date(rowData.FechaEmision)) : ''}
           </span>
         </div>
       </div>
@@ -882,6 +896,34 @@ const FileManager = () => {
     );
   };
 
+  // templates to column FechaEmision
+  const fechaEmisionBodyTemplate = (rowData: FileManagerEntity) => {
+    return (
+      <p className="text-sm m-0">
+        {!rowData.FechaEmision
+          ? "00/00/0000, 00:00 TM"
+          : formatDate(new Date(rowData.FechaEmision))}
+      </p>
+    );
+  };
+
+  const fechaEmisionFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <Calendar
+        value={options.value ? new Date(options.value) : null}
+        onChange={(e) => {
+          options.filterCallback(e.value, options.index);
+        }}
+        dateFormat="mm/dd/yy"
+        placeholder="mm/dd/yyyy"
+        mask="99/99/9999"
+        showIcon
+      />
+    );
+  };
+
   // templates to actions update and remove on dataTable
   const getItemsMenuActionsFM = (rowData: FileManagerEntity): MenuItem[] => {
     const isOwner = rowData.Usuario.IdUsuario === userTest.IdUsuario;
@@ -933,14 +975,16 @@ const FileManager = () => {
               label: "Eliminar",
               icon: "pi pi-trash",
               command: () => {
-                confirmRemoveCarpeta({
-                  IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-                  IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-                  Descripcion: rowData.Descripcion,
-                  CreadoEl: rowData.FechaEmision,
+                confirmRemoveDocumento({
+                  IdDocumento: parseInt(rowData.IdFM.split("_")[1]),
+                  Titulo: rowData.Descripcion,
+                  FechaEmision: rowData.FechaEmision,
+                  UrlDocumento: rowData.UrlFM,
+                  FirmaDigital: rowData.FirmaDigital,
                   Categoria: rowData.Categoria,
                   IdUsuario: rowData.Usuario.IdUsuario,
-                  Activo: rowData.Activo,
+                  IdEstado: rowData.Estado.IdEstado,
+                  IdCarpeta: rowData.Carpeta?.IdCarpeta,
                 });
               },
             },
@@ -954,14 +998,16 @@ const FileManager = () => {
               label: "Eliminar",
               icon: "pi pi-trash",
               command: () => {
-                confirmRemoveCarpeta({
-                  IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-                  IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-                  Descripcion: rowData.Descripcion,
-                  CreadoEl: rowData.FechaEmision,
+                confirmRemoveDocumento({
+                  IdDocumento: parseInt(rowData.IdFM.split("_")[1]),
+                  Titulo: rowData.Descripcion,
+                  FechaEmision: rowData.FechaEmision,
+                  UrlDocumento: rowData.UrlFM,
+                  FirmaDigital: rowData.FirmaDigital,
                   Categoria: rowData.Categoria,
                   IdUsuario: rowData.Usuario.IdUsuario,
-                  Activo: rowData.Activo,
+                  IdEstado: rowData.Estado.IdEstado,
+                  IdCarpeta: rowData.Carpeta?.IdCarpeta,
                 });
               },
             },
@@ -1137,6 +1183,7 @@ const FileManager = () => {
               "Descripcion",
               "Usuario.NombreCompleto",
               "Estado.Descripcion",
+              "FechaEmision",
             ]}
             emptyMessage={<EmptyMessageData loading={loading} />}
             selectionMode="checkbox"
@@ -1205,6 +1252,22 @@ const FileManager = () => {
                     filterPlaceholder={col.filterPlaceholder}
                     body={estadoBodyTemplate}
                     // filterElement={modifiadoElFilterTemplate}
+                  />
+                );
+              } else if (col.field == "FechaEmision") {
+                return (
+                  <Column
+                    key={col.field}
+                    field={col.field}
+                    filterField={col.field}
+                    header={col.header}
+                    dataType={col.dataType}
+                    sortable
+                    style={{ width: col.width, padding: 5 }}
+                    filter
+                    filterPlaceholder={col.filterPlaceholder}
+                    body={fechaEmisionBodyTemplate}
+                    filterElement={fechaEmisionFilterTemplate}
                   />
                 );
               } else {

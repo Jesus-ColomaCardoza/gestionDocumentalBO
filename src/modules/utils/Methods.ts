@@ -34,14 +34,14 @@ export const printLog = (...args: any[]) => {
   }
 };
 
-export const formatDate = (value: Date) => {
+export const formatDate = (value: Date | null): string => {
+  if (!value) return '';
   return value.toLocaleDateString("en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-    // second: "2-digit",
     timeZone: "America/Lima",
   });
 };

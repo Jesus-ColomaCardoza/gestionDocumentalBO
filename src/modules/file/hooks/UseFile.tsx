@@ -2,7 +2,7 @@ import axios from "axios";
 import { VITE_API_URL_GDS } from "../../utils/Constants";
 import { Menssage } from "../../utils/menssage";
 import { FILE } from "../service/FileService";
-import { FileOut } from "../interfaces/FileInterface";
+import { FileOut, FileRemove } from "../interfaces/FileInterface";
 
 const UseFile = () => {
   let message = new Menssage();
@@ -29,8 +29,23 @@ const UseFile = () => {
     }
   };
 
+  const remove = async (
+    fileRemove: FileRemove
+  ): Promise<FileOut | undefined> => {
+    try {
+      const file = await axios.post<FileOut>(
+        `${VITE_API_URL_GDS + FILE.REMOVE}`,
+        fileRemove
+      );
+      return file.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return {
     create,
+    remove,
   };
 };
 

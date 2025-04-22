@@ -3,7 +3,7 @@ import { Message } from "../../utils/Interfaces";
 export interface FileManagerEntity {
   IdFM: string;
   Descripcion: string;
-  FechaEmision: Date;
+  FechaEmision: Date|null;
   UrlFM: string;
   FirmaDigital: boolean | null;
   Categoria?: "MF" | "FA" | "FS" | undefined;

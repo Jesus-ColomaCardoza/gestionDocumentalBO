@@ -13,6 +13,10 @@ export interface FileEntity {
   url: string;
 }
 
+export interface FileRemove {
+  PublicUrl: string;
+}
+
 export interface FileOut {
   message: Message;
   registro?: FileEntity;

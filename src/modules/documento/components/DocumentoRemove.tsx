@@ -45,7 +45,7 @@ const DocumentoRemove = (props: DocumentoRemoveProps) => {
         {props.documento && (
           <span>
             {/* Are you sure you want to remove <b>{props.documento.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar este documento <b>{props.documento.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar este documento <b>{props.documento.Titulo}</b>?
           </span>
         )}
       </div>

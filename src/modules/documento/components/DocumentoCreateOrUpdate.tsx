@@ -67,7 +67,12 @@ const DocumentoCreateOrUpdate = (props: DocumentoCreateOrUpdateProps) => {
   };
 
   const headerTemplate = (options: FileUploadHeaderTemplateOptions) => {
-    const { className, chooseButton, uploadButton, cancelButton } = options;
+    const {
+      className,
+      chooseButton,
+      // uploadButton,
+      cancelButton,
+    } = options;
     const value = props.totalSizeFilesUpload / 20000;
     const formatedValue =
       fileUpload && fileUpload.current
@@ -200,7 +205,7 @@ const DocumentoCreateOrUpdate = (props: DocumentoCreateOrUpdateProps) => {
         <div className="flex align-items-center gap-2">
           <InputSwitch
             id="FirmaDigital"
-            checked={props.documento.FirmaDigital}
+            checked={props.documento.FirmaDigital ?? false}
             onChange={(e) => props.onSwitchChange(e)}
             className="h-2"
           />

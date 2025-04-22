@@ -2,7 +2,6 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ColumnMeta } from "../../utils/Interfaces";
 import { DataTableFilterMeta } from "primereact/datatable";
 import { FileManagerEntity } from "../interfaces/FileMangerInterface";
-import { CarpetaEntity } from "../../carpeta/interfaces/CarpetaInterface";
 
 export const columns: ColumnMeta[] = [
   {
@@ -19,7 +18,7 @@ export const columns: ColumnMeta[] = [
     filterField: "Descripcion",
     header: "Descripcion",
     dataType: "text",
-    width: "40%",
+    width: "35%",
     show: true,
     filterPlaceholder: "Buscar por Descripcion",
   },
@@ -28,7 +27,7 @@ export const columns: ColumnMeta[] = [
     filterField: "Usuario.NombreCompleto",
     header: "Usuario",
     dataType: "text",
-    width: "40%",
+    width: "35%",
     show: true,
     filterPlaceholder: "Buscar por Usuario",
   },
@@ -40,6 +39,15 @@ export const columns: ColumnMeta[] = [
     width: "10%",
     show: true,
     filterPlaceholder: "Buscar por Estado",
+  },
+  {
+    field: "FechaEmision",
+    filterField: "FechaEmision",
+    header: "FechaEmision",
+    dataType: "date",
+    width: "10%",
+    show: true,
+    filterPlaceholder: "Buscar por Fecha",
   },
 ];
 
@@ -62,6 +70,10 @@ export const defaultFilters: DataTableFilterMeta = {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
   },
+  FechaEmision: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+  },
 };
 
 export let emptyFileManager: FileManagerEntity = {
@@ -70,7 +82,7 @@ export let emptyFileManager: FileManagerEntity = {
   FechaEmision: new Date(),
   UrlFM: "",
   FirmaDigital: null,
-  Activo:false,
+  Activo: false,
   Usuario: {
     IdUsuario: 0,
     Nombres: "",
