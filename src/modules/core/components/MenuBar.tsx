@@ -174,7 +174,11 @@ const MenuBar = (props: MenuBarProps) => {
       }}
     >
       <Menubar
-        style={{ height: "3.5rem" }}
+        style={{ height: "3.5rem",
+          backgroundColor: "var(--surface-50)",
+          borderColor:"var(--surface-50)"
+
+         }}
         model={items}
         start={start}
         end={end}

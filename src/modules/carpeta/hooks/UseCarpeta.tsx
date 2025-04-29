@@ -1,4 +1,5 @@
 import {
+  CarpetaCombinationsFilters,
   CarpetaCreate,
   CarpetaOut,
   CarpetasOut,
@@ -33,6 +34,20 @@ const UseCarpeta = () => {
       const fileManagers = await axios.post<CarpetasOut>(
         `${VITE_API_URL_GDS + CARPETA.FIND_ALL}`,
         filterBodyRequest
+      );
+      return fileManagers.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const findAllTree = async (
+    carpetaCombinationsFilters: CarpetaCombinationsFilters
+  ): Promise<any | undefined> => {
+    try {
+      const fileManagers = await axios.post<any>(
+        `${VITE_API_URL_GDS + CARPETA.FIND_ALL_TREE}`,
+        carpetaCombinationsFilters
       );
       return fileManagers.data;
     } catch (error) {
@@ -80,6 +95,7 @@ const UseCarpeta = () => {
   return {
     create,
     findAll,
+    findAllTree,
     findOne,
     update,
     remove,

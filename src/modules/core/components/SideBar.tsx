@@ -15,9 +15,9 @@ type SideBarProps = {
 const SideBar = (props: SideBarProps) => {
   const btnRef1 = useRef<any>(null);
   const btnRef2 = useRef<any>(null);
-  const btnRef3 = useRef<any>(null);
-  const btnRef4 = useRef<any>(null);
-  const btnRef5 = useRef<any>(null);
+  // const btnRef3 = useRef<any>(null);
+  // const btnRef4 = useRef<any>(null);
+  // const btnRef5 = useRef<any>(null);
 
   const refSideBar = useRef<Card>(null);
 
@@ -25,6 +25,8 @@ const SideBar = (props: SideBarProps) => {
     <Card
       ref={refSideBar}
       style={{
+        backgroundColor: "var(--surface-50)",
+
         position: "sticky",
         top: "5rem",
         // marginRight: ".5em",
@@ -210,7 +212,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Cargo</span>
+                  <span className="font-medium text-sm">Cargo</span>
                   <Ripple />
                 </Link>
               </li>
@@ -220,7 +222,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Estado</span>
+                  <span className="font-medium text-sm">Estado</span>
                   <Ripple />
                 </Link>
               </li>
@@ -230,7 +232,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Esquema Estado</span>
+                  <span className="font-medium text-sm">Esquema Estado</span>
                   <Ripple />
                 </Link>
               </li>
@@ -250,7 +252,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Tipo Documento</span>
+                  <span className="font-medium text-sm">Tipo Documento</span>
                   <Ripple />
                 </Link>
               </li>
@@ -270,7 +272,7 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium">Tipo Tramite</span>
+                  <span className="font-medium text-sm">Tipo Tramite</span>
                   <Ripple />
                 </Link>
               </li>
@@ -284,7 +286,7 @@ const SideBar = (props: SideBarProps) => {
                   <Ripple />
                 </Link>
               </li>
-              <li>
+              {/* <li>
                 <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                   <i className="pi pi-bookmark mr-2"></i>
                   <span className="font-medium">Bookmarks</span>
@@ -392,11 +394,11 @@ const SideBar = (props: SideBarProps) => {
                   <span className="font-medium">Settings</span>
                   <Ripple />
                 </a>
-              </li>
+              </li> */}
             </ul>
           </li>
         </ul>
-        <ul className="list-none px-2">
+        {/* <ul className="list-none px-2">
           <li>
             <StyleClass
               nodeRef={btnRef5}
@@ -415,7 +417,7 @@ const SideBar = (props: SideBarProps) => {
                 <Ripple />
               </div>
             </StyleClass>
-            <ul className="list-none p-0 m-0 overflow-hidden">
+            <ul className="list-none p-0 m-0 hidden overflow-hidden">
               <li>
                 <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                   <i className="pi pi-folder mr-2"></i>
@@ -439,7 +441,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
             </ul>
           </li>
-        </ul>
+        </ul> */}
       </div>
 
       {/* Sidebar-footer */}

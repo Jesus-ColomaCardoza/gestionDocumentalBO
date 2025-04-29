@@ -2,17 +2,44 @@ export interface ColumnMeta {
   field: string;
   filterField?: string;
   header: string;
-  dataType?: 'text' | 'numeric' | 'date' | string | undefined;
+  dataType?: "text" | "numeric" | "date" | string | undefined;
   width: string;
   show: boolean;
-  filterPlaceholder?:string,
+  filterPlaceholder?: string;
 }
 
+//message
 export interface Message {
   msgId: number;
   msgTxt: string;
 }
 
-export interface ErrorOut {
-  message : Message;
+// filters
+export type FilterOperator =
+  | "EQ"
+  | "BT"
+  | "GT"
+  | "LT"
+  | "GE"
+  | "LE"
+  | "Contains"
+  | "IN";
+export type FilterType =
+  | "date"
+  | "numeric2"
+  | "string"
+  | "comboPlataforma"
+  | "boolean"
+  | "other";
+export interface CreateFilter {
+  campo: string;
+  operador: FilterOperator;
+  valor1: string;
+  valor2?: string;
+  tipo: FilterType;
+}
+export interface CombinationsFilters {
+  filters: CreateFilter[];
+  cantidad_max: string;
+  Language: string;
 }

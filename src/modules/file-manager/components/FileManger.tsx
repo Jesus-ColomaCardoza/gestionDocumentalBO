@@ -18,9 +18,10 @@ import {
   FileManagerEntity,
   FileManagerGetFilesArea,
   FileManagerGetMyFiles,
+  FileManagerOut,
 } from "../interfaces/FileMangerInterface";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters } from "../utils/Constants";
+import { columns, defaultFilters, emptyFileManager } from "../utils/Constants";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
@@ -28,7 +29,10 @@ import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { Menu } from "primereact/menu";
 import { BreadCrumb } from "primereact/breadcrumb";
 import { emptyCarpeta } from "../../carpeta/utils/Constants";
-import { CarpetaEntity } from "../../carpeta/interfaces/CarpetaInterface";
+import {
+  CarpetaCombinationsFilters,
+  CarpetaEntity,
+} from "../../carpeta/interfaces/CarpetaInterface";
 import CarpetaCreateOrUpdate from "../../carpeta/components/CarpetaCreateOrUpdate";
 import CarpetaRemove from "../../carpeta/components/CarpetaRemove";
 import { emptyDocumento } from "../../documento/utils/Constants";
@@ -37,6 +41,12 @@ import DocumentoCreateOrUpdate from "../../documento/components/DocumentoCreateO
 import DocumentoRemove from "../../documento/components/DocumentoRemove";
 import UseFile from "../../file/hooks/UseFile";
 import { InputSwitchChangeEvent } from "primereact/inputswitch";
+import FileManagerMove from "./FileMangerMove";
+import UseCarpeta from "../../carpeta/hooks/UseCarpeta";
+import {
+  TreeCheckboxSelectionKeys,
+  TreeMultipleSelectionKeys,
+} from "primereact/tree";
 
 const FileManager = () => {
   const userTest = {
@@ -58,6 +68,8 @@ const FileManager = () => {
 
   const { create, remove } = UseFile();
 
+  const { findAllTree } = UseCarpeta();
+
   //useRefs
   const toastx = useRef<Toast>(null);
 
@@ -66,6 +78,10 @@ const FileManager = () => {
   const menuActionsFM = useRef<Menu>(null);
 
   //useStates
+  const [selectedFileMoved, setSelectedFileMoved] = useState<
+    string | TreeMultipleSelectionKeys | TreeCheckboxSelectionKeys | null
+  >(null);
+
   const [selectedFilesUpload, setSelectedFilesUpload] = useState<File[]>([]);
 
   const [totalSizeFilesUpload, setTotalSizeFilesUpload] = useState<number>(0);
@@ -90,11 +106,18 @@ const FileManager = () => {
   const [loadingDocumentoCreateOrUpdate, setLoadingDocumentoCreateOrUpdate] =
     useState<boolean>(false);
 
+  const [loadingFileManagerMove, setLoadingFileManagerMove] =
+    useState<boolean>(false);
+
   const [carpeta, setCarpeta] = useState<CarpetaEntity>(emptyCarpeta);
 
   const [documento, setDocumento] = useState<DocumentoEntity>(emptyDocumento);
 
+  const [treeFileManager, setTreeFileManager] = useState([]);
+
   const [fileManagers, setFileManagers] = useState<FileManagerEntity[]>([]);
+
+  const [fileManager, setFileManager] = useState<FileManagerEntity>(emptyFileManager);
 
   const [selectedFileManagers, setSelectedFileManagers] = useState<
     FileManagerEntity[]
@@ -118,6 +141,9 @@ const FileManager = () => {
     useState<boolean>(false);
 
   const [removeDocumentoDialog, setRemoveDocumentoDialog] =
+    useState<boolean>(false);
+
+  const [moveFileManagerDialog, setMoveFileManagerDialog] =
     useState<boolean>(false);
 
   const [itemBreadCrumbs, setItemBreadCrumbs] = useState<MenuItem[]>([]);
@@ -165,7 +191,6 @@ const FileManager = () => {
   ) => {
     setLoading(true);
     const fileManagersFindAll = await findAllMyFiles(fileManagerGetMyFiles);
-    setLoading(false);
 
     if (
       fileManagersFindAll?.message.msgId == 0 &&
@@ -176,7 +201,9 @@ const FileManager = () => {
           ? fileManagersFindAll.registro?.map((af) => {
               return {
                 ...af,
-                FechaEmision:af.FechaEmision ? new Date(af.FechaEmision) : null,
+                FechaEmision: af.FechaEmision
+                  ? new Date(af.FechaEmision)
+                  : null,
                 Usuario: {
                   ...af.Usuario,
                   NombreCompleto:
@@ -201,7 +228,6 @@ const FileManager = () => {
   ) => {
     setLoading(true);
     const fileManagersFindAll = await findAllFilesArea(fileManagerGetFilesArea);
-    setLoading(false);
 
     if (
       fileManagersFindAll?.message.msgId == 0 &&
@@ -212,7 +238,9 @@ const FileManager = () => {
           ? fileManagersFindAll.registro?.map((af) => {
               return {
                 ...af,
-                FechaEmision:af.FechaEmision ? new Date(af.FechaEmision) : null,
+                FechaEmision: af.FechaEmision
+                  ? new Date(af.FechaEmision)
+                  : null,
                 Usuario: {
                   ...af.Usuario,
                   NombreCompleto:
@@ -230,6 +258,23 @@ const FileManager = () => {
 
     setLoading(false);
     onGlobalFilterChange();
+  };
+
+  const findAllTreeFileManager = async (
+    fileManagerGetTree: CarpetaCombinationsFilters
+  ) => {
+    const fileManagersFindAll = await findAllTree(fileManagerGetTree);
+
+    if (
+      fileManagersFindAll?.message.msgId == 0 &&
+      fileManagersFindAll.registro
+    ) {
+      setTreeFileManager(
+        Array.isArray(fileManagersFindAll.registro)
+          ? fileManagersFindAll.registro
+          : []
+      );
+    }
   };
 
   const createCarpetaFileManager = async () => {
@@ -396,6 +441,7 @@ const FileManager = () => {
     }
   };
 
+  // updateDocumentoFileManager - doesn't work
   const updateDocumentoFileManager = async () => {
     setSubmitted(true);
     if (documento.IdDocumento) {
@@ -475,6 +521,62 @@ const FileManager = () => {
     }
   };
 
+  const moveFileManager = async (categoria: "MF" | "FA" | "FS") => {
+    //ga
+    if (fileManager?.IdFM) {
+      setLoadingFileManagerMove(true);
+
+      const typeElement = fileManager.IdFM.split("_")[0];
+      const idElement = fileManager.IdFM.split("_")[1];
+
+      let element: FileManagerOut | undefined = undefined;
+
+      if (typeElement == "c") {
+        element = await updateCarpeta(idElement, {
+          IdCarpetaPadre: parseInt(selectedFileMoved?.toString()!),
+          Categoria: categoria,
+        });
+      } else {
+        element = await updateDocumento(idElement, {
+          IdCarpeta: parseInt(selectedFileMoved?.toString()!),
+          Categoria: categoria,
+        });
+      }
+
+      setLoadingFileManagerMove(false);
+
+      if (element?.message.msgId == 0 && element.registro) {
+        // If the final ubication is diferent current ubication
+        if (
+          (parseInt(selectedFileMoved?.toString()!) || null) !=
+            (fileManager?.Carpeta?.IdCarpeta || null) ||
+          titleFM?.id != element?.registro?.Categoria
+        ) {
+          setFileManagers(
+            fileManagers?.filter(
+              (fileManager) => fileManager.IdFM !== element?.registro?.IdFM
+            )
+          );
+        }
+
+        toastx.current?.show({
+          severity: "success",
+          detail: `${element.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (element?.message.msgId == 1) {
+        toastx.current?.show({
+          severity: "error",
+          detail: `${element.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      setSelectedFileMoved(null);
+      setMoveFileManagerDialog(false);
+    }
+  };
+
   // templates to dialogs
   // carpeta
   const hideCarpetaDialog = () => {
@@ -528,6 +630,35 @@ const FileManager = () => {
   const confirmRemoveDocumento = (documento: DocumentoEntity) => {
     setDocumento({ ...documento });
     setRemoveDocumentoDialog(true);
+  };
+
+  //tree
+  const showMoveFileManagerDialog = async (fileManager: FileManagerEntity) => {
+    setFileManager({ ...fileManager });
+
+    await findAllTreeFileManager({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "Categoria",
+          operador: "EQ",
+          tipo: "string",
+          valor1: `${titleFM?.id}`,
+          valor2: "",
+        },
+      ],
+      CustomIcon: "pi pi-folder",
+      IdArea: userTest?.IdArea,
+      NotIncludeIdCarpeta: parseInt(fileManager.IdFM.split("_")[1]),
+    });
+
+    setMoveFileManagerDialog(true);
+  };
+
+  const hideMoveFileManagerDialog = () => {
+    setSelectedFileMoved(null);
+    setMoveFileManagerDialog(false);
   };
 
   // events change
@@ -813,7 +944,9 @@ const FileManager = () => {
             </a>
           )}
           <span className="text-xs m-0">
-          {rowData.FechaEmision ? formatDate(new Date(rowData.FechaEmision)) : ''}
+            {rowData.FechaEmision
+              ? formatDate(new Date(rowData.FechaEmision))
+              : ""}
           </span>
         </div>
       </div>
@@ -949,6 +1082,14 @@ const FileManager = () => {
               },
             },
             {
+              label: "Mover",
+              // icon: "pi pi-file-export",
+              icon: "pi pi-send",
+              command: () => {
+                showMoveFileManagerDialog(rowData);
+              },
+            },
+            {
               label: "Eliminar",
               icon: "pi pi-trash",
               command: () => {
@@ -988,6 +1129,14 @@ const FileManager = () => {
                 });
               },
             },
+            {
+              label: "Mover",
+              // icon: "pi pi-file-export",
+              icon: "pi pi-send",
+              command: () => {
+                showMoveFileManagerDialog(rowData);
+              },
+            },
             { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
           ]
         : [{ label: "Compartir", icon: "pi pi-user-plus", disabled: true }];
@@ -1009,6 +1158,14 @@ const FileManager = () => {
                   IdEstado: rowData.Estado.IdEstado,
                   IdCarpeta: rowData.Carpeta?.IdCarpeta,
                 });
+              },
+            },
+            {
+              label: "Mover",
+              // icon: "pi pi-file-export",
+              icon: "pi pi-send",
+              command: () => {
+                showMoveFileManagerDialog(rowData);
               },
             },
             { label: "Firmar", icon: "pi pi-pen-to-square", disabled: true },
@@ -1334,6 +1491,19 @@ const FileManager = () => {
         removeDocumentoDialog={removeDocumentoDialog}
         hideRemoveDocumentoDialog={hideRemoveDocumentoDialog}
         removeDocumento={removeDocumentoFileManager}
+      />
+
+      <FileManagerMove
+        usuario={userTest}
+        fileManager={fileManager}
+        carpetas={treeFileManager}
+        selectedFileMoved={selectedFileMoved}
+        setSelectedFileMoved={setSelectedFileMoved}
+        moveFileManagerDialog={moveFileManagerDialog}
+        hideDialog={hideMoveFileManagerDialog}
+        moveFileManager={moveFileManager}
+        loadingFileManagerMove={loadingFileManagerMove}
+        findAllTreeFileManager={findAllTreeFileManager}
       />
     </div>
   );

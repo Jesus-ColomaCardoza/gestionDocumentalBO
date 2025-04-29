@@ -1,4 +1,4 @@
-import { Message } from "../../utils/Interfaces";
+import { CombinationsFilters, Message } from "../../utils/Interfaces";
 
 type Fecha = Date | string | null;
 export interface CarpetaEntity {
@@ -33,6 +33,11 @@ export interface CarpetaUpdate {
   ModificadoEl?: Date | string;
   ModificadoPor?: string;
 }
+export interface CarpetaCombinationsFilters extends CombinationsFilters {
+  CustomIcon?: string;
+  IdArea: number;
+  NotIncludeIdCarpeta: number;
+}
 export interface CarpetaOut {
   message: Message;
   registro?: CarpetaEntity;
@@ -41,3 +46,4 @@ export interface CarpetasOut {
   message: Message;
   registro?: CarpetaEntity[];
 }
+

@@ -92,8 +92,9 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
           options={props.esquemaEstados}
           optionLabel="Descripcion"
           filter
-          placeholder="Select Cities"
+          placeholder="Seleccionar Esquema Estado"
           className="w-full"
+          showClear
         />
         {props.submitted && !props.estado.IdEsquemaEstado && (
           <small className="p-error">EsquemaEstado is required.</small>
