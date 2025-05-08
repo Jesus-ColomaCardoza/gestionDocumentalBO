@@ -47,14 +47,18 @@ import {
   TreeCheckboxSelectionKeys,
   TreeMultipleSelectionKeys,
 } from "primereact/tree";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const FileManager = () => {
+  // custom hooks
   const userTest = {
     IdUsuario: 1,
     IdArea: 1,
   };
 
-  // custom hooks
+  const { userAuth } = useAuth()!;
+
+
   const {
     createCarpeta,
     createDocumento,
@@ -117,7 +121,8 @@ const FileManager = () => {
 
   const [fileManagers, setFileManagers] = useState<FileManagerEntity[]>([]);
 
-  const [fileManager, setFileManager] = useState<FileManagerEntity>(emptyFileManager);
+  const [fileManager, setFileManager] =
+    useState<FileManagerEntity>(emptyFileManager);
 
   const [selectedFileManagers, setSelectedFileManagers] = useState<
     FileManagerEntity[]
@@ -150,7 +155,7 @@ const FileManager = () => {
 
   const [lastItemBreadCrumbMF, setLastItemBreadCrumbMF] =
     useState<FileManagerGetMyFiles>({
-      IdUsuario: userTest.IdUsuario,
+      IdUsuario: userAuth?.IdUsuario,
       IdCarpeta: null,
       Categoria: "MF",
     });
@@ -158,7 +163,7 @@ const FileManager = () => {
   const [lastItemBreadCrumbFA, setLastItemBreadCrumbFA] =
     useState<FileManagerGetFilesArea>({
       IdCarpeta: null,
-      IdArea: userTest.IdArea,
+      IdArea: userAuth?.Area.IdArea,
       Categoria: "FA",
     });
 
@@ -287,7 +292,7 @@ const FileManager = () => {
           titleFM?.id == "MF"
             ? lastItemBreadCrumbMF.IdCarpeta
             : lastItemBreadCrumbFA.IdCarpeta,
-        IdUsuario: userTest.IdUsuario, //
+        IdUsuario: userAuth?.IdUsuario, //
         Activo: carpeta.Activo,
         Categoria: titleFM?.id,
       });
@@ -398,7 +403,7 @@ const FileManager = () => {
           UrlBase: fileUpload.registro?.path,
           Titulo: fileUpload.registro?.parseoriginalname,
           Descripcion: documento.Descripcion,
-          IdUsuario: userTest.IdUsuario, //
+          IdUsuario: userAuth?.IdUsuario, //
           FirmaDigital: documento.FirmaDigital,
           IdCarpeta:
             titleFM?.id == "MF"
@@ -649,7 +654,7 @@ const FileManager = () => {
         },
       ],
       CustomIcon: "pi pi-folder",
-      IdArea: userTest?.IdArea,
+      IdArea: userAuth?.Area?.IdArea,
       NotIncludeIdCarpeta: parseInt(fileManager.IdFM.split("_")[1]),
     });
 
@@ -810,24 +815,24 @@ const FileManager = () => {
             command: () => {
               if (titleFM?.id == "MF") {
                 setLastItemBreadCrumbMF({
-                  IdUsuario: userTest.IdUsuario,
+                  IdUsuario: userAuth?.IdUsuario,
                   IdCarpeta: null,
                   Categoria: "MF",
                 });
                 findAllMyFilesFileManager({
-                  IdUsuario: userTest.IdUsuario,
+                  IdUsuario: userAuth?.IdUsuario,
                   IdCarpeta: null,
                   Categoria: "MF",
                 });
               } else if (titleFM?.id == "FA") {
                 setLastItemBreadCrumbFA({
                   IdCarpeta: null,
-                  IdArea: userTest.IdArea,
+                  IdArea: userAuth?.Area.IdArea,
                   Categoria: "FA",
                 });
                 findAllFilesAreaFileManager({
                   IdCarpeta: null,
-                  IdArea: userTest.IdArea,
+                  IdArea: userAuth?.Area.IdArea,
                   Categoria: "FA",
                 });
               }
@@ -866,24 +871,24 @@ const FileManager = () => {
               onClick={() => {
                 if (titleFM?.id == "MF") {
                   setLastItemBreadCrumbMF({
-                    IdUsuario: userTest.IdUsuario,
+                    IdUsuario: userAuth?.IdUsuario,
                     IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
                     Categoria: "MF",
                   });
                   findAllMyFilesFileManager({
-                    IdUsuario: userTest.IdUsuario,
+                    IdUsuario: userAuth?.IdUsuario,
                     IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
                     Categoria: "MF",
                   });
                 } else if (titleFM?.id == "FA") {
                   setLastItemBreadCrumbFA({
                     IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-                    IdArea: userTest.IdArea,
+                    IdArea: userAuth?.Area.IdArea,
                     Categoria: "FA",
                   });
                   findAllFilesAreaFileManager({
                     IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-                    IdArea: userTest.IdArea,
+                    IdArea: userAuth?.Area.IdArea,
                     Categoria: "FA",
                   });
                 }
@@ -896,24 +901,24 @@ const FileManager = () => {
                     command: (event: MenuItemCommandEvent) => {
                       if (titleFM?.id == "MF") {
                         setLastItemBreadCrumbMF({
-                          IdUsuario: userTest.IdUsuario,
+                          IdUsuario: userAuth?.IdUsuario,
                           IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
                           Categoria: "MF",
                         });
                         findAllMyFilesFileManager({
-                          IdUsuario: userTest.IdUsuario,
+                          IdUsuario: userAuth?.IdUsuario,
                           IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
                           Categoria: "MF",
                         });
                       } else if (titleFM?.id == "FA") {
                         setLastItemBreadCrumbFA({
                           IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-                          IdArea: userTest.IdArea,
+                          IdArea: userAuth?.Area.IdArea,
                           Categoria: "FA",
                         });
                         findAllFilesAreaFileManager({
                           IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-                          IdArea: userTest.IdArea,
+                          IdArea: userAuth?.Area.IdArea,
                           Categoria: "FA",
                         });
                       }
@@ -1059,7 +1064,7 @@ const FileManager = () => {
 
   // templates to actions update and remove on dataTable
   const getItemsMenuActionsFM = (rowData: FileManagerEntity): MenuItem[] => {
-    const isOwner = rowData.Usuario.IdUsuario === userTest.IdUsuario;
+    const isOwner = rowData.Usuario.IdUsuario === userAuth?.IdUsuario;
     const typeElement = rowData.IdFM.split("_")[0];
     const isSigned = rowData.FirmaDigital;
 
@@ -1211,7 +1216,7 @@ const FileManager = () => {
   useEffect(() => {
     setTitleFM({ id: "MF", title: "Mis archivos" });
     findAllMyFilesFileManager({
-      IdUsuario: userTest.IdUsuario,
+      IdUsuario: userAuth?.IdUsuario,
       IdCarpeta: null,
       Categoria: "MF",
     });
@@ -1268,13 +1273,13 @@ const FileManager = () => {
                     command: (event: MenuItemCommandEvent) => {
                       setTitleFM({ id: "MF", title: event.item.label });
                       setLastItemBreadCrumbMF({
-                        IdUsuario: userTest.IdUsuario,
+                        IdUsuario: userAuth?.IdUsuario,
                         IdCarpeta: null,
                         Categoria: "MF",
                       });
                       findAllMyFilesFileManager({
                         IdCarpeta: null,
-                        IdUsuario: userTest.IdUsuario,
+                        IdUsuario: userAuth?.IdUsuario,
                         Categoria: "MF",
                       });
                       setItemBreadCrumbs([]);
@@ -1287,12 +1292,12 @@ const FileManager = () => {
                       setTitleFM({ id: "FA", title: event.item.label });
                       setLastItemBreadCrumbFA({
                         IdCarpeta: null,
-                        IdArea: userTest.IdArea,
+                        IdArea: userAuth?.Area.IdArea,
                         Categoria: "FA",
                       });
                       findAllFilesAreaFileManager({
                         IdCarpeta: null,
-                        IdArea: userTest.IdArea,
+                        IdArea: userAuth?.Area.IdArea,
                         Categoria: "FA",
                       });
                       setItemBreadCrumbs([]);
@@ -1494,7 +1499,7 @@ const FileManager = () => {
       />
 
       <FileManagerMove
-        usuario={userTest}
+        usuario={userAuth}
         fileManager={fileManager}
         carpetas={treeFileManager}
         selectedFileMoved={selectedFileMoved}

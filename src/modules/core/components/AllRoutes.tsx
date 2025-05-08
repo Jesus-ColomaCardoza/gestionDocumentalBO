@@ -10,25 +10,36 @@ import TipoIdentificacion from "../../tipo-identificacion/components/TipoIdentif
 import EsquemaEstado from "../../esquema-estado/components/EsquemaEstado";
 import Estado from "../../estado/components/Estado";
 import Rol from "../../rol/components/Rol";
+import Login from "../../auth/Components/Login";
+import { AuthProvider } from "../../auth/context/AuthContext";
 
 const AllRoutes = () => {
   return (
     <>
       <BrowserRouter>
-        <Routes>
-          <Route path="/dashboard" element={<Dashboard />}>
-            <Route path="file_manager" element={<FileManager />}></Route>
-            <Route path="area" element={<Area />}></Route>
-            <Route path="tipo_usuario" element={<TipoUsuario />}></Route>
-            <Route path="tipo_documento" element={<TipoDocumento />}></Route>
-            <Route path="cargo" element={<Cargo />}></Route>
-            <Route path="tipo_tramite" element={<TipoTramite />}></Route>
-            <Route path="tipo_identificacion" element={<TipoIdentificacion />}></Route>
-            <Route path="esquema_estado" element={<EsquemaEstado />}></Route>
-            <Route path="estado" element={<Estado />}></Route>
-            <Route path="rol" element={<Rol />}></Route> 
-          </Route>
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/auth" element={""}>
+              <Route path="login" element={<Login />}></Route>
+            </Route>
+
+            <Route path="/dashboard" element={<Dashboard />}>
+              <Route path="file_manager" element={<FileManager />}></Route>
+              <Route path="area" element={<Area />}></Route>
+              <Route path="tipo_usuario" element={<TipoUsuario />}></Route>
+              <Route path="tipo_documento" element={<TipoDocumento />}></Route>
+              <Route path="cargo" element={<Cargo />}></Route>
+              <Route path="tipo_tramite" element={<TipoTramite />}></Route>
+              <Route
+                path="tipo_identificacion"
+                element={<TipoIdentificacion />}
+              ></Route>
+              <Route path="esquema_estado" element={<EsquemaEstado />}></Route>
+              <Route path="estado" element={<Estado />}></Route>
+              <Route path="rol" element={<Rol />}></Route>
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </>
   );

@@ -40,7 +40,7 @@ export interface DocumentoCreate {
   UrlBase?: string;
   IdTipoDocumento?: number;
   IdTramite?: number;
-  IdUsuario: number;
+  IdUsuario?: number;
   FirmaDigital: boolean | null;
   IdCarpeta?: number | null ;
   Categoria: "MF" | "FA" | "FS" | undefined;

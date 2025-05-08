@@ -12,12 +12,10 @@ import { TreeNode } from "primereact/treenode";
 import { Dropdown } from "primereact/dropdown";
 import { CarpetaCombinationsFilters } from "../../carpeta/interfaces/CarpetaInterface";
 import { FileManagerEntity } from "../interfaces/FileMangerInterface";
+import { UserAuth } from "../../auth/interfaces/AuthInterface";
 
 type FileManagerMoveProps = {
-  usuario: {
-    IdUsuario: number;
-    IdArea: number;
-  };
+  usuario: UserAuth | null;
   fileManager: FileManagerEntity;
   carpetas: any;
   selectedFileMoved:
@@ -137,7 +135,7 @@ const FileManagerMove = (props: FileManagerMoveProps) => {
                 },
               ],
               CustomIcon: "pi pi-folder",
-              IdArea: props.usuario.IdArea,
+              IdArea: props.usuario?.Area?.IdArea,
               NotIncludeIdCarpeta: parseInt(
                 props.fileManager.IdFM.split("_")[1]
               ),

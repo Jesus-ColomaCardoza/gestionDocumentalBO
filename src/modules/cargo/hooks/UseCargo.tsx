@@ -7,7 +7,7 @@ import {
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
 import { Menssage } from "../../utils/menssage";
-import { CARGO } from "../service/AreaService";
+import { CARGO } from "../service/CargoService";
 
 const UseCargo = () => {
   let message = new Menssage();

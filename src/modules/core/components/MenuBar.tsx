@@ -5,6 +5,7 @@ import { Menubar } from "primereact/menubar";
 import { Badge } from "primereact/badge";
 import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
+import { useAuth } from "../../auth/context/AuthContext";
 
 type MenuBarProps = {
   visible?: boolean;
@@ -13,6 +14,8 @@ type MenuBarProps = {
 
 const MenuBar = (props: MenuBarProps) => {
   const { switchTheme } = useTheme();
+
+  const {logout} = useAuth()!;
 
   const itemRenderer = (item: any) => (
     <Link className="flex align-items-center p-menuitem-link" to={"/dashboard"}>
@@ -52,13 +55,16 @@ const MenuBar = (props: MenuBarProps) => {
     },
 
     {
-      label: "Home v1",
+      label: "Login",
       icon: "pi pi-home",
-      url: "/dashboard",
+      url: "/auth/login",
     },
     {
-      label: "Features",
-      icon: "pi pi-star",
+      label: "Exit",
+      icon: "pi pi-sign-out",
+      command: () => {
+        logout();
+      },
     },
     {
       label: "Projects",
@@ -174,11 +180,11 @@ const MenuBar = (props: MenuBarProps) => {
       }}
     >
       <Menubar
-        style={{ height: "3.5rem",
+        style={{
+          height: "3.5rem",
           backgroundColor: "var(--surface-50)",
-          borderColor:"var(--surface-50)"
-
-         }}
+          borderColor: "var(--surface-50)",
+        }}
         model={items}
         start={start}
         end={end}

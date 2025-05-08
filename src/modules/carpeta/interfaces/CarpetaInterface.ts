@@ -17,7 +17,7 @@ export interface CarpetaCreate {
   IdCarpeta?: number;
   Descripcion: string;
   IdCarpetaPadre: number | null| undefined;
-  IdUsuario: number;
+  IdUsuario?: number;
   Activo: boolean | null | undefined;
   Categoria: "MF" | "FA" | "FS"| undefined;
   CreadoEl?: Date | string;
@@ -35,7 +35,7 @@ export interface CarpetaUpdate {
 }
 export interface CarpetaCombinationsFilters extends CombinationsFilters {
   CustomIcon?: string;
-  IdArea: number;
+  IdArea?: number;
   NotIncludeIdCarpeta: number;
 }
 export interface CarpetaOut {
