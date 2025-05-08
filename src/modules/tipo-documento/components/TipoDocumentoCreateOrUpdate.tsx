@@ -31,7 +31,7 @@ const TipoDocumentoCreateOrUpdate = (props: TipoDocumentoCreateOrUpdateProps) =>
       />
       <Button
         loading={props.loadingTipoDocumentoCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.tipoDocumentoDialog.type == "create"

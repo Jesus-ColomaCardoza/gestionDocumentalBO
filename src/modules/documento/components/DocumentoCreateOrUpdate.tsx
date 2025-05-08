@@ -179,7 +179,7 @@ const DocumentoCreateOrUpdate = (props: DocumentoCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingDocumentoCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.documentoDialog.type == "create"

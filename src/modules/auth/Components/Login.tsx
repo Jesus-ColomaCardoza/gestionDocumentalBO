@@ -8,6 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { Card } from "primereact/card";
 import { LoginAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 
 const Login = () => {
   // variables and constants
@@ -28,7 +29,7 @@ const Login = () => {
   const [checked, setChecked] = useState(remenberMeSGD ? true : false);
 
   // custom hooks
-  const { login } = useAuth()!;
+  const { login, loadingAuth } = useAuth()!;
 
   // functions
   const validateForm = () => {
@@ -72,15 +73,8 @@ const Login = () => {
     >
       <div className="flex flex-column align-items-center justify-content-center">
         {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
-        <div
-          style={{
-            borderRadius: "15px",
-            padding: "0.2rem",
-            background:
-              "linear-gradient(180deg, var(--primary-color) 50%, rgba(33, 150, 243, 0) 100%)",
-          }}
-        >
-          <Card className="w-full py-4 px-2" style={{ borderRadius: "15px" }}>
+        <div>
+          <Card className="w-full py-4 px-2" style={{ borderRadius: "10px" }}>
             <div className="text-center mb-5">
               {/* <img
                 src="/demo/images/login/avatar.png"
@@ -88,7 +82,7 @@ const Login = () => {
                 height="50"
                 className="mb-3"
               /> */}
-              <div className="text-900 text-3xl font-medium mb-3">
+              <div className="text-900 text-2xl font-medium mb-3">
                 Inicio de Sesión
               </div>
               {/* <span className="text-600 font-medium">Inicio de Sesión</span> */}
@@ -96,11 +90,11 @@ const Login = () => {
 
             <label
               htmlFor="Email"
-              className="block text-900 text-lg font-medium mb-2"
+              className="block text-900 text-sm font-medium mb-2"
             >
               Email
             </label>
-            <div className="flex flex-column mb-5 gap-1">
+            <div className="flex flex-column mb-3 gap-1">
               <InputText
                 id="Email"
                 value={loginAuthData.Email}
@@ -109,8 +103,7 @@ const Login = () => {
                 }}
                 type="text"
                 placeholder="Ingresa tu email"
-                className="w-full p-3 md:w-25rem"
-                style={{ padding: "1rem" }}
+                className="w-full md:w-25rem"
               />
               {loginAuthErrors.Email && (
                 <small className="p-error">{loginAuthErrors.Email}</small>
@@ -119,7 +112,7 @@ const Login = () => {
 
             <label
               htmlFor="Contrasena"
-              className="block text-900 font-medium text-lg mb-2"
+              className="block text-900 font-medium text-sm mb-2"
             >
               Contraseña
             </label>
@@ -132,7 +125,7 @@ const Login = () => {
                 }}
                 placeholder="Ingresa tu contraseña"
                 toggleMask
-                inputClassName="w-full p-3 md:w-25rem"
+                inputClassName="w-full md:w-25rem"
                 feedback={false}
               ></Password>
               {loginAuthErrors.Contrasena && (
@@ -140,14 +133,14 @@ const Login = () => {
               )}
             </div>
 
-            <div className="flex align-items-center justify-content-between mb-7 gap-5">
+            <div className="flex align-items-center justify-content-between mb-4 gap-5">
               <div className="flex align-items-center">
                 <Checkbox
                   inputId="rememberme1"
                   checked={checked}
                   onChange={(e) => {
                     setChecked(e.checked ?? false);
-                    
+
                     if (e.checked) {
                       localStorage.setItem(
                         "remenberMeSGD",
@@ -159,12 +152,12 @@ const Login = () => {
                   }}
                   className="mr-2"
                 ></Checkbox>
-                <label className="text-sm" htmlFor="rememberme1">
+                <label className="text-xs" htmlFor="rememberme1">
                   Recordar credenciales
                 </label>
               </div>
               <a
-                className="font-medium no-underline ml-2 text-right cursor-pointer text-sm"
+                className="font-medium no-underline ml-2 text-right cursor-pointer text-xs"
                 style={{ color: "var(--primary-color)" }}
               >
                 ¿Olvidé mi contraseña?
@@ -173,11 +166,25 @@ const Login = () => {
 
             <Button
               label="Aceptar"
-              className="w-full p-2 text-xl"
+              className="w-full p-2 text-xl "
+              loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) login(loginAuthData);
               }}
             ></Button>
+
+            <div className="flex align-items-center justify-content-center mt-3 ">
+              <label className="text-xs" htmlFor="rememberme1">
+                ¿No tienes cuenta?
+              </label>
+              <Link
+                to={"../signup"}
+                className="font-medium no-underline ml-2 text-right cursor-pointer text-xs"
+                style={{ color: "var(--primary-color)" }}
+              >
+                Registrate aquí
+              </Link>
+            </div>
           </Card>
         </div>
       </div>

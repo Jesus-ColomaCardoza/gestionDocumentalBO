@@ -31,7 +31,7 @@ const TipoTramiteCreateOrUpdate = (props: TipoTramiteCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingTipoTramiteCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.tipoTramiteDialog.type == "create"

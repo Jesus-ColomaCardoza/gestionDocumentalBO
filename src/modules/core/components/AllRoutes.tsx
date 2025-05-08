@@ -12,6 +12,8 @@ import Estado from "../../estado/components/Estado";
 import Rol from "../../rol/components/Rol";
 import Login from "../../auth/Components/Login";
 import { AuthProvider } from "../../auth/context/AuthContext";
+import Signup from "../../auth/Components/Signup";
+import NotFound from "../../auth/Components/NotFound";
 
 const AllRoutes = () => {
   return (
@@ -21,6 +23,7 @@ const AllRoutes = () => {
           <Routes>
             <Route path="/auth" element={""}>
               <Route path="login" element={<Login />}></Route>
+              <Route path="signup" element={<Signup />}></Route>
             </Route>
 
             <Route path="/dashboard" element={<Dashboard />}>
@@ -38,6 +41,8 @@ const AllRoutes = () => {
               <Route path="estado" element={<Estado />}></Route>
               <Route path="rol" element={<Rol />}></Route>
             </Route>
+
+            <Route path="nofound" element={<NotFound />}></Route>
           </Routes>
         </AuthProvider>
       </BrowserRouter>

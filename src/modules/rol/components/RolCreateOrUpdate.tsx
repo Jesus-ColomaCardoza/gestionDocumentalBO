@@ -31,7 +31,7 @@ const RolCreateOrUpdate = (props: RolCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingRolCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.rolDialog.type == "create"

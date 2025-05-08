@@ -31,7 +31,7 @@ const EsquemaEstadoCreateOrUpdate = (props: EsquemaEstadoCreateOrUpdateProps) =>
       />
       <Button
         loading={props.loadingEsquemaEstadoCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.esquemaEstadoDialog.type == "create"

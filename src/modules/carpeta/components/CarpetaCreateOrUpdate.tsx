@@ -31,7 +31,7 @@ const CarpetaCreateOrUpdate = (props: CarpetaCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingCarpetaCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.carpetaDialog.type == "create"

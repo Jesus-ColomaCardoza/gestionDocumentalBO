@@ -104,7 +104,7 @@ const Cargo = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Save" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
     </>
   );
 

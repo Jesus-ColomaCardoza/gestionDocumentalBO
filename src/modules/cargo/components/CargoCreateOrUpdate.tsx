@@ -31,7 +31,7 @@ const CargoCreateOrUpdate = (props: CargoCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingCargoCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.cargoDialog.type == "create"

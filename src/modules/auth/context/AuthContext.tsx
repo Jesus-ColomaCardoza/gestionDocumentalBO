@@ -9,13 +9,15 @@ import axios, { AxiosError } from "axios";
 import {
   LoginAuth,
   OutLoginAuth,
+  OutSignupAuth,
   OutVerifyTokenAuth,
+  SignupAuth,
   UserAuth,
 } from "../interfaces/AuthInterface";
 import { REACT_APP_SALT, VITE_API_URL_GDS } from "../../utils/Constants";
 import { AUTH } from "../service/AuthService";
 import { Toast } from "primereact/toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { sha256 } from "js-sha256";
 
 type AuthPoroviderProps = {
@@ -25,6 +27,7 @@ type AuthPoroviderProps = {
 interface AuthContextType {
   userAuth: UserAuth | null;
   login: (loginAuth: LoginAuth) => Promise<void>;
+  signup: (signupAuth: SignupAuth) => Promise<void>;
   logout: () => void;
   loadingAuth: boolean;
 }
@@ -36,6 +39,13 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
   const [userAuth, setUserAuth] = useState<UserAuth | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const authRoutes = [
+    "/auth/login",
+    "/auth/signup",
+    "/auth/forgot-password",
+    "/auth/recover-password",
+  ];
 
   const verifyToken = async () => {
     try {
@@ -60,8 +70,10 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
           navigate("/auth/login");
         }
-      } else {
-        navigate("/auth/login");
+      } else if (!authRoutes.includes(pathname)) {
+        console.log("ga");
+
+        navigate("/nofound");
 
         setLoadingAuth(false);
       }
@@ -90,6 +102,8 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
   const login = async (loginAuth: LoginAuth) => {
     try {
+      setLoadingAuth(true);
+
       const hashedPassword = sha256(
         REACT_APP_SALT + sha256(loginAuth.Contrasena)
       );
@@ -150,6 +164,67 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     }
   };
 
+  const signup = async (signupAuth: SignupAuth) => {
+    try {
+      setLoadingAuth(true);
+      
+      const hashedPassword = sha256(
+        REACT_APP_SALT + sha256(signupAuth.Contrasena)
+      );
+
+      const hashedConfirmPassword = sha256(
+        REACT_APP_SALT + sha256(signupAuth.ContrasenaConfirmacion)
+      );
+
+      const signuppedUser = await axios.post<OutSignupAuth>(
+        `${VITE_API_URL_GDS + AUTH.SIGNUP}`,
+        {
+          ...signupAuth,
+          Contrasena: hashedPassword,
+          ContrasenaConfirmacion: hashedConfirmPassword,
+        }
+      );
+
+      if (signuppedUser.data.message.msgId == 0) {
+        toastAuth.current?.show({
+          severity: "success",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+
+        navigate("/auth/login");
+      } else if (signuppedUser.data.message.msgId == 2) {
+        toastAuth.current?.show({
+          severity: "info",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (signuppedUser.data.message.msgId == 1) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.status == 400) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${error.response?.data.message}`,
+          life: 3000,
+        });
+      } else {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${"Error: Error interno en el servidor"}`,
+          life: 3000,
+        });
+      }
+    } finally {
+      setLoadingAuth(false);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem("tokenSGD");
 
@@ -163,7 +238,9 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ userAuth, login, logout, loadingAuth }}>
+    <AuthContext.Provider
+      value={{ userAuth, login, signup, logout, loadingAuth }}
+    >
       <Toast ref={toastAuth} position={"bottom-right"} />
       {children}
     </AuthContext.Provider>

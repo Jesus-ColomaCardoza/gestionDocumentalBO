@@ -55,3 +55,22 @@ export interface OutVerifyTokenAuth {
     };
   };
 }
+
+export interface SignupAuth {
+  Nombres: string;
+  ApellidoPaterno: string;
+  ApellidoMaterno: string;
+  Email: string;
+  Contrasena: string;
+  ContrasenaConfirmacion: string;
+  IdRol: string;
+  IdCargo: number;
+  IdArea: number;
+}
+
+export interface OutSignupAuth {
+  message: Menssage;
+  registro?: {
+    IdUsuario: number;
+  };
+}

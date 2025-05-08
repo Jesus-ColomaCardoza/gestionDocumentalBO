@@ -41,7 +41,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingEstadoCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.estadoDialog.type == "create"

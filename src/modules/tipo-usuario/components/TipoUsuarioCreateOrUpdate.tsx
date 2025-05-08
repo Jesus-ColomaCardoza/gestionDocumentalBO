@@ -31,7 +31,7 @@ const TipoUsuarioCreateOrUpdate = (props: TipoUsuarioCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingTipoUsuarioCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.tipoUsuarioDialog.type == "create"

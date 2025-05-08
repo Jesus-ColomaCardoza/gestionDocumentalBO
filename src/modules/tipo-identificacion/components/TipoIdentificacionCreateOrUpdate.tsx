@@ -31,7 +31,7 @@ const TipoIdentificacionCreateOrUpdate = (props: TipoIdentificacionCreateOrUpdat
       />
       <Button
         loading={props.loadingTipoIdentificacionCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.tipoIdentificacionDialog.type == "create"

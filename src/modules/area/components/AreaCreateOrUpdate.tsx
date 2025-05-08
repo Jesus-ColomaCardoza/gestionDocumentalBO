@@ -31,7 +31,7 @@ const AreaCreateOrUpdate = (props: AreaCreateOrUpdateProps) => {
       />
       <Button
         loading={props.loadingAreaCreateOrUpdate}
-        label="Save"
+        label="Aceptar"
         icon="pi pi-check"
         onClick={
           props.areaDialog.type == "create"
