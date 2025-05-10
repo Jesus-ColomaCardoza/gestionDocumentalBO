@@ -7,10 +7,14 @@ import React, {
 } from "react";
 import axios, { AxiosError } from "axios";
 import {
+  ForgotPasswordAuth,
   LoginAuth,
+  OutForgotPasswordAuth,
   OutLoginAuth,
+  OutResetPasswordAuth,
   OutSignupAuth,
   OutVerifyTokenAuth,
+  ResetPasswordAuth,
   SignupAuth,
   UserAuth,
 } from "../interfaces/AuthInterface";
@@ -28,6 +32,8 @@ interface AuthContextType {
   userAuth: UserAuth | null;
   login: (loginAuth: LoginAuth) => Promise<void>;
   signup: (signupAuth: SignupAuth) => Promise<void>;
+  forgotPassword: (forgotPasswordAuth: ForgotPasswordAuth) => Promise<void>;
+  resetPassword: (resetPasswordAuth: ResetPasswordAuth) => Promise<void>;
   logout: () => void;
   loadingAuth: boolean;
 }
@@ -35,17 +41,30 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export const AuthProvider = ({ children }: AuthPoroviderProps) => {
+  //refs
   const toastAuth = useRef<Toast>(null);
+
+  // states
   const [userAuth, setUserAuth] = useState<UserAuth | null>(null);
   const [loadingAuth, setLoadingAuth] = useState(true);
+
+  // custom hooks
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  // variables
   const authRoutes = [
     "/auth/login",
     "/auth/signup",
-    "/auth/forgot-password",
-    "/auth/recover-password",
+    "/auth/forgot_password",
+    "/auth/reset_password/:token",
   ];
+
+  //functions
+  const validateAuthRoute = authRoutes.some((route) => {
+    const pattern = new RegExp(`^${route.replace(/:\w+/g, "[^/]+")}$`);
+    return pattern.test(pathname);
+  });
 
   const verifyToken = async () => {
     try {
@@ -70,8 +89,8 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
           navigate("/auth/login");
         }
-      } else if (!authRoutes.includes(pathname)) {
-        console.log("ga");
+      } else if (!validateAuthRoute) {
+        console.log("not found");
 
         navigate("/nofound");
 
@@ -95,6 +114,67 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
       navigate("/auth/login");
 
       setUserAuth(null);
+    } finally {
+      setLoadingAuth(false);
+    }
+  };
+
+  const signup = async (signupAuth: SignupAuth) => {
+    try {
+      setLoadingAuth(true);
+
+      const hashedPassword = sha256(
+        REACT_APP_SALT + sha256(signupAuth.Contrasena)
+      );
+
+      const hashedConfirmPassword = sha256(
+        REACT_APP_SALT + sha256(signupAuth.ContrasenaConfirmacion)
+      );
+
+      const signuppedUser = await axios.post<OutSignupAuth>(
+        `${VITE_API_URL_GDS + AUTH.SIGNUP}`,
+        {
+          ...signupAuth,
+          Contrasena: hashedPassword,
+          ContrasenaConfirmacion: hashedConfirmPassword,
+        }
+      );
+
+      if (signuppedUser.data.message.msgId == 0) {
+        toastAuth.current?.show({
+          severity: "success",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+
+        navigate("/auth/login");
+      } else if (signuppedUser.data.message.msgId == 2) {
+        toastAuth.current?.show({
+          severity: "info",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (signuppedUser.data.message.msgId == 1) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.status == 400) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${error.response?.data.message}`,
+          life: 3000,
+        });
+      } else {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${"Error: Error interno en el servidor"}`,
+          life: 3000,
+        });
+      }
     } finally {
       setLoadingAuth(false);
     }
@@ -164,45 +244,92 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     }
   };
 
-  const signup = async (signupAuth: SignupAuth) => {
+  const forgotPassword = async (forgotPasswordAuth: ForgotPasswordAuth) => {
     try {
       setLoadingAuth(true);
-      
+
+      const resForgotPassword = await axios.post<OutForgotPasswordAuth>(
+        `${VITE_API_URL_GDS + AUTH.FORGOT_PASSWORD}`,
+        forgotPasswordAuth
+      );
+
+      if (resForgotPassword.data.message.msgId == 0) {
+        toastAuth.current?.show({
+          severity: "success",
+          detail: `${resForgotPassword.data.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (resForgotPassword.data.message.msgId == 2) {
+        toastAuth.current?.show({
+          severity: "info",
+          detail: `${resForgotPassword.data.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (resForgotPassword.data.message.msgId == 1) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${resForgotPassword.data.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.status == 400) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${error.response?.data.message}`,
+          life: 3000,
+        });
+      } else {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${"Error: Error interno en el servidor"}`,
+          life: 3000,
+        });
+      }
+    } finally {
+      setLoadingAuth(false);
+    }
+  };
+
+  const resetPassword = async (resetPasswordAuth: ResetPasswordAuth) => {
+    try {
+      setLoadingAuth(true);
+
       const hashedPassword = sha256(
-        REACT_APP_SALT + sha256(signupAuth.Contrasena)
+        REACT_APP_SALT + sha256(resetPasswordAuth.Contrasena)
       );
 
       const hashedConfirmPassword = sha256(
-        REACT_APP_SALT + sha256(signupAuth.ContrasenaConfirmacion)
+        REACT_APP_SALT + sha256(resetPasswordAuth.ContrasenaConfirmacion)
       );
 
-      const signuppedUser = await axios.post<OutSignupAuth>(
-        `${VITE_API_URL_GDS + AUTH.SIGNUP}`,
+      const resResetPassword = await axios.post<OutResetPasswordAuth>(
+        `${VITE_API_URL_GDS + AUTH.RESET_PASSWORD}`,
         {
-          ...signupAuth,
+          ...resetPasswordAuth,
           Contrasena: hashedPassword,
           ContrasenaConfirmacion: hashedConfirmPassword,
         }
       );
 
-      if (signuppedUser.data.message.msgId == 0) {
+      if (resResetPassword.data.message.msgId == 0) {
         toastAuth.current?.show({
           severity: "success",
-          detail: `${signuppedUser.data.message.msgTxt}`,
+          detail: `${resResetPassword.data.message.msgTxt}`,
           life: 3000,
         });
 
-        navigate("/auth/login");
-      } else if (signuppedUser.data.message.msgId == 2) {
+        navigate("auth/login");
+      } else if (resResetPassword.data.message.msgId == 2) {
         toastAuth.current?.show({
           severity: "info",
-          detail: `${signuppedUser.data.message.msgTxt}`,
+          detail: `${resResetPassword.data.message.msgTxt}`,
           life: 3000,
         });
-      } else if (signuppedUser.data.message.msgId == 1) {
+      } else if (resResetPassword.data.message.msgId == 1) {
         toastAuth.current?.show({
           severity: "error",
-          detail: `${signuppedUser.data.message.msgTxt}`,
+          detail: `${resResetPassword.data.message.msgTxt}`,
           life: 3000,
         });
       }
@@ -239,7 +366,15 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ userAuth, login, signup, logout, loadingAuth }}
+      value={{
+        userAuth,
+        login,
+        signup,
+        forgotPassword,
+        resetPassword,
+        logout,
+        loadingAuth,
+      }}
     >
       <Toast ref={toastAuth} position={"bottom-right"} />
       {children}

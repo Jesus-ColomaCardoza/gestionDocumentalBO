@@ -74,3 +74,27 @@ export interface OutSignupAuth {
     IdUsuario: number;
   };
 }
+
+export interface ForgotPasswordAuth {
+  Email: string;
+}
+
+export interface OutForgotPasswordAuth {
+  message: Menssage;
+  registro?: {
+    IdUsuario: number;
+  };
+}
+
+export interface ResetPasswordAuth {
+  CodigoConfirmacion: string;
+  Contrasena: string;
+  ContrasenaConfirmacion: string;
+}
+
+export interface OutResetPasswordAuth {
+  message: Menssage;
+  registro?: {
+    IdUsuario: number;
+  };
+}

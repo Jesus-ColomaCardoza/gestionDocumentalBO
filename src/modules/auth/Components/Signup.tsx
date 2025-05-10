@@ -1,13 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "primereact/button";
 import { Password } from "primereact/password";
 import { InputText } from "primereact/inputtext";
 import { Card } from "primereact/card";
 import { SignupAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const Signup = () => {
   // variables and constants
@@ -39,27 +39,28 @@ const Signup = () => {
     const fieldErrors: Partial<SignupAuth> = {};
 
     if (!signupAuthData.Nombres.trim()) {
-      fieldErrors.Nombres = "El email es obligatorio.";
+      fieldErrors.Nombres = "Nombres es obligatorio.";
     }
 
     if (!signupAuthData.ApellidoPaterno.trim()) {
-      fieldErrors.ApellidoPaterno = "La contraseña es obligatoria.";
+      fieldErrors.ApellidoPaterno = "Apellido paterno es obligatoria.";
     }
 
     if (!signupAuthData.ApellidoMaterno.trim()) {
-      fieldErrors.ApellidoMaterno = "El email es obligatorio.";
+      fieldErrors.ApellidoMaterno = "Apellido materno es obligatorio.";
     }
 
     if (!signupAuthData.Email.trim()) {
-      fieldErrors.Email = "El email es obligatorio.";
+      fieldErrors.Email = "Email es obligatorio.";
     }
 
     if (!signupAuthData.Contrasena.trim()) {
-      fieldErrors.Contrasena = "La contraseña es obligatoria.";
+      fieldErrors.Contrasena = "Contraseña es obligatoria.";
     }
 
     if (!signupAuthData.ContrasenaConfirmacion.trim()) {
-      fieldErrors.ContrasenaConfirmacion = "La contraseña es obligatoria.";
+      fieldErrors.ContrasenaConfirmacion =
+        "Confirmación de contraseña es obligatoria.";
     }
 
     setSignupAuthErrors(fieldErrors);
@@ -81,13 +82,17 @@ const Signup = () => {
   return (
     <div
       className={
-        "flex align-items-center justify-content-center min-h-screen  overflow-hidden"
+        "flex align-items-center justify-content-center overflow-hidden"
       }
+      style={{
+        height: "100dvh",
+        margin: "0 2em",
+      }}
     >
       <div className="flex flex-column align-items-center justify-content-center">
-        {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
+        {/* <img src={""} alt="Sakai logo" className="mb-5 w-6em flex-shrink-0" /> */}
         <div>
-          <Card className="w-full  px-2" style={{ borderRadius: "10px" }}>
+          <Card className="w-full px-2" style={{ borderRadius: "10px" }}>
             <div className="text-center mb-5">
               {/* <img
                 src="/demo/images/login/avatar.png"
@@ -95,20 +100,33 @@ const Signup = () => {
                 height="50"
                 className="mb-3"
               /> */}
-              <div className="text-900 text-2xl font-medium mb-3">
-                Registro de Usuario
-              </div>
+              <div className="text-900 text-xl">Registro de Usuario</div>
               {/* <span className="text-600 font-medium">Inicio de Sesión</span> */}
             </div>
 
-            <label
+            {/* <label
               htmlFor="Nombres"
-              className="block text-900 text-sm font-medium mb-2"
+              className="block text-900 text-xs font-medium mb-2"
             >
               Nombres
-            </label>
+            </label> */}
             <div className="flex flex-column mb-3 gap-1">
-              <InputText
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-user"></i>
+                </span>
+                <InputText
+                  id="Nombres"
+                  value={signupAuthData.Nombres}
+                  onChange={(e) => {
+                    onInputChange(e, "Nombres");
+                  }}
+                  type="text"
+                  placeholder="Ingresa tus nombres"
+                  className="p-inputtext-sm"
+                />
+              </div>
+              {/* <InputText
                 id="Nombres"
                 value={signupAuthData.Nombres}
                 onChange={(e) => {
@@ -116,27 +134,42 @@ const Signup = () => {
                 }}
                 type="text"
                 placeholder="Ingresa tus nombres"
-                className="w-full  md:w-25rem"
-              />
+                className="p-inputtext-sm"
+              /> */}
               {signupAuthErrors.Nombres && (
                 <small className="p-error">{signupAuthErrors.Nombres}</small>
               )}
             </div>
 
             <div className="flex flex-row" style={{ gap: "1rem" }}>
-              <div
-                style={{
-                  width: "12rem",
-                }}
+              <div className="md:w-12rem"
+              // style={{
+              //   width: "10em",
+              // }}
               >
-                <label
+                {/* <label
                   htmlFor="ApellidoPaterno"
-                  className="block text-900 text-sm font-medium mb-2"
+                  className="block text-900 text-xs font-medium mb-2"
                 >
                   Apellido Paterno
-                </label>
+                </label> */}
                 <div className="flex flex-column mb-3 gap-1">
-                  <InputText
+                  <div className="p-inputgroup">
+                    <span className="p-inputgroup-addon">
+                      <i className="pi pi-sort-alpha-down"></i>
+                    </span>
+                    <InputText
+                      id="ApellidoPaterno"
+                      value={signupAuthData.ApellidoPaterno}
+                      onChange={(e) => {
+                        onInputChange(e, "ApellidoPaterno");
+                      }}
+                      type="text"
+                      placeholder="Apellido paterno"
+                      className="p-inputtext-sm "
+                    />
+                  </div>
+                  {/* <InputText
                     id="ApellidoPaterno"
                     value={signupAuthData.ApellidoPaterno}
                     onChange={(e) => {
@@ -144,7 +177,8 @@ const Signup = () => {
                     }}
                     type="text"
                     placeholder="Apellido paterno"
-                  />
+                    className="p-inputtext-sm"
+                  /> */}
                   {signupAuthErrors.ApellidoPaterno && (
                     <small className="p-error">
                       {signupAuthErrors.ApellidoPaterno}
@@ -152,19 +186,34 @@ const Signup = () => {
                   )}
                 </div>
               </div>
-              <div
-                style={{
-                  width: "12rem",
-                }}
+              <div className="md:w-10rem"
+              // style={{
+              //   width: "10em",
+              // }}
               >
-                <label
+                {/* <label
                   htmlFor="ApellidoMaterno"
-                  className="block text-900 text-sm font-medium mb-2"
+                  className="block text-900 text-xs font-medium mb-2"
                 >
                   Apellido Materno
-                </label>
+                </label> */}
                 <div className="flex flex-column mb-3 gap-1">
-                  <InputText
+                  <div className="p-inputgroup">
+                    {/* <span className="p-inputgroup-addon">
+                      <i className="pi pi-sort-alpha-down"></i>
+                    </span> */}
+                    <InputText
+                      id="ApellidoMaterno"
+                      value={signupAuthData.ApellidoMaterno}
+                      onChange={(e) => {
+                        onInputChange(e, "ApellidoMaterno");
+                      }}
+                      type="text"
+                      placeholder="Apellido materno"
+                      className="p-inputtext-sm "
+                    />
+                  </div>
+                  {/* <InputText
                     id="ApellidoMaterno"
                     value={signupAuthData.ApellidoMaterno}
                     onChange={(e) => {
@@ -172,7 +221,8 @@ const Signup = () => {
                     }}
                     type="text"
                     placeholder="Apellido materno"
-                  />
+                    className="p-inputtext-sm"
+                  /> */}
                   {signupAuthErrors.ApellidoMaterno && (
                     <small className="p-error">
                       {signupAuthErrors.ApellidoMaterno}
@@ -182,14 +232,29 @@ const Signup = () => {
               </div>
             </div>
 
-            <label
+            {/* <label
               htmlFor="Email"
-              className="block text-900 text-sm font-medium mb-2"
+              className="block text-900 text-xs font-medium mb-2"
             >
               Email
-            </label>
+            </label> */}
             <div className="flex flex-column mb-3 gap-1">
-              <InputText
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-envelope"></i>
+                </span>
+                <InputText
+                  id="Email"
+                  value={signupAuthData.Email}
+                  onChange={(e) => {
+                    onInputChange(e, "Email");
+                  }}
+                  type="text"
+                  placeholder="Ingresa tu email"
+                  className="p-inputtext-sm w-full w-10rem"
+                />
+              </div>
+              {/* <InputText
                 id="Email"
                 value={signupAuthData.Email}
                 onChange={(e) => {
@@ -197,21 +262,39 @@ const Signup = () => {
                 }}
                 type="text"
                 placeholder="Ingresa tu email"
-                className="w-full  md:w-25rem"
-              />
+                className="p-inputtext-sm"
+              /> */}
               {signupAuthErrors.Email && (
                 <small className="p-error">{signupAuthErrors.Email}</small>
               )}
             </div>
 
-            <label
+            {/* <label
               htmlFor="Contrasena"
-              className="block text-900 font-medium text-sm mb-2"
+              className="block text-900 font-medium text-xs mb-2"
             >
               Contraseña
-            </label>
+            </label> */}
             <div className="flex flex-column mb-3 gap-1">
-              <Password
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-lock"></i>
+                </span>
+                <Password
+                  inputId="Contrasena"
+                  value={signupAuthData.Contrasena}
+                  onChange={(e) => {
+                    onInputChange(e, "Contrasena");
+                  }}
+                  placeholder="Ingresa tu contraseña"
+                  toggleMask
+                  inputClassName="w-full sm:w-20rem md:w-20rem "
+                  feedback={false}
+                  className="p-inputtext-sm"
+
+                ></Password>
+              </div>
+              {/* <Password
                 inputId="Contrasena"
                 value={signupAuthData.Contrasena}
                 onChange={(e) => {
@@ -219,22 +302,40 @@ const Signup = () => {
                 }}
                 placeholder="Ingresa tu contraseña"
                 toggleMask
-                inputClassName="w-full md:w-25rem"
+                inputClassName="w-full md:w-25em"
                 feedback={false}
-              ></Password>
+                className="p-inputtext-sm"
+              ></Password> */}
               {signupAuthErrors.Contrasena && (
                 <small className="p-error">{signupAuthErrors.Contrasena}</small>
               )}
             </div>
 
-            <label
+            {/* <label
               htmlFor="ContrasenaConfirmacion"
               className="block text-900 font-medium text-sm mb-2"
             >
               Confirmar contraseña
-            </label>
+            </label> */}
             <div className="flex flex-column mb-4 gap-1">
-              <Password
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-lock"></i>
+                </span>
+                <Password
+                  inputId="ContrasenaConfirmacion"
+                  value={signupAuthData.ContrasenaConfirmacion}
+                  onChange={(e) => {
+                    onInputChange(e, "ContrasenaConfirmacion");
+                  }}
+                  placeholder="Confirmar contraseña"
+                  toggleMask
+                  inputClassName="w-full sm:w-20rem md:w-20rem "
+                  feedback={false}
+                  className="p-inputtext-sm"
+                ></Password>
+              </div>
+              {/* <Password
                 inputId="ContrasenaConfirmacion"
                 value={signupAuthData.ContrasenaConfirmacion}
                 onChange={(e) => {
@@ -242,9 +343,10 @@ const Signup = () => {
                 }}
                 placeholder="Confirmar contraseña"
                 toggleMask
-                inputClassName="w-full md:w-25rem"
+                inputClassName="w-full md:w-25em"
                 feedback={false}
-              ></Password>
+                className="p-inputtext-sm"
+              ></Password> */}
               {signupAuthErrors.ContrasenaConfirmacion && (
                 <small className="p-error">
                   {signupAuthErrors.ContrasenaConfirmacion}
@@ -254,7 +356,7 @@ const Signup = () => {
 
             <Button
               label="Aceptar"
-              className="w-full p-2 text-xl"
+              className="w-full p-2 text-md"
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) signup(signupAuthData);
@@ -262,7 +364,7 @@ const Signup = () => {
             ></Button>
 
             <div className="flex align-items-center justify-content-center mt-3 ">
-              <label className="text-xs" htmlFor="rememberme1">
+              <label className="text-xs" htmlFor="ememberme1">
                 ¿Ya tienes cuenta?
               </label>
               <Link

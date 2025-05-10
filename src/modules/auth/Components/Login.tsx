@@ -68,56 +68,92 @@ const Login = () => {
   return (
     <div
       className={
-        "flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden"
+        "flex align-items-center justify-content-center overflow-hidden"
       }
+      style={{
+        height: "100dvh",
+        margin: "0 2em",
+      }}
     >
       <div className="flex flex-column align-items-center justify-content-center">
         {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
-        <div>
-          <Card className="w-full py-4 px-2" style={{ borderRadius: "10px" }}>
-            <div className="text-center mb-5">
+        <div className="my-5">
+          <Card className="w-full py-3 px-2" style={{ borderRadius: "10px" }}>
+            <div className="text-center mb-6">
               {/* <img
                 src="/demo/images/login/avatar.png"
                 alt="Image"
                 height="50"
                 className="mb-3"
               /> */}
-              <div className="text-900 text-2xl font-medium mb-3">
-                Inicio de Sesión
-              </div>
+              <div className="text-900 text-xl">Inicio de Sesión</div>
               {/* <span className="text-600 font-medium">Inicio de Sesión</span> */}
             </div>
 
-            <label
+            {/* <label
               htmlFor="Email"
-              className="block text-900 text-sm font-medium mb-2"
+              className="block text-900 text-xs font-medium mb-2"
             >
               Email
-            </label>
+            </label> */}
             <div className="flex flex-column mb-3 gap-1">
-              <InputText
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-envelope"></i>
+                </span>
+                <InputText
+                  id="Email"
+                  value={loginAuthData.Email}
+                  onChange={(e) => {
+                    onInputChange(e, "Email");
+                  }}
+                  type="text"
+                  placeholder="Ingrese su email"
+                  className="p-inputtext-sm w-full md:w-18em"
+                />
+              </div>
+              {/* <InputText
                 id="Email"
                 value={loginAuthData.Email}
                 onChange={(e) => {
                   onInputChange(e, "Email");
                 }}
                 type="text"
-                placeholder="Ingresa tu email"
-                className="w-full md:w-25rem"
-              />
+                placeholder="Search"
+                className="p-inputtext-sm w-full md:w-25rem"
+              /> */}
               {loginAuthErrors.Email && (
-                <small className="p-error">{loginAuthErrors.Email}</small>
+                <small className="p-error text-xs">
+                  {loginAuthErrors.Email}
+                </small>
               )}
             </div>
 
-            <label
+            {/* <label
               htmlFor="Contrasena"
-              className="block text-900 font-medium text-sm mb-2"
+              className="block text-900 font-medium text-xs mb-2"
             >
               Contraseña
-            </label>
+            </label> */}
             <div className="flex flex-column mb-5 gap-1">
-              <Password
+              <div className="p-inputgroup">
+                <span className="p-inputgroup-addon">
+                  <i className="pi pi-lock"></i>
+                </span>
+                <Password
+                  inputId="Contrasena"
+                  value={loginAuthData.Contrasena}
+                  onChange={(e) => {
+                    onInputChange(e, "Contrasena");
+                  }}
+                  placeholder="Ingresa tu contraseña"
+                  toggleMask
+                  inputClassName="w-full sm:w-18rem md:w-18rem "
+                  className="p-inputtext-sm"
+                  feedback={false}
+                ></Password>
+              </div>
+              {/* <Password
                 inputId="Contrasena"
                 value={loginAuthData.Contrasena}
                 onChange={(e) => {
@@ -126,10 +162,13 @@ const Login = () => {
                 placeholder="Ingresa tu contraseña"
                 toggleMask
                 inputClassName="w-full md:w-25rem"
+                className="p-inputtext-sm"
                 feedback={false}
-              ></Password>
+              ></Password> */}
               {loginAuthErrors.Contrasena && (
-                <small className="p-error">{loginAuthErrors.Contrasena}</small>
+                <small className="p-error text-xs">
+                  {loginAuthErrors.Contrasena}
+                </small>
               )}
             </div>
 
@@ -156,17 +195,19 @@ const Login = () => {
                   Recordar credenciales
                 </label>
               </div>
-              <a
+
+              <Link
+                to={"../forgot_password"}
                 className="font-medium no-underline ml-2 text-right cursor-pointer text-xs"
                 style={{ color: "var(--primary-color)" }}
               >
                 ¿Olvidé mi contraseña?
-              </a>
+              </Link>
             </div>
 
             <Button
               label="Aceptar"
-              className="w-full p-2 text-xl "
+              className="w-full p-2 text-md"
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) login(loginAuthData);

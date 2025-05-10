@@ -14,6 +14,8 @@ import Login from "../../auth/Components/Login";
 import { AuthProvider } from "../../auth/context/AuthContext";
 import Signup from "../../auth/Components/Signup";
 import NotFound from "../../auth/Components/NotFound";
+import ForgotPassword from "../../auth/Components/ForgotPassword";
+import ResetPassword from "../../auth/Components/ResetPassword";
 
 const AllRoutes = () => {
   return (
@@ -24,6 +26,11 @@ const AllRoutes = () => {
             <Route path="/auth" element={""}>
               <Route path="login" element={<Login />}></Route>
               <Route path="signup" element={<Signup />}></Route>
+              <Route
+                path="forgot_password"
+                element={<ForgotPassword />}
+              ></Route>
+              <Route path="reset_password/:token" element={<ResetPassword />}></Route>
             </Route>
 
             <Route path="/dashboard" element={<Dashboard />}>
