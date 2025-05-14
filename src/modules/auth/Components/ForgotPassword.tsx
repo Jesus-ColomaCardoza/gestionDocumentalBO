@@ -119,13 +119,14 @@ const ForgotPassword = () => {
             </div>
 
             <Button
-              label="Aceptar"
-              className="w-full p-2 text-md mb-3"
+              className="w-full p-2 text-md flex justify-content-center gap-1"
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) forgotPassword(forgotPasswordData);
               }}
-            ></Button>
+            >
+              Aceptar
+            </Button>
 
             <Button
               icon={
@@ -134,7 +135,7 @@ const ForgotPassword = () => {
                   <span className="text-sm">Volver al inicio</span>{" "}
                 </>
               }
-              className="w-full p-2 "
+              className="w-full p-2 mt-3"
               text
               onClick={() => {
                 navigate("../login");

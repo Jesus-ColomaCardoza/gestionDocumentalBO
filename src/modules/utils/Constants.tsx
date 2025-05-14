@@ -2,6 +2,8 @@ export const VITE_API_URL_GDS = import.meta.env.VITE_API_URL_GDS;
 
 export const REACT_APP_SALT = import.meta.env.REACT_APP_SALT;
 
+export const VITE_ID_OAUTH2_GOOGLE = import.meta.env.VITE_ID_OAUTH2_GOOGLE;
+
 export const filterBodyRequest = {
   cantidad_max: "0",
   Language: "ES",

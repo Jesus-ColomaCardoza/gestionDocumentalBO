@@ -16,6 +16,7 @@ import {
   OutVerifyTokenAuth,
   ResetPasswordAuth,
   SignupAuth,
+  SignupGoogleAuth,
   UserAuth,
 } from "../interfaces/AuthInterface";
 import { REACT_APP_SALT, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -23,6 +24,7 @@ import { AUTH } from "../service/AuthService";
 import { Toast } from "primereact/toast";
 import { useLocation, useNavigate } from "react-router-dom";
 import { sha256 } from "js-sha256";
+import { CredentialResponse } from "@react-oauth/google";
 
 type AuthPoroviderProps = {
   children: React.ReactNode;
@@ -31,7 +33,9 @@ type AuthPoroviderProps = {
 interface AuthContextType {
   userAuth: UserAuth | null;
   login: (loginAuth: LoginAuth) => Promise<void>;
+  loginGoogle: (credentialResponse: CredentialResponse) => Promise<void>;
   signup: (signupAuth: SignupAuth) => Promise<void>;
+  signupGoogle: (SignupGoogleAuth: SignupGoogleAuth) => Promise<void>;
   forgotPassword: (forgotPasswordAuth: ForgotPasswordAuth) => Promise<void>;
   resetPassword: (resetPasswordAuth: ResetPasswordAuth) => Promise<void>;
   logout: () => void;
@@ -180,6 +184,55 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     }
   };
 
+  const signupGoogle = async (SignupGoogleAuth: SignupGoogleAuth) => {
+    try {
+      setLoadingAuth(true);
+
+      const signuppedUser = await axios.post<OutSignupAuth>(
+        `${VITE_API_URL_GDS + AUTH.SIGNUP_GOOGLE}`,
+        SignupGoogleAuth
+      );
+
+      if (signuppedUser.data.message.msgId == 0) {
+        toastAuth.current?.show({
+          severity: "success",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+
+        navigate("/auth/login");
+      } else if (signuppedUser.data.message.msgId == 2) {
+        toastAuth.current?.show({
+          severity: "info",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+      } else if (signuppedUser.data.message.msgId == 1) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${signuppedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.status == 400) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${error.response?.data.message}`,
+          life: 3000,
+        });
+      } else {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${"Error: Error interno en el servidor"}`,
+          life: 3000,
+        });
+      }
+    } finally {
+      setLoadingAuth(false);
+    }
+  };
+
   const login = async (loginAuth: LoginAuth) => {
     try {
       setLoadingAuth(true);
@@ -218,6 +271,68 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
         toastAuth.current?.show({
           severity: "error",
           detail: `${loggedUser.data.message.msgTxt}`,
+          life: 3000,
+        });
+
+        setUserAuth(null);
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.status == 400) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${error.response?.data.message}`,
+          life: 3000,
+        });
+      } else {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${"Error: Error interno en el servidor"}`,
+          life: 3000,
+        });
+      }
+
+      setUserAuth(null);
+    } finally {
+      setLoadingAuth(false);
+    }
+  };
+
+  const loginGoogle = async (credentialResponse: CredentialResponse) => {
+    try {
+      setLoadingAuth(true);
+
+      const loggedUserWithGoogle = await axios.post<OutLoginAuth>(
+        `${VITE_API_URL_GDS + AUTH.LOGIN_GOOGLE}`,
+        {
+          Token: credentialResponse.credential,
+        }
+      );
+
+      if (loggedUserWithGoogle.data.message.msgId == 0) {
+        toastAuth.current?.show({
+          severity: "success",
+          detail: `${loggedUserWithGoogle.data.message.msgTxt}`,
+          life: 3000,
+        });
+
+        localStorage.setItem(
+          "tokenSGD",
+          loggedUserWithGoogle.data.registro?.AccessToken!
+        );
+
+        await verifyToken();
+      } else if (loggedUserWithGoogle.data.message.msgId == 2) {
+        toastAuth.current?.show({
+          severity: "info",
+          detail: `${loggedUserWithGoogle.data.message.msgTxt}`,
+          life: 3000,
+        });
+
+        setUserAuth(null);
+      } else if (loggedUserWithGoogle.data.message.msgId == 1) {
+        toastAuth.current?.show({
+          severity: "error",
+          detail: `${loggedUserWithGoogle.data.message.msgTxt}`,
           life: 3000,
         });
 
@@ -369,7 +484,9 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
       value={{
         userAuth,
         login,
+        loginGoogle,
         signup,
+        signupGoogle,
         forgotPassword,
         resetPassword,
         logout,

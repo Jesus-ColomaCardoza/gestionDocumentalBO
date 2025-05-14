@@ -1,5 +1,9 @@
 import { Menssage } from "../../utils/menssage";
 
+export interface TokenAuth {
+  Token: string;
+}
+
 export interface UserAuth {
   IdUsuario: number;
   Nombres: string;
@@ -7,6 +11,10 @@ export interface UserAuth {
   ApellidoMaterno: string;
   UrlFotoPerfil: string;
   Email: string;
+  Cargo: {
+    IdCargo: number;
+    Descripcion: string;
+  };
   Rol: {
     IdRol: string;
     Descripcion: string;
@@ -45,6 +53,10 @@ export interface OutVerifyTokenAuth {
     ApellidoMaterno: string;
     UrlFotoPerfil: string;
     Email: string;
+    Cargo: {
+      IdCargo: number;
+      Descripcion: string;
+    };
     Rol: {
       IdRol: string;
       Descripcion: string;
@@ -63,6 +75,16 @@ export interface SignupAuth {
   Email: string;
   Contrasena: string;
   ContrasenaConfirmacion: string;
+  IdRol: string;
+  IdCargo: number;
+  IdArea: number;
+  Area?: {
+    IdArea: number;
+    Descripcion: string;
+  };
+}
+
+export interface SignupGoogleAuth extends TokenAuth {
   IdRol: string;
   IdCargo: number;
   IdArea: number;

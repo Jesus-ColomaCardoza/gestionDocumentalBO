@@ -163,10 +163,10 @@ const MenuBar = (props: MenuBarProps) => {
           onClick={() => switchTheme("lara-light-blue", "light")}
         ></Button>
 
-        <Avatar
+        {/* <Avatar
           image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
           shape="circle"
-        />
+        /> */}
       </div>
     </div>
   );

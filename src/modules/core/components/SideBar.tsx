@@ -6,6 +6,7 @@ import { Card } from "primereact/card";
 import "./../styles/Dashboard.css";
 import { useRef } from "react";
 import { Avatar } from "primereact/avatar";
+import { useAuth } from "../../auth/context/AuthContext";
 
 type SideBarProps = {
   visible?: boolean;
@@ -20,6 +21,8 @@ const SideBar = (props: SideBarProps) => {
   // const btnRef5 = useRef<any>(null);
 
   const refSideBar = useRef<Card>(null);
+
+  const { userAuth } = useAuth()!;
 
   return (
     <Card
@@ -169,7 +172,9 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-file mr-2"></i>
-                  <span className="font-medium text-sm">Archivos digitales</span>
+                  <span className="font-medium text-sm">
+                    Archivos digitales
+                  </span>
                   <Ripple />
                 </Link>
               </li>
@@ -282,7 +287,9 @@ const SideBar = (props: SideBarProps) => {
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Tipo Identificacion</span>
+                  <span className="font-medium text-sm">
+                    Tipo Identificacion
+                  </span>
                   <Ripple />
                 </Link>
               </li>
@@ -456,10 +463,19 @@ const SideBar = (props: SideBarProps) => {
         <hr className="border-top-1 border-none surface-border" />
         <a className="my-2 mx-3 flex align-items-center justify-content-center cursor-pointer p-1 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
           <Avatar
-            image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+            label={`${
+              userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+              "" +
+              userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+            }`}
+            image={`${userAuth?.UrlFotoPerfil}`}
             shape="circle"
           />
-          <span className="font-bold">Amy Elsner</span>
+          <span className="font-bold">
+            {userAuth?.Nombres.split(" ")[0] +
+              " " +
+              userAuth?.ApellidoPaterno.split(" ")[0]}
+          </span>
         </a>
       </div>
     </Card>

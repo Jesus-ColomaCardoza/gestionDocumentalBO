@@ -90,7 +90,7 @@ const ResetPassword = () => {
               /> */}
               <div className="text-900 text-xl mb-1">Cambio de contraseña</div>
               <span className="text-200 text-xs">
-                A continución ingrese su  nueva contraseña
+                A continución ingrese su nueva contraseña
               </span>
             </div>
 
@@ -181,13 +181,14 @@ const ResetPassword = () => {
             </div>
 
             <Button
-              label="Aceptar"
-              className="w-full p-2 text-md mb-3"
+              className="w-full p-2 text-md mb-3 flex justify-content-center gap-1"
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) resetPassword(resetPasswordData);
               }}
-            ></Button>
+            >
+              Aceptar
+            </Button>
 
             <Button
               icon={
@@ -196,7 +197,7 @@ const ResetPassword = () => {
                   <span className="text-sm">Volver al inicio</span>{" "}
                 </>
               }
-              className="w-full  p-2 "
+              className="w-full p-2 mt-3"
               text
               onClick={() => {
                 navigate("../login");

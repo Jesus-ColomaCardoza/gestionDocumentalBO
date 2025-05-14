@@ -9,6 +9,7 @@ import { Card } from "primereact/card";
 import { LoginAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
+import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   // variables and constants
@@ -29,7 +30,7 @@ const Login = () => {
   const [checked, setChecked] = useState(remenberMeSGD ? true : false);
 
   // custom hooks
-  const { login, loadingAuth } = useAuth()!;
+  const { login, loginGoogle, loadingAuth } = useAuth()!;
 
   // functions
   const validateForm = () => {
@@ -79,15 +80,39 @@ const Login = () => {
         {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
         <div className="my-5">
           <Card className="w-full py-3 px-2" style={{ borderRadius: "10px" }}>
-            <div className="text-center mb-6">
+            <div className="text-center mb-3">
               {/* <img
                 src="/demo/images/login/avatar.png"
                 alt="Image"
                 height="50"
                 className="mb-3"
               /> */}
-              <div className="text-900 text-xl">Inicio de Sesión</div>
-              {/* <span className="text-600 font-medium">Inicio de Sesión</span> */}
+              <div className="text-2xl">Inicio de Sesión</div>
+              <span className="text-200 text-xs">
+                Bienvenido! Selecciona el metodo para
+                <br /> acceder al SGD
+              </span>
+            </div>
+
+            <div className="flex flex-column mb-3 mt-5">
+              <GoogleLogin
+                // type="icon"
+                logo_alignment="center"
+                // theme="filled_blue"
+                onSuccess={async (credentialResponse: CredentialResponse) => {
+                  loginGoogle(credentialResponse);
+                }}
+                onError={() => {
+                  window.alert("Error al iniciar sesión");
+                }}
+              />
+              <div className="flex align-items-center mt-5">
+                <div style={{ flexGrow: 3, border: "1px #999 solid" }}></div>
+                <span style={{ flexGrow: 1 }} className="text-xs text-center">
+                  o registrate con email
+                </span>
+                <div style={{ flexGrow: 3, border: "1px #999 solid" }}></div>
+              </div>
             </div>
 
             {/* <label
@@ -206,13 +231,14 @@ const Login = () => {
             </div>
 
             <Button
-              label="Aceptar"
-              className="w-full p-2 text-md"
+              className="w-full p-2 text-md flex justify-content-center gap-1"
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) login(loginAuthData);
               }}
-            ></Button>
+            >
+              Aceptar
+            </Button>
 
             <div className="flex align-items-center justify-content-center mt-3 ">
               <label className="text-xs" htmlFor="rememberme1">
