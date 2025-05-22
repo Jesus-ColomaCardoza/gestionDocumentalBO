@@ -154,12 +154,14 @@ const MenuBar = (props: MenuBarProps) => {
       >
         <Button
           icon="pi pi-moon"
-          className="mr-2"
+          className="mr-2 text-white"
+          severity="secondary"
           onClick={() => switchTheme("lara-dark-blue", "dark")}
         ></Button>
         <Button
           icon="pi pi-sun"
-          className="mr-2"
+          className="mr-2 text-white"
+          severity="secondary"
           onClick={() => switchTheme("lara-light-blue", "light")}
         ></Button>
 

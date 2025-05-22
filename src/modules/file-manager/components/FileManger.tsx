@@ -51,13 +51,7 @@ import { useAuth } from "../../auth/context/AuthContext";
 
 const FileManager = () => {
   // custom hooks
-  const userTest = {
-    IdUsuario: 1,
-    IdArea: 1,
-  };
-
   const { userAuth } = useAuth()!;
-
 
   const {
     createCarpeta,
@@ -1250,16 +1244,18 @@ const FileManager = () => {
             popupAlignment="right"
           />
           <Button
-            label="Agregar"
-            icon="pi pi-plus"
             className="mr-2"
             onClick={(event) => menuAddFM.current?.toggle(event)}
             aria-controls="popup_menu_right"
             aria-haspopup
-            text
-            raised
+            severity="info"
             size="small"
-          />
+          >
+            <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+              <i className="pi pi-plus"></i>
+              <span>Agregar</span>
+            </span>
+          </Button>
 
           <Menu
             className="w-full surface-section"

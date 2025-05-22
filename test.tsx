@@ -171,7 +171,6 @@ export default function AdvancedFilterDemo() {
     setGlobalFilterValue("");
   };
 
-  
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -193,7 +192,6 @@ export default function AdvancedFilterDemo() {
       </div>
     );
   };
-
 
   const countryBodyTemplate = (rowData: Customer) => {
     return (
@@ -235,7 +233,6 @@ export default function AdvancedFilterDemo() {
     return <div className="px-3 pt-0 pb-3 text-center">Filter by Country</div>;
   };
 
-
   const representativeBodyTemplate = (rowData: Customer) => {
     const representative = rowData.representative;
 
@@ -255,17 +252,21 @@ export default function AdvancedFilterDemo() {
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <MultiSelect
-        value={options.value}
-        options={representatives}
-        itemTemplate={representativesItemTemplate}
-        onChange={(e: MultiSelectChangeEvent) =>
-          options.filterCallback(e.value)
-        }
-        optionLabel="name"
-        placeholder="Any"
-        className="p-column-filter"
-      />
+      <>
+        <div className="mb-3 font-bold">Agent Picker</div>
+
+        <MultiSelect
+          value={options.value}
+          options={representatives}
+          itemTemplate={representativesItemTemplate}
+          onChange={(e: MultiSelectChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+          optionLabel="name"
+          placeholder="Any"
+          className="p-column-filter"
+        />
+      </>
     );
   };
 
@@ -282,8 +283,6 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-
-
   const dateBodyTemplate = (rowData: Customer) => {
     return formatDate(new Date(rowData.date));
   };
@@ -299,8 +298,6 @@ export default function AdvancedFilterDemo() {
       />
     );
   };
-
-
 
   const balanceBodyTemplate = (rowData: Customer) => {
     return formatCurrency(rowData.balance);
@@ -321,8 +318,6 @@ export default function AdvancedFilterDemo() {
       />
     );
   };
-
-
 
   const statusBodyTemplate = (rowData: Customer) => {
     return (
@@ -351,8 +346,6 @@ export default function AdvancedFilterDemo() {
   const statusItemTemplate = (option: string) => {
     return <Tag value={option} severity={getSeverity(option)} />;
   };
-
-
 
   const activityBodyTemplate = (rowData: Customer) => {
     return (
@@ -383,8 +376,6 @@ export default function AdvancedFilterDemo() {
     );
   };
 
-
-
   const verifiedBodyTemplate = (rowData: Customer) => {
     return (
       <i
@@ -414,7 +405,6 @@ export default function AdvancedFilterDemo() {
       </div>
     );
   };
-
 
   const header = renderHeader();
 

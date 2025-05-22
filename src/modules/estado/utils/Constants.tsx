@@ -84,10 +84,7 @@ export const defaultFilters: DataTableFilterMeta = {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
-  "EsquemaEstado.Descripcion": {
-    operator: FilterOperator.AND,
-    constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
-  },
+  "EsquemaEstado.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
   Activo: { value: null, matchMode: FilterMatchMode.EQUALS },
   CreadoEl: {
     operator: FilterOperator.AND,

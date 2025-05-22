@@ -30,23 +30,30 @@ const AllRoutes = () => {
                 path="forgot_password"
                 element={<ForgotPassword />}
               ></Route>
-              <Route path="reset_password/:token" element={<ResetPassword />}></Route>
+              <Route
+                path="reset_password/:token"
+                element={<ResetPassword />}
+              ></Route>
             </Route>
 
             <Route path="/dashboard" element={<Dashboard />}>
               <Route path="file_manager" element={<FileManager />}></Route>
+
+              <Route path="pendiente" element={<Area />}></Route>
+              <Route path="recibido" element={<Cargo />}></Route>
+
               <Route path="area" element={<Area />}></Route>
-              <Route path="tipo_usuario" element={<TipoUsuario />}></Route>
-              <Route path="tipo_documento" element={<TipoDocumento />}></Route>
               <Route path="cargo" element={<Cargo />}></Route>
+              <Route path="estado" element={<Estado />}></Route>
+              <Route path="esquema_estado" element={<EsquemaEstado />}></Route>
+              <Route path="rol" element={<Rol />}></Route>
+              <Route path="tipo_documento" element={<TipoDocumento />}></Route>
+              <Route path="tipo_usuario" element={<TipoUsuario />}></Route>
               <Route path="tipo_tramite" element={<TipoTramite />}></Route>
               <Route
                 path="tipo_identificacion"
                 element={<TipoIdentificacion />}
               ></Route>
-              <Route path="esquema_estado" element={<EsquemaEstado />}></Route>
-              <Route path="estado" element={<Estado />}></Route>
-              <Route path="rol" element={<Rol />}></Route>
             </Route>
 
             <Route path="nofound" element={<NotFound />}></Route>

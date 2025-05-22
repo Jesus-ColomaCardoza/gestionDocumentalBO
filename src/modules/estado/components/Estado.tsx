@@ -114,7 +114,11 @@ const Estado = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -522,7 +526,7 @@ const Estado = () => {
   // templates to column EsquemaEstado
   const esquemaEstadoBodyTemplate = (rowData: EstadoEntity) => {
     return (
-      <div className="flex flex-column gap-2">
+      <div className="flex align-items-center gap-2">
         <p className="text-sm m-0">{rowData.EsquemaEstado.Descripcion}</p>
       </div>
     );
@@ -532,16 +536,27 @@ const Estado = () => {
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <Calendar
-        value={options.value ? new Date(options.value) : null}
-        onChange={(e) => {
-          options.filterCallback(e.value, options.index);
-        }}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-        showIcon
-      />
+      <>
+        <div className="mb-3 text-sm w-12rem">Esquema Picker</div>
+        <MultiSelect
+          value={options.value}
+          options={esquemaEstados}
+          itemTemplate={(option: EsquemaEstadoEntity) => {
+            return (
+              <div className="flex align-items-center gap-2">
+                <span>{option.Descripcion}</span>
+              </div>
+            );
+          }}
+          onChange={(e: MultiSelectChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+          optionLabel="Descripcion"
+          optionValue="Descripcion"
+          placeholder="Seleccionar"
+          className="p-column-filter"
+        />
+      </>
     );
   };
 
@@ -724,8 +739,9 @@ const Estado = () => {
             return (
               <Column
                 key={col.field}
-                field={col.field}
+                field={col.filterField}
                 filterField={col.filterField}
+                showFilterMatchModes={false}
                 sortField={col.filterField}
                 header={col.header}
                 dataType={col.dataType}
@@ -734,7 +750,7 @@ const Estado = () => {
                 filter
                 filterPlaceholder={col.filterPlaceholder}
                 body={esquemaEstadoBodyTemplate}
-                // filterElement={creadoElFilterTemplate}
+                filterElement={esquemaEstadoFilterTemplate}
               />
             );
           } else if (col.field == "Activo") {
