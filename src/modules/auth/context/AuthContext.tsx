@@ -58,19 +58,38 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
   // variables
   const authRoutes = [
+    //auth
     "/auth/login",
     "/auth/signup",
     "/auth/forgot_password",
     "/auth/reset_password/:token",
+
+    //firma digital
+    "/firma_digital/archivos_digitales",
+
+    //tramite
+    "/tramite/pendiente",
+    "/tramite/recibido",
+
+    //mantenimiento
+    "/mantenimiento/area",
+    "/mantenimiento/cargo",
+    "/mantenimiento/estado",
+    "/mantenimiento/esquema_estado",
+    "/mantenimiento/rol",
+    "/mantenimiento/tipo_documento",
+    "/mantenimiento/tipo_usuario",
+    "/mantenimiento/tipo_tramite",
+    "/mantenimiento/tipo_identificacion",
   ];
 
   //functions
-  const validateAuthRoute = authRoutes.some((route) => {
+  const validateRoutes = authRoutes.some((route) => {
     const pattern = new RegExp(`^${route.replace(/:\w+/g, "[^/]+")}$`);
     return pattern.test(pathname);
   });
 
-  const verifyToken = async () => {
+  const verifyToken = async (origin: "login" | "reload") => {
     try {
       const tokenSGD = localStorage.getItem("tokenSGD");
 
@@ -83,7 +102,15 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
         if (validateUser.data.message.msgId == 0) {
           setUserAuth(validateUser.data.registro || null);
 
-          navigate("/dashboard");
+          console.log("entra");
+          console.log(validateRoutes);
+          console.log(pathname);
+
+          if (origin === "login") {
+            navigate("/dashboard");
+          } else {
+            navigate(validateRoutes ? pathname : "/dashboard");
+          }
         } else if (validateUser.data.message.msgId == 1) {
           toastAuth.current?.show({
             severity: "error",
@@ -93,7 +120,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
           navigate("/auth/login");
         }
-      } else if (!validateAuthRoute) {
+      } else if (!validateRoutes) {
         console.log("not found");
 
         navigate("/nofound");
@@ -258,7 +285,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
           loggedUser.data.registro?.AccessToken!
         );
 
-        await verifyToken();
+        await verifyToken("login");
       } else if (loggedUser.data.message.msgId == 2) {
         toastAuth.current?.show({
           severity: "info",
@@ -320,7 +347,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
           loggedUserWithGoogle.data.registro?.AccessToken!
         );
 
-        await verifyToken();
+        await verifyToken("login");
       } else if (loggedUserWithGoogle.data.message.msgId == 2) {
         toastAuth.current?.show({
           severity: "info",
@@ -476,7 +503,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
   };
 
   useEffect(() => {
-    verifyToken();
+    verifyToken("reload");
   }, []);
 
   return (

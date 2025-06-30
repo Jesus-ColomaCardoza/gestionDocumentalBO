@@ -16,6 +16,8 @@ import Signup from "../../auth/Components/Signup";
 import NotFound from "../../auth/Components/NotFound";
 import ForgotPassword from "../../auth/Components/ForgotPassword";
 import ResetPassword from "../../auth/Components/ResetPassword";
+import TramitePendiente from "../../tramite/components/TramitePendiente";
+import TramiteRecibido from "../../tramite/components/TramiteRecibido";
 
 const AllRoutes = () => {
   return (
@@ -26,34 +28,27 @@ const AllRoutes = () => {
             <Route path="/auth" element={""}>
               <Route path="login" element={<Login />}></Route>
               <Route path="signup" element={<Signup />}></Route>
-              <Route
-                path="forgot_password"
-                element={<ForgotPassword />}
-              ></Route>
-              <Route
-                path="reset_password/:token"
-                element={<ResetPassword />}
-              ></Route>
+              <Route path="forgot_password" element={<ForgotPassword />}></Route>
+              <Route path="reset_password/:token" element={<ResetPassword />}></Route>
             </Route>
 
-            <Route path="/dashboard" element={<Dashboard />}>
-              <Route path="file_manager" element={<FileManager />}></Route>
+            <Route path="/dashboard" element={<Dashboard />}></Route>
 
-              <Route path="pendiente" element={<Area />}></Route>
-              <Route path="recibido" element={<Cargo />}></Route>
+            <Route path="/" element={<Dashboard />}>
+              <Route path="firma_digital/archivos_digitales" element={<FileManager />}></Route>
 
-              <Route path="area" element={<Area />}></Route>
-              <Route path="cargo" element={<Cargo />}></Route>
-              <Route path="estado" element={<Estado />}></Route>
-              <Route path="esquema_estado" element={<EsquemaEstado />}></Route>
-              <Route path="rol" element={<Rol />}></Route>
-              <Route path="tipo_documento" element={<TipoDocumento />}></Route>
-              <Route path="tipo_usuario" element={<TipoUsuario />}></Route>
-              <Route path="tipo_tramite" element={<TipoTramite />}></Route>
-              <Route
-                path="tipo_identificacion"
-                element={<TipoIdentificacion />}
-              ></Route>
+              <Route path="tramite/pendiente" element={<TramitePendiente />}></Route>
+              <Route path="tramite/recibido" element={<TramiteRecibido />}></Route>
+
+              <Route path="mantenimiento/area" element={<Area />}></Route>
+              <Route path="mantenimiento/cargo" element={<Cargo />}></Route>
+              <Route path="mantenimiento/estado" element={<Estado />}></Route>
+              <Route path="mantenimiento/esquema_estado" element={<EsquemaEstado />}></Route>
+              <Route path="mantenimiento/rol" element={<Rol />}></Route>
+              <Route path="mantenimiento/tipo_documento" element={<TipoDocumento />}></Route>
+              <Route path="mantenimiento/tipo_usuario" element={<TipoUsuario />}></Route>
+              <Route path="mantenimiento/tipo_tramite" element={<TipoTramite />}></Route>
+              <Route path="mantenimiento/tipo_identificacion" element={<TipoIdentificacion />}></Route>
             </Route>
 
             <Route path="nofound" element={<NotFound />}></Route>

@@ -9,37 +9,42 @@ import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useState, useEffect, useRef } from "react";
-import UseArea from "../hooks/UseArea";
+import UseEstado from "../hooks/UseEstado";
 import { ColumnMeta } from "../../utils/Interfaces";
 import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
 import {
-  AreaCreate,
-  AreaEntity,
-  AreaOut,
-  AreasOut,
-} from "../interfaces/AreaInterface";
+  EstadoCreate,
+  EstadoEntity,
+  EstadoOut,
+  EstadosOut,
+} from "../interfaces/EstadoInterface";
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyArea } from "../utils/Constants";
-import AreaCreateOrUpdate from "./AreaCreateOrUpdate";
-import AreaRemove from "./AreaRemove";
-import AreasRemove from "./AreasRemove";
+import { columns, defaultFilters, emptyEstado } from "../utils/Constants";
+import EstadoCreateOrUpdate from "./EstadoCreateOrUpdate";
+import EstadoRemove from "./EstadoRemove";
+import EstadosRemove from "./EstadosRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { UseEsquemaEstado } from "../../esquema-estado/hooks/UseEsquemaEstado";
+import { EsquemaEstadoEntity } from "../../esquema-estado/interfaces/EsquemaEstadoInterface";
+import { DropdownChangeEvent } from "primereact/dropdown";
 
-const Area = () => {
+const TramiteRecibido = () => {
   // custom hooks
-  const { create, findAll, findOne, update, remove } = UseArea();
+  const { create, findAll, findOne, update, remove } = UseEstado();
+
+  const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
 
   //useRefs
   const toast = useRef<Toast>(null);
 
-  const dt = useRef<DataTable<AreaEntity[]>>(null);
+  const dt = useRef<DataTable<EstadoEntity[]>>(null);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -54,74 +59,41 @@ const Area = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingAreaCreateOrUpdate, setLoadingAreaCreateOrUpdate] =
+  const [loadingEstadoCreateOrUpdate, setLoadingEstadoCreateOrUpdate] =
     useState<boolean>(false);
 
-  const [area, setArea] = useState<AreaEntity>(emptyArea);
+  const [estado, setEstado] = useState<EstadoEntity>(emptyEstado);
 
-  const [areas, setAreas] = useState<AreaEntity[]>([]);
+  const [estados, setEstados] = useState<EstadoEntity[]>([]);
 
-  const [selectedAreas, setSelectedAreas] = useState<AreaEntity[]>([]);
+  const [selectedEstados, setSelectedEstados] = useState<EstadoEntity[]>([]);
 
-  const [areaDialog, setAreaDialog] = useState<{
+  const [esquemaEstados, setEsquemaEstados] = useState<
+    Pick<EsquemaEstadoEntity, "IdEsquemaEstado" | "Descripcion">[]
+  >([]);
+
+  const [estadoDialog, setEstadoDialog] = useState<{
     type?: "create" | "update" | undefined;
     state: boolean;
   }>({
     state: false,
   });
 
-  const [removeAreaDialog, setRemoveAreaDialog] = useState<boolean>(false);
+  const [removeEstadoDialog, setRemoveEstadoDialog] = useState<boolean>(false);
 
-  const [removeAreasDialog, setRemoveAreasDialog] = useState<boolean>(false);
+  const [removeEstadosDialog, setRemoveEstadosDialog] =
+    useState<boolean>(false);
 
-  // templates to component Toolbar
-  const items: MenuItem[] = [
-    {
-      label: "Update",
-      icon: "pi pi-refresh",
-    },
-    {
-      label: "Remove",
-      icon: "pi pi-times",
-    },
-  ];
-
-  const startContent = (
-    <div className="flex flex-column p-1 gap-2">
-      <h3 className="m-0">Mantenimiento de Áreas</h3>
-      {/* <div>
-        <Button label="Nuevo" icon="pi pi-plus" className=" p-2 " outlined />
-      </div> */}
-    </div>
-  );
-
-  const centerContent = (
-    <IconField iconPosition="left">
-      <InputIcon className="pi pi-search" />
-      <InputText placeholder="Search" />
-    </IconField>
-  );
-
-  const endContent = (
-    <>
-      <SplitButton
-        label="Aceptar"
-        model={items}
-        icon="pi pi-check"
-      ></SplitButton>
-    </>
-  );
-
-  // actions CRUD (create, read, update, remove) -> (create, findAll-findOne, update, remove)
-  const findAllArea = async () => {
+  // actions CRUD - TramiteRecibido (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllEstado = async () => {
     setLoading(true);
-    const areasFindAll = await findAll();
+    const estadosFindAll = await findAll();
     setLoading(false);
 
-    if (areasFindAll?.message.msgId == 0 && areasFindAll.registro) {
-      setAreas(
-        Array.isArray(areasFindAll.registro)
-          ? areasFindAll.registro?.map((af) => {
+    if (estadosFindAll?.message.msgId == 0 && estadosFindAll.registro) {
+      setEstados(
+        Array.isArray(estadosFindAll.registro)
+          ? estadosFindAll.registro?.map((af) => {
               return {
                 ...af,
                 CreadoEl: af.CreadoEl ? new Date(af.CreadoEl) : null,
@@ -134,13 +106,13 @@ const Area = () => {
       );
       //   toast.current?.show({
       //     severity: "success",
-      //     detail: `${areasFindAll.message.msgTxt}`,
+      //     detail: `${estadosFindAll.message.msgTxt}`,
       //     life: 3000,
       //   });
-      // } else if (areasFindAll?.message.msgId == 1) {
+      // } else if (estadosFindAll?.message.msgId == 1) {
       //   toast.current?.show({
       //     severity: "error",
-      //     detail: `${areasFindAll.message.msgTxt}`,
+      //     detail: `${estadosFindAll.message.msgTxt}`,
       //     life: 3000,
       //   });
     }
@@ -149,154 +121,181 @@ const Area = () => {
     onGlobalFilterChange();
   };
 
-  const createArea = async () => {
+  const createEstado = async () => {
     setSubmitted(true);
-    if (area.Descripcion.trim()) {
-      setLoadingAreaCreateOrUpdate(true);
-      let areaCreate = await create({
-        Descripcion: area.Descripcion,
-        Activo: area.Activo,
+    if (estado.Descripcion.trim() && estado.IdEsquemaEstado != 0) {
+      setLoadingEstadoCreateOrUpdate(true);
+      let estadoCreate = await create({
+        Descripcion: estado.Descripcion,
+        IdEsquemaEstado: estado.IdEsquemaEstado,
+        Activo: estado.Activo,
       });
-      setLoadingAreaCreateOrUpdate(false);
+      setLoadingEstadoCreateOrUpdate(false);
 
-      if (areaCreate?.message.msgId == 0 && areaCreate.registro) {
-        setAreas([...areas, areaCreate.registro]);
+      if (estadoCreate?.message.msgId == 0 && estadoCreate.registro) {
+        setEstados([...estados, estadoCreate.registro]);
         toast.current?.show({
           severity: "success",
-          detail: `${areaCreate.message.msgTxt}`,
+          detail: `${estadoCreate.message.msgTxt}`,
           life: 3000,
         });
-      } else if (areaCreate?.message.msgId == 1) {
+      } else if (estadoCreate?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${areaCreate.message.msgTxt}`,
+          detail: `${estadoCreate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setAreaDialog({ state: false });
-      setArea(emptyArea);
+      setEstadoDialog({ state: false });
+      setEstado(emptyEstado);
     }
   };
 
-  const updateArea = async () => {
+  const updateEstado = async () => {
     setSubmitted(true);
-    if (area.IdArea) {
-      setLoadingAreaCreateOrUpdate(true);
-      let areaUpdate = await update(area.IdArea.toString(), {
-        Descripcion: area.Descripcion,
-        Activo: area.Activo,
+    if (estado.IdEstado) {
+      setLoadingEstadoCreateOrUpdate(true);
+      let estadoUpdate = await update(estado.IdEstado.toString(), {
+        Descripcion: estado.Descripcion,
+        IdEsquemaEstado: estado.IdEsquemaEstado,
+        Activo: estado.Activo,
       });
-      setLoadingAreaCreateOrUpdate(false);
+      setLoadingEstadoCreateOrUpdate(false);
 
-      if (areaUpdate?.message.msgId == 0 && areaUpdate.registro) {
-        setAreas(
-          areas?.map((area) =>
-            area.IdArea === areaUpdate?.registro?.IdArea
-              ? { ...area, ...areaUpdate.registro }
-              : area
+      if (estadoUpdate?.message.msgId == 0 && estadoUpdate.registro) {
+        setEstados(
+          estados?.map((estado) =>
+            estado.IdEstado === estadoUpdate?.registro?.IdEstado
+              ? { ...estado, ...estadoUpdate.registro }
+              : estado
           )
         );
         toast.current?.show({
           severity: "success",
-          detail: `${areaUpdate.message.msgTxt}`,
+          detail: `${estadoUpdate.message.msgTxt}`,
           life: 3000,
         });
-      } else if (areaUpdate?.message.msgId == 1) {
+      } else if (estadoUpdate?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${areaUpdate.message.msgTxt}`,
+          detail: `${estadoUpdate.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setAreaDialog({ state: false });
-      setArea(emptyArea);
+      setEstadoDialog({ state: false });
+      setEstado(emptyEstado);
     }
   };
 
-  const removeArea = async () => {
-    if (area.IdArea) {
-      let areaRemove = await remove(area.IdArea.toString());
+  const removeEstado = async () => {
+    if (estado.IdEstado) {
+      let estadoRemove = await remove(estado.IdEstado.toString());
 
-      if (areaRemove?.message.msgId == 0 && areaRemove.registro) {
-        setAreas(
-          areas?.filter((area) => area.IdArea !== areaRemove?.registro?.IdArea)
+      if (estadoRemove?.message.msgId == 0 && estadoRemove.registro) {
+        setEstados(
+          estados?.filter(
+            (estado) => estado.IdEstado !== estadoRemove?.registro?.IdEstado
+          )
         );
         toast.current?.show({
           severity: "success",
-          detail: `${areaRemove.message.msgTxt}`,
+          detail: `${estadoRemove.message.msgTxt}`,
           life: 3000,
         });
-      } else if (areaRemove?.message.msgId == 1) {
+      } else if (estadoRemove?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${areaRemove.message.msgTxt}`,
+          detail: `${estadoRemove.message.msgTxt}`,
           life: 3000,
         });
       }
 
-      setRemoveAreaDialog(false);
-      setArea(emptyArea);
+      setRemoveEstadoDialog(false);
+      setEstado(emptyEstado);
     }
   };
 
-  const removeSelectedAreas = () => {
-    let _areas = areas.filter(
-      (val: AreaEntity) => !selectedAreas?.includes(val)
+  const removeSelectedEstados = () => {
+    let _estados = estados.filter(
+      (val: EstadoEntity) => !selectedEstados?.includes(val)
     );
 
-    setAreas(_areas);
-    setRemoveAreasDialog(false);
-    setSelectedAreas([]);
+    setEstados(_estados);
+    setRemoveEstadosDialog(false);
+    setSelectedEstados([]);
     toast.current?.show({
       severity: "success",
       summary: "Successful",
-      detail: "Areas Removed",
+      detail: "Estados Removed",
       life: 3000,
     });
+  };
+
+  // actions CRUD - Esquema TramiteRecibido (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllEsquemaEstadoCombox = async () => {
+    setLoading(true);
+    const esquemaEstadosFindAll = await findAllEsquemaEstado();
+    setLoading(false);
+
+    if (
+      esquemaEstadosFindAll?.message.msgId == 0 &&
+      esquemaEstadosFindAll.registro
+    ) {
+      setEsquemaEstados(
+        Array.isArray(esquemaEstadosFindAll.registro)
+          ? esquemaEstadosFindAll.registro?.map((af) => {
+              return {
+                IdEsquemaEstado: af.IdEsquemaEstado,
+                Descripcion: af.Descripcion,
+              };
+            })
+          : []
+      );
+    }
   };
 
   // templates to dialogs
   const hideDialog = () => {
     setSubmitted(false);
-    setAreaDialog({ state: false });
+    setEstadoDialog({ state: false });
   };
 
-  const showCreateAreaDialog = () => {
-    setArea(emptyArea);
+  const showCreateEstadoDialog = () => {
+    setEstado(emptyEstado);
     setSubmitted(false);
-    setAreaDialog({ type: "create", state: true });
+    setEstadoDialog({ type: "create", state: true });
   };
 
-  const showUpdateAreaDialog = (area: AreaEntity) => {
-    setArea({ ...area });
-    setAreaDialog({ type: "update", state: true });
+  const showUpdateEstadoDialog = (estado: EstadoEntity) => {
+    setEstado({ ...estado });
+    setEstadoDialog({ type: "update", state: true });
   };
 
-  const hideRemoveAreaDialog = () => {
-    setRemoveAreaDialog(false);
+  const hideRemoveEstadoDialog = () => {
+    setRemoveEstadoDialog(false);
   };
 
-  const hideRemoveAreasDialog = () => {
-    setRemoveAreasDialog(false);
+  const hideRemoveEstadosDialog = () => {
+    setRemoveEstadosDialog(false);
   };
 
-  const confirmRemoveArea = (area: AreaEntity) => {
-    setArea(area);
-    setRemoveAreaDialog(true);
+  const confirmRemoveEstado = (estado: EstadoEntity) => {
+    setEstado(estado);
+    setRemoveEstadoDialog(true);
   };
 
-  const confirmRemoveSelectedAreas = () => {
-    setRemoveAreasDialog(true);
+  const confirmRemoveSelectedEstados = () => {
+    setRemoveEstadosDialog(true);
   };
 
   // here
   const findIndexById = (id: string) => {
     let index = -1;
 
-    for (let i = 0; i < areas.length; i++) {
-      if (areas[i].IdArea.toString() === id) {
+    for (let i = 0; i < estados.length; i++) {
+      if (estados[i].IdEstado.toString() === id) {
         index = i;
         break;
       }
@@ -323,10 +322,10 @@ const Area = () => {
   //here
 
   const onActivoChange = (e: RadioButtonChangeEvent) => {
-    let _area = { ...area };
+    let _estado = { ...estado };
 
-    _area["Activo"] = e.value;
-    setArea(_area);
+    _estado["Activo"] = e.value;
+    setEstado(_estado);
   };
 
   const onInputChange = (
@@ -334,25 +333,40 @@ const Area = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _area = { ...area };
 
-    // @ts-ignore
-    _area[name] = val;
+    let _estado: any = { ...estado };
 
-    setArea(_area);
+    _estado[name] = val;
+
+    setEstado(_estado);
   };
 
-  // const onInputTextAreaChange = (
-  //   e: React.ChangeEvent<HTMLTextAreaElement>,
+  const onDropdownChange = (
+    e: DropdownChangeEvent,
+    nameFK: string,
+    nameObj: string
+  ) => {
+    const val = (e.target && e.target.value) || "";
+
+    let _estado: any = { ...estado };
+
+    _estado[nameFK] = val[nameFK];
+    _estado[nameObj] = { ...val };
+
+    setEstado(_estado);
+  };
+
+  // const onInputTextEstadoChange = (
+  //   e: React.ChangeEvent<HTMLTextEstadoElement>,
   //   name: string
   // ) => {
   //   const val = (e.target && e.target.value) || "";
-  //   let _area = { ...area };
+  //   let _estado = { ...estado };
 
   //   // @ts-ignore
-  //   _area[name] = val;
+  //   _estado[name] = val;
 
-  //   setArea(_area);
+  //   setEstado(_estado);
   // };
 
   // const onInputNumberChange = (
@@ -360,12 +374,12 @@ const Area = () => {
   //   name: string
   // ) => {
   //   const val = e.value ?? 0;
-  //   let _area = { ...area };
+  //   let _estado = { ...estado };
 
   //   // @ts-ignore
-  //   _area[name] = val;
+  //   _estado[name] = val;
 
-  //   setArea(_area);
+  //   setEstado(_estado);
   // };
 
   // templates to component DataTable
@@ -400,7 +414,7 @@ const Area = () => {
 
   const headerDataTable = (
     <div className="flex flex-wrap justify-content-between m-0 p-0">
-      <div className="flex justify-content-between gap-2 align-items-center">
+      <div className="flex flex-wrap justify-content-between gap-2 align-items-center">
         {/* <p className="m-0">Mantemiento de Áreas</p> */}
         <Button
           type="button"
@@ -418,7 +432,7 @@ const Area = () => {
           type="button"
           icon="pi pi-refresh"
           severity="info"
-          onClick={findAllArea}
+          onClick={findAllEstado}
           style={{
             width: "2rem",
             height: "2rem",
@@ -428,16 +442,77 @@ const Area = () => {
         />
         <Button
           type="button"
-          icon="pi pi-plus"
-          severity="success"
-          onClick={showCreateAreaDialog}
+          onClick={findAllEstado}
+          size="small"
           style={{
-            width: "2rem",
+            padding: "0",
+            width: "10rem",
             height: "2rem",
             margin: "auto 0",
             color: "#fff",
           }}
-        />
+        >
+          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+            <i className="pi pi-reply text-sm"></i>
+            <span>Derivar selección</span>
+          </span>
+        </Button>
+        <Button
+          type="button"
+          onClick={showCreateEstadoDialog}
+          size="small"
+          style={{
+            padding: "0",
+            width: "10rem",
+            height: "2rem",
+            margin: "auto 0",
+            background: "#293",
+            border: "none",
+          }}
+        >
+          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+            <i className="pi pi-verified text-sm"></i>
+            <span>Atender selección</span>
+          </span>
+        </Button>
+        <Button
+          type="button"
+          severity="danger"
+          onClick={findAllEstado}
+          size="small"
+          style={{
+            padding: "0",
+            width: "10rem",
+            height: "2rem",
+            margin: "auto 0",
+            color: "#fff",
+          }}
+        >
+          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+            <i className="pi pi-exclamation-circle text-sm"></i>
+            <span>Observar selección</span>
+          </span>
+        </Button>
+        <Button
+          type="button"
+          severity="contrast"
+          onClick={findAllEstado}
+          size="small"
+          style={{
+            padding: "0",
+            width: "10rem",
+            height: "2rem",
+            margin: "auto 0",
+            color: "#000",
+            background: "#eee",
+            border: "none",
+          }}
+        >
+          <span className="flex justify-content-between gap-2 align-items-center m-auto">
+            <i className="pi pi-trash text-sm"></i>
+            <span>Archivar selección</span>
+          </span>
+        </Button>
       </div>
 
       <div className="flex justify-content-between gap-2 ">
@@ -471,8 +546,95 @@ const Area = () => {
     </div>
   );
 
+    // templates to component Toolbar
+  const items: MenuItem[] = [
+    {
+      label: "Update",
+      icon: "pi pi-refresh",
+    },
+    {
+      label: "Remove",
+      icon: "pi pi-times",
+    },
+  ];
+
+  const startContent = (
+    <div className="flex flex-column p-1 gap-2">
+      <h3 className="m-0">Trámites recibidos</h3>
+      {/* <div>
+        <Button label="Nuevo" icon="pi pi-plus" className=" p-2 " outlined />
+      </div> */}
+    </div>
+  );
+
+  const centerContent = (
+    <IconField iconPosition="left">
+      <InputIcon className="pi pi-search" />
+      <InputText placeholder="Search" />
+    </IconField>
+  );
+
+  const endContent = (
+    <>
+      <Button
+        type="button"
+        // onClick={findAllEstado}
+        size="small"
+        style={{
+          padding: "0",
+          width: "10rem",
+          height: "2rem",
+          margin: "auto 0",
+          color: "#fff",
+        }}
+      >
+        <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+          <i className="pi pi-plus text-sm"></i>
+          <span>Nuevo Trámite</span>
+        </span>
+      </Button>
+    </>
+  );
+
+  // templates to column EsquemaEstado
+  const esquemaEstadoBodyTemplate = (rowData: EstadoEntity) => {
+    return (
+      <div className="flex align-items-center gap-2">
+        <p className="text-sm m-0">{rowData.EsquemaEstado.Descripcion}</p>
+      </div>
+    );
+  };
+
+  const esquemaEstadoFilterTemplate = (
+    options: ColumnFilterElementTemplateOptions
+  ) => {
+    return (
+      <>
+        <div className="mb-3 text-sm w-12rem">Esquema Picker</div>
+        <MultiSelect
+          value={options.value}
+          options={esquemaEstados}
+          itemTemplate={(option: EsquemaEstadoEntity) => {
+            return (
+              <div className="flex align-items-center gap-2">
+                <span>{option.Descripcion}</span>
+              </div>
+            );
+          }}
+          onChange={(e: MultiSelectChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+          optionLabel="Descripcion"
+          optionValue="Descripcion"
+          placeholder="Seleccionar"
+          className="p-column-filter"
+        />
+      </>
+    );
+  };
+
   // templates to column Activo
-  const activoBodyTemplate = (rowData: AreaEntity) => {
+  const activoBodyTemplate = (rowData: EstadoEntity) => {
     return (
       <i
         className={classNames("pi", {
@@ -487,7 +649,7 @@ const Area = () => {
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <div className="flex align-items-center justify-content-center gap-2">
+      <div className="flex align-items-center justify-content-center gap-2 w-12rem">
         <label htmlFor="verified-filter" className="font-bold">
           Activo
         </label>
@@ -503,7 +665,7 @@ const Area = () => {
   };
 
   // templates to column ModificadoEl
-  const modifiadoElBodyTemplate = (rowData: AreaEntity) => {
+  const modifiadoElBodyTemplate = (rowData: EstadoEntity) => {
     return (
       <p className="text-sm m-0">
         {!rowData.ModificadoEl
@@ -531,7 +693,7 @@ const Area = () => {
   };
 
   // templates to column CreadoEl
-  const creadoElBodyTemplate = (rowData: AreaEntity) => {
+  const creadoElBodyTemplate = (rowData: EstadoEntity) => {
     return (
       <p className="text-sm m-0">
         {!rowData.CreadoEl ? "__" : formatDate(new Date(rowData.CreadoEl))}
@@ -557,7 +719,7 @@ const Area = () => {
   };
 
   // templates to actions update and remove on dataTable
-  const actionsBodyTemplate = (rowData: AreaEntity) => {
+  const actionsBodyTemplate = (rowData: EstadoEntity) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
@@ -568,7 +730,7 @@ const Area = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => showUpdateAreaDialog(rowData)}
+          onClick={() => showUpdateEstadoDialog(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -578,7 +740,7 @@ const Area = () => {
             height: "1rem",
             color: "#fff",
           }}
-          onClick={() => confirmRemoveArea(rowData)}
+          onClick={() => confirmRemoveEstado(rowData)}
         />
       </div>
     );
@@ -586,7 +748,8 @@ const Area = () => {
 
   //useEffects
   useEffect(() => {
-    findAllArea();
+    findAllEstado();
+    findAllEsquemaEstadoCombox();
   }, []);
 
   return (
@@ -600,11 +763,11 @@ const Area = () => {
         }}
         start={startContent}
         // center={centerContent}
-        // end={endContent}
+        end={endContent}
       />
 
       <DataTable
-        value={areas}
+        value={estados}
         sortMode="multiple"
         removableSort
         paginator
@@ -618,8 +781,9 @@ const Area = () => {
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
-          "IdArea",
+          "IdEstado",
           "Descripcion",
+          "EsquemaEstado.Descripcion",
           "Activo",
           "CreadoEl",
           "CreadoPor",
@@ -628,13 +792,13 @@ const Area = () => {
         ]}
         emptyMessage={<EmptyMessageData loading={loading} />}
         selectionMode="multiple"
-        selection={selectedAreas}
+        selection={selectedEstados}
         onSelectionChange={(e) => {
           if (Array.isArray(e.value)) {
-            setSelectedAreas(e.value);
+            setSelectedEstados(e.value);
           }
         }}
-        dataKey="IdArea"
+        dataKey="IdEstado"
         selectionPageOnly
         // loading={loading}
       >
@@ -644,7 +808,25 @@ const Area = () => {
           headerStyle={{ width: "0%" }}
         />
         {visibleColumns.map((col) => {
-          if (col.field == "Activo") {
+          if (col.field == "EsquemaEstado") {
+            return (
+              <Column
+                key={col.field}
+                field={col.filterField}
+                filterField={col.filterField}
+                showFilterMatchModes={false}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={esquemaEstadoBodyTemplate}
+                filterElement={esquemaEstadoFilterTemplate}
+              />
+            );
+          } else if (col.field == "Activo") {
             return (
               <Column
                 key={col.field}
@@ -713,33 +895,35 @@ const Area = () => {
         ></Column>
       </DataTable>
 
-      <AreaCreateOrUpdate
+      <EstadoCreateOrUpdate
         submitted={submitted}
-        area={area}
-        areaDialog={areaDialog}
+        estado={estado}
+        esquemaEstados={esquemaEstados}
+        estadoDialog={estadoDialog}
         hideDialog={hideDialog}
-        createArea={createArea}
-        updateArea={updateArea}
+        createEstado={createEstado}
+        updateEstado={updateEstado}
         onInputChange={onInputChange}
+        onDropdownChange={onDropdownChange}
         onActivoChange={onActivoChange}
-        loadingAreaCreateOrUpdate={loadingAreaCreateOrUpdate}
+        loadingEstadoCreateOrUpdate={loadingEstadoCreateOrUpdate}
       />
 
-      <AreaRemove
-        area={area}
-        removeAreaDialog={removeAreaDialog}
-        hideRemoveAreaDialog={hideRemoveAreaDialog}
-        removeArea={removeArea}
+      <EstadoRemove
+        estado={estado}
+        removeEstadoDialog={removeEstadoDialog}
+        hideRemoveEstadoDialog={hideRemoveEstadoDialog}
+        removeEstado={removeEstado}
       />
 
-      <AreasRemove
-        area={area}
-        removeAreasDialog={removeAreasDialog}
-        hideRemoveAreasDialog={hideRemoveAreasDialog}
-        removeSelectedAreas={removeSelectedAreas}
+      <EstadosRemove
+        estado={estado}
+        removeEstadosDialog={removeEstadosDialog}
+        hideRemoveEstadosDialog={hideRemoveEstadosDialog}
+        removeSelectedEstados={removeSelectedEstados}
       />
     </div>
   );
 };
 
-export default Area;
+export default TramiteRecibido;

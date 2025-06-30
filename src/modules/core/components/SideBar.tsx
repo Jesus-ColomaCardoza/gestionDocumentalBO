@@ -16,9 +16,7 @@ type SideBarProps = {
 const SideBar = (props: SideBarProps) => {
   const btnRef1 = useRef<any>(null);
   const btnRef2 = useRef<any>(null);
-  // const btnRef3 = useRef<any>(null);
-  // const btnRef4 = useRef<any>(null);
-  // const btnRef5 = useRef<any>(null);
+  const btnRef3 = useRef<any>(null);
 
   const refSideBar = useRef<Card>(null);
 
@@ -168,7 +166,7 @@ const SideBar = (props: SideBarProps) => {
             <ul className="list-none p-0 m-0 overflow-hidden">
               <li>
                 <Link
-                  to={"file_manager"}
+                  to={"../firma_digital/archivos_digitales"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-file mr-2"></i>
@@ -203,7 +201,7 @@ const SideBar = (props: SideBarProps) => {
             <ul className="list-none p-0 m-0 overflow-hidden">
               <li>
                 <Link
-                  to={"area"}
+                  to={"../tramite/pendiente"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-file-export mr-2"></i>
@@ -213,7 +211,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"cargo"}
+                  to={"../tramite/recibido"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-book mr-2"></i>
@@ -227,7 +225,7 @@ const SideBar = (props: SideBarProps) => {
         <ul className="list-none px-2 ">
           <li>
             <StyleClass
-              nodeRef={btnRef2}
+              nodeRef={btnRef3}
               selector="@next"
               enterFromClassName="hidden"
               enterActiveClassName="slidedown"
@@ -235,7 +233,7 @@ const SideBar = (props: SideBarProps) => {
               leaveActiveClassName="slideup"
             >
               <div
-                ref={btnRef2}
+                ref={btnRef3}
                 className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
               >
                 <span className="font-medium">Mantenimiento</span>
@@ -246,7 +244,7 @@ const SideBar = (props: SideBarProps) => {
             <ul className="list-none p-0 m-0 overflow-hidden">
               <li>
                 <Link
-                  to={"area"}
+                  to={"../mantenimiento/area"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -256,7 +254,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"cargo"}
+                  to={"../mantenimiento/cargo"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -266,7 +264,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"estado"}
+                  to={"../mantenimiento/estado"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -276,7 +274,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"esquema_estado"}
+                  to={"../mantenimiento/esquema_estado"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -286,7 +284,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"rol"}
+                  to={"../mantenimiento/rol"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -296,7 +294,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"tipo_documento"}
+                  to={"../mantenimiento/tipo_documento"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -306,7 +304,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"tipo_usuario"}
+                  to={"../mantenimiento/tipo_usuario"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -316,7 +314,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"tipo_tramite"}
+                  to={"../mantenimiento/tipo_tramite"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
@@ -326,7 +324,7 @@ const SideBar = (props: SideBarProps) => {
               </li>
               <li>
                 <Link
-                  to={"tipo_identificacion"}
+                  to={"../mantenimiento/tipo_identificacion"}
                   className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                 >
                   <i className="pi pi-table mr-2"></i>
