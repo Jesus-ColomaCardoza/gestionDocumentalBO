@@ -46,7 +46,7 @@ const TipoIdentificacionRemove = (props: TipoIdentificacionRemoveProps) => {
         {props.tipoIdentificacion && (
           <span>
             {/* Are you sure you want to remove <b>{props.tipoIdentificacion.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.tipoIdentificacion.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el tipo de identificacion <b>{props.tipoIdentificacion.Descripcion}</b>?
           </span>
         )}
       </div>

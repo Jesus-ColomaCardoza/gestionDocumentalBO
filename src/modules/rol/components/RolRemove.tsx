@@ -45,7 +45,7 @@ const RolRemove = (props: RolRemoveProps) => {
         {props.rol && (
           <span>
             {/* Are you sure you want to remove <b>{props.rol.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.rol.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el rol <b>{props.rol.Descripcion}</b>?
           </span>
         )}
       </div>

@@ -57,7 +57,7 @@ const EstadoCreateOrUpdate = (props: EstadoCreateOrUpdateProps) => {
       visible={props.estadoDialog.state}
       style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Área Detalles"
+      header="Estado Detalles"
       modal
       className="p-fluid"
       footer={estadoDialogFooter}

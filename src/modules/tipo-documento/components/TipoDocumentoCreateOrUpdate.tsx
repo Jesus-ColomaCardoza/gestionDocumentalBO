@@ -47,7 +47,7 @@ const TipoDocumentoCreateOrUpdate = (props: TipoDocumentoCreateOrUpdateProps) =>
       visible={props.tipoDocumentoDialog.state}
       style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Área Detalles"
+      header="Tipo Documento Detalles"
       modal
       className="p-fluid"
       footer={tipoDocumentoDialogFooter}

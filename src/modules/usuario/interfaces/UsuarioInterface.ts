@@ -44,11 +44,13 @@ export interface UsuarioEntity {
   ModificadoEl: Fecha;
   ModificadoPor: string;
   CodigoConfirmacion: string;
-  UrlBase: string;
-  FormatoFotoPerfil: string;
-  NombreFotoPerfil: string;
-  SizeFotoPerfil: number;
-  UrlFotoPerfil: string;
+  // UrlBase: string;
+  // FormatoFotoPerfil: string;
+  // NombreFotoPerfil: string;
+  // SizeFotoPerfil: number;
+  // UrlFotoPerfil: string;
+  FotoPerfilNombre?: string;
+  FotoPerfilBase64?: string;
   CodigoConfirmacionExp: Fecha;
 }
 export interface UsuarioCreate {
@@ -72,11 +74,13 @@ export interface UsuarioCreate {
   CreadoEl?: Date | string;
   CreadoPor?: string;
   CodigoConfirmacion?: string;
-  UrlBase?: string;
-  FormatoFotoPerfil?: string;
-  NombreFotoPerfil?: string;
-  SizeFotoPerfil?: number;
-  UrlFotoPerfil?: string;
+  // UrlBase?: string;
+  // FormatoFotoPerfil?: string;
+  // NombreFotoPerfil?: string;
+  // SizeFotoPerfil?: number;
+  // UrlFotoPerfil?: string;
+  FotoPerfilNombre?: string;
+  FotoPerfilBase64?: string;
   CodigoConfirmacionExp?: Fecha;
 }
 export interface UsuarioUpdate {
@@ -100,11 +104,13 @@ export interface UsuarioUpdate {
   ModificadoEl?: Date | string;
   ModificadoPor?: string;
   CodigoConfirmacion?: string;
-  UrlBase?: string;
-  FormatoFotoPerfil?: string;
-  NombreFotoPerfil?: string;
-  SizeFotoPerfil?: number;
-  UrlFotoPerfil?: string;
+  // UrlBase?: string;
+  // FormatoFotoPerfil?: string;
+  // NombreFotoPerfil?: string;
+  // SizeFotoPerfil?: number;
+  // UrlFotoPerfil?: string;
+  FotoPerfilNombre?: string;
+  FotoPerfilBase64?: string;
   CodigoConfirmacionExp?: Fecha;
 }
 export interface UsuarioOut {

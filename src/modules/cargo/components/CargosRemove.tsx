@@ -44,7 +44,7 @@ const CargoRemove = (props: CargosRemoveProps) => {
         />
         {props.cargo && (
           // <span>Are you sure you want to remove the selected cargos?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los cargos selecionadas?</span>
         )}
       </div>
     </Dialog>

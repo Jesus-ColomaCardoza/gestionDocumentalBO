@@ -45,7 +45,7 @@ const TipoDocumentoRemove = (props: TipoDocumentoRemoveProps) => {
         {props.tipoDocumento && (
           <span>
             {/* Are you sure you want to remove <b>{props.tipoDocumento.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.tipoDocumento.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el Tipo de Documento <b>{props.tipoDocumento.Descripcion}</b>?
           </span>
         )}
       </div>

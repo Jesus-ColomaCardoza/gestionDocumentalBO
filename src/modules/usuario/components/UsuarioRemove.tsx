@@ -45,7 +45,7 @@ const UsuarioRemove = (props: UsuarioRemoveProps) => {
         {props.usuario && (
           <span>
             {/* Are you sure you want to remove <b>{props.usuario.Nombres}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.usuario.Nombres}</b>?
+            ¿Estás seguro de que quieres eliminar el usuario <b>{props.usuario.Nombres}</b>?
           </span>
         )}
       </div>

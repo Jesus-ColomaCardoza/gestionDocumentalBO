@@ -195,7 +195,7 @@ const Usuario = () => {
       usuario.ApellidoMaterno.trim() &&
       usuario.Email.trim() &&
       usuario.Contrasena.trim() &&
-      usuario.Genero.trim() &&
+      // usuario.Genero.trim() &&
       usuario.IdTipoIdentificacion != 0 &&
       usuario.IdTipoUsuario != 0 &&
       usuario.IdRol != "" &&
@@ -222,11 +222,13 @@ const Usuario = () => {
         IdCargo: usuario.IdCargo,
         IdArea: usuario.IdArea,
         CodigoConfirmacion: usuario.CodigoConfirmacion,
-        UrlBase: usuario.UrlBase,
-        FormatoFotoPerfil: usuario.FormatoFotoPerfil,
-        NombreFotoPerfil: usuario.NombreFotoPerfil,
-        SizeFotoPerfil: usuario.SizeFotoPerfil,
-        UrlFotoPerfil: usuario.UrlFotoPerfil,
+        // UrlBase: usuario.UrlBase,
+        // FormatoFotoPerfil: usuario.FormatoFotoPerfil,
+        // NombreFotoPerfil: usuario.NombreFotoPerfil,
+        // SizeFotoPerfil: usuario.SizeFotoPerfil,
+        // UrlFotoPerfil: usuario.UrlFotoPerfil,
+        FotoPerfilNombre: usuario.FotoPerfilNombre,
+        FotoPerfilBase64: usuario.FotoPerfilBase64,
         CodigoConfirmacionExp: usuario.CodigoConfirmacionExp,
         Activo: usuario.Activo,
       });
@@ -275,11 +277,13 @@ const Usuario = () => {
         IdCargo: usuario.IdCargo,
         IdArea: usuario.IdArea,
         CodigoConfirmacion: usuario.CodigoConfirmacion,
-        UrlBase: usuario.UrlBase,
-        FormatoFotoPerfil: usuario.FormatoFotoPerfil,
-        NombreFotoPerfil: usuario.NombreFotoPerfil,
-        SizeFotoPerfil: usuario.SizeFotoPerfil,
-        UrlFotoPerfil: usuario.UrlFotoPerfil,
+        // UrlBase: usuario.UrlBase,
+        // FormatoFotoPerfil: usuario.FormatoFotoPerfil,
+        // NombreFotoPerfil: usuario.NombreFotoPerfil,
+        // SizeFotoPerfil: usuario.SizeFotoPerfil,
+        // UrlFotoPerfil: usuario.UrlFotoPerfil,
+        FotoPerfilNombre: usuario.FotoPerfilNombre,
+        FotoPerfilBase64: usuario.FotoPerfilBase64,
         CodigoConfirmacionExp: usuario.CodigoConfirmacionExp,
         Activo: usuario.Activo,
       });

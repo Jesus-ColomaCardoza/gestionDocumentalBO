@@ -45,7 +45,7 @@ const TipoUsuarioRemove = (props: TipoUsuarioRemoveProps) => {
         {props.tipoUsuario && (
           <span>
             {/* Are you sure you want to remove <b>{props.tipoUsuario.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.tipoUsuario.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el Tipo Usuario <b>{props.tipoUsuario.Descripcion}</b>?
           </span>
         )}
       </div>

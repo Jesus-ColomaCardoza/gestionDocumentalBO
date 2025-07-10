@@ -45,7 +45,7 @@ const EsquemaEstadoRemove = (props: EsquemaEstadoRemoveProps) => {
         {props.esquemaEstado && (
           <span>
             {/* Are you sure you want to remove <b>{props.esquemaEstado.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.esquemaEstado.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el esqueno estado <b>{props.esquemaEstado.Descripcion}</b>?
           </span>
         )}
       </div>

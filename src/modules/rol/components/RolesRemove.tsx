@@ -44,7 +44,7 @@ const RolRemove = (props: RolesRemoveProps) => {
         />
         {props.rol && (
           // <span>Are you sure you want to remove the selected rols?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los roles selecionadas?</span>
         )}
       </div>
     </Dialog>

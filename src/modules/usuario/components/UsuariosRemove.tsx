@@ -44,7 +44,7 @@ const UsuarioRemove = (props: UsuariosRemoveProps) => {
         />
         {props.usuario && (
           // <span>Are you sure you want to remove the selected usuarios?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los usuarios selecionadas?</span>
         )}
       </div>
     </Dialog>

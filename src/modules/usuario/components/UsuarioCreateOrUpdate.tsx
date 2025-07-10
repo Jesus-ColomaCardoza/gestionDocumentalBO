@@ -68,7 +68,7 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
       visible={props.usuarioDialog.state}
       style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Área Detalles"
+      header="Usuario Detalles"
       modal
       className="p-fluid"
       footer={usuarioDialogFooter}
@@ -334,75 +334,55 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
           <small className="p-error">CodigoConfirmacion is required.</small>
         )}
       </div>
-
       <div className="field">
-        <label htmlFor="UrlBase" className="font-bold">
-          Url Base
+        <label htmlFor="CodigoConfirmacionExp" className="font-bold">
+          Codigo Confirmacion Exp
         </label>
         <InputText
-          id="UrlBase"
-          value={props.usuario.UrlBase}
-          onChange={(e) => props.onInputChange(e, "UrlBase")}
+          id="CodigoConfirmacionExp"
+          value={props.usuario.CodigoConfirmacionExp+""}
+          onChange={(e) => props.onInputChange(e, "CodigoConfirmacionExp")}
           className={classNames({
-            "p-invalid": props.submitted && !props.usuario.UrlBase,
+            "p-invalid":
+              props.submitted && !props.usuario.CodigoConfirmacionExp,
           })}
         />
-        {props.submitted && !props.usuario.UrlBase && (
-          <small className="p-error">UrlBase is required.</small>
+        {props.submitted && !props.usuario.CodigoConfirmacionExp && (
+          <small className="p-error">CodigoConfirmacionExp is required.</small>
         )}
       </div>
-
       <div className="field">
-        <label htmlFor="FormatoFotoPerfil" className="font-bold">
-          Formato Foto Perfil
+        <label htmlFor="FotoPerfilNombre" className="font-bold">
+          Foto Perfil Nombre
         </label>
         <InputText
-          id="FormatoFotoPerfil"
-          value={props.usuario.FormatoFotoPerfil}
-          onChange={(e) => props.onInputChange(e, "FormatoFotoPerfil")}
+          id="FotoPerfilNombre"
+          value={props.usuario.FotoPerfilNombre}
+          onChange={(e) => props.onInputChange(e, "FotoPerfilNombre")}
           className={classNames({
-            "p-invalid": props.submitted && !props.usuario.FormatoFotoPerfil,
+            "p-invalid": props.submitted && !props.usuario.FotoPerfilNombre,
           })}
         />
-        {props.submitted && !props.usuario.FormatoFotoPerfil && (
-          <small className="p-error">FormatoFotoPerfil is required.</small>
+        {props.submitted && !props.usuario.FotoPerfilNombre && (
+          <small className="p-error">FotoPerfilNombre is required.</small>
         )}
       </div>
-
       <div className="field">
-        <label htmlFor="NombreFotoPerfil" className="font-bold">
-          Nombre Foto Perfil
+        <label htmlFor="FotoPerfilBase64" className="font-bold">
+          Foto Perfil Base64
         </label>
         <InputText
-          id="NombreFotoPerfil"
-          value={props.usuario.NombreFotoPerfil}
-          onChange={(e) => props.onInputChange(e, "NombreFotoPerfil")}
+          id="FotoPerfilBase64"
+          value={props.usuario.FotoPerfilBase64}
+          onChange={(e) => props.onInputChange(e, "FotoPerfilBase64")}
           className={classNames({
-            "p-invalid": props.submitted && !props.usuario.NombreFotoPerfil,
+            "p-invalid": props.submitted && !props.usuario.FotoPerfilBase64,
           })}
         />
-        {props.submitted && !props.usuario.NombreFotoPerfil && (
-          <small className="p-error">NombreFotoPerfil is required.</small>
+        {props.submitted && !props.usuario.FotoPerfilBase64 && (
+          <small className="p-error">FotoPerfilBase64 is required.</small>
         )}
       </div>
-
-      <div className="field">
-        <label htmlFor="UrlFotoPerfil" className="font-bold">
-          Url Foto Perfil
-        </label>
-        <InputText
-          id="UrlFotoPerfil"
-          value={props.usuario.UrlFotoPerfil}
-          onChange={(e) => props.onInputChange(e, "UrlFotoPerfil")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.UrlFotoPerfil,
-          })}
-        />
-        {props.submitted && !props.usuario.UrlFotoPerfil && (
-          <small className="p-error">UrlFotoPerfil is required.</small>
-        )}
-      </div>
-
       <div className="field">
         <label className="mb-3 font-bold">Activo</label>
         <div className="formgrid grid">

@@ -47,7 +47,7 @@ const TipoUsuarioCreateOrUpdate = (props: TipoUsuarioCreateOrUpdateProps) => {
       visible={props.tipoUsuarioDialog.state}
       style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Área Detalles"
+      header="Tipo Usuario Detalles"
       modal
       className="p-fluid"
       footer={tipoUsuarioDialogFooter}

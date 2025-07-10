@@ -45,7 +45,7 @@ const CargoRemove = (props: CargoRemoveProps) => {
         {props.cargo && (
           <span>
             {/* Are you sure you want to remove <b>{props.cargo.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.cargo.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el Cargo <b>{props.cargo.Descripcion}</b>?
           </span>
         )}
       </div>

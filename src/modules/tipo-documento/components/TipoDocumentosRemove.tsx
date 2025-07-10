@@ -44,7 +44,7 @@ const TipoDocumentoRemove = (props: TipoDocumentosRemoveProps) => {
         />
         {props.tipoDocumento && (
           // <span>Are you sure you want to remove the selected tipoDocumentos?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los tipos de documento selecionadas?</span>
         )}
       </div>
     </Dialog>

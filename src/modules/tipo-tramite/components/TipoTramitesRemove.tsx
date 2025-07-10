@@ -44,7 +44,7 @@ const TipoTramiteRemove = (props: TipoTramitesRemoveProps) => {
         />
         {props.tipoTramite && (
           // <span>Are you sure you want to remove the selected tipoTramites?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los tipos de tramites selecionadas?</span>
         )}
       </div>
     </Dialog>

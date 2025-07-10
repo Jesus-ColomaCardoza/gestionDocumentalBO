@@ -47,7 +47,7 @@ const RolCreateOrUpdate = (props: RolCreateOrUpdateProps) => {
       visible={props.rolDialog.state}
       style={{ width: "32rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Área Detalles"
+      header="Rol Detalles"
       modal
       className="p-fluid"
       footer={rolDialogFooter}

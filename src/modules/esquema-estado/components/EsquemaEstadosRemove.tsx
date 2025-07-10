@@ -44,7 +44,7 @@ const EsquemaEstadoRemove = (props: EsquemaEstadosRemoveProps) => {
         />
         {props.esquemaEstado && (
           // <span>Are you sure you want to remove the selected esquemaEstados?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los esquemas estados selecionadas?</span>
         )}
       </div>
     </Dialog>

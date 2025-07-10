@@ -45,7 +45,7 @@ const TipoIdentificacionRemove = (props: TipoIdentificacionesRemoveProps) => {
         />
         {props.tipoIdentificacion && (
           // <span>Are you sure you want to remove the selected tipoIdentificaciones?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los tipo de identificacion selecionadas?</span>
         )}
       </div>
     </Dialog>

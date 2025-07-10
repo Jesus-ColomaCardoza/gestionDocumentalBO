@@ -44,7 +44,7 @@ const TipoUsuarioRemove = (props: TipoUsuariosRemoveProps) => {
         />
         {props.tipoUsuario && (
           // <span>Are you sure you want to remove the selected tipoUsuarios?</span>
-          <span>¿Estás segura¿o que quieres eliminar las áreas selecionadas?</span>
+          <span>¿Estás segura¿o que quieres eliminar los tipos de usuario selecionadas?</span>
         )}
       </div>
     </Dialog>

@@ -45,7 +45,7 @@ const EstadoRemove = (props: EstadoRemoveProps) => {
         {props.estado && (
           <span>
             {/* Are you sure you want to remove <b>{props.estado.Descripcion}</b>? */}
-            ¿Estás seguro de que quieres eliminar el área <b>{props.estado.Descripcion}</b>?
+            ¿Estás seguro de que quieres eliminar el estado <b>{props.estado.Descripcion}</b>?
           </span>
         )}
       </div>
