@@ -729,10 +729,10 @@ const Usuario = () => {
   };
 
   // templates to column tipoUsuario
-  const tipoUsuarioBodyTemplate = (rowData: UsuarioEntity) => {
+  const tipoUsuarioBodyTemplate = (rowData: TipoUsuarioEntity) => {
     return (
       <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.TipoUsuario.Descripcion}</p>
+        <p className="text-sm m-0">{rowData.Descripcion}</p>
       </div>
     );
   };
@@ -1085,6 +1085,80 @@ const Usuario = () => {
                 filterPlaceholder={col.filterPlaceholder}
                 body={tipoIdentificacionBodyTemplate}
                 filterElement={tipoIdentificacionFilterTemplate}
+              />
+            );
+          } else if (col.field == "TipoUsuario") {
+            return (
+              <Column
+                key={col.field}
+                field={col.filterField}
+                filterField={col.filterField}
+                showFilterMatchModes={false}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={tipoUsuarioBodyTemplate}
+                filterElement={tipoUsuarioFilterTemplate}
+              />
+            );
+          }else if (col.field == "Rol") {
+            return (
+              <Column
+                key={col.field}
+                field={col.filterField}
+                filterField={col.filterField}
+                showFilterMatchModes={false}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={rolBodyTemplate}
+                filterElement={rolFilterTemplate}
+              />
+            );
+          }
+          else if (col.field == "Cargo") {
+            return (
+              <Column
+                key={col.field}
+                field={col.filterField}
+                filterField={col.filterField}
+                showFilterMatchModes={false}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={cargoBodyTemplate}
+                filterElement={cargoFilterTemplate}
+              />
+            );
+          }
+          else if (col.field == "Area") {
+            return (
+              <Column
+                key={col.field}
+                field={col.filterField}
+                filterField={col.filterField}
+                showFilterMatchModes={false}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={areaBodyTemplate}
+                filterElement={areaFilterTemplate}
               />
             );
           } else if (col.field == "Activo") {
