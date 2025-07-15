@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     //tramite
     "/tramite/pendiente",
     "/tramite/recibido",
+    "/tramite/emitido",
 
     //mantenimiento
     "/mantenimiento/usuario",

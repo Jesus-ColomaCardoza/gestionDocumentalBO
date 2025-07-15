@@ -9,21 +9,15 @@ import { DataTable, DataTableFilterMeta } from "primereact/datatable";
 import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
 import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useState, useEffect, useRef } from "react";
-import UseEstado from "../hooks/UseEstado";
 import { ColumnMeta } from "../../utils/Interfaces";
 import {
   TriStateCheckbox,
   TriStateCheckboxChangeEvent,
 } from "primereact/tristatecheckbox";
-import {
-  EstadoCreate,
-  EstadoEntity,
-  EstadoOut,
-  EstadosOut,
-} from "../interfaces/EstadoInterface";
+
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyEstado } from "../utils/Constants";
+import { columns, defaultFilters } from "../utils/Constants";
 import EstadoCreateOrUpdate from "./EstadoCreateOrUpdate";
 import EstadoRemove from "./EstadoRemove";
 import EstadosRemove from "./EstadosRemove";
@@ -34,6 +28,9 @@ import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { UseEsquemaEstado } from "../../esquema-estado/hooks/UseEsquemaEstado";
 import { EsquemaEstadoEntity } from "../../esquema-estado/interfaces/EsquemaEstadoInterface";
 import { DropdownChangeEvent } from "primereact/dropdown";
+import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
+import { emptyEstado } from "../../estado/utils/Constants";
+import UseEstado from "../../estado/hooks/UseEstado";
 
 const TramitePendiente = () => {
   // custom hooks
@@ -142,17 +139,6 @@ const TramitePendiente = () => {
             })
           : []
       );
-      //   toast.current?.show({
-      //     severity: "success",
-      //     detail: `${estadosFindAll.message.msgTxt}`,
-      //     life: 3000,
-      //   });
-      // } else if (estadosFindAll?.message.msgId == 1) {
-      //   toast.current?.show({
-      //     severity: "error",
-      //     detail: `${estadosFindAll.message.msgTxt}`,
-      //     life: 3000,
-      //   });
     }
 
     setLoading(false);

@@ -20,6 +20,7 @@ import TramitePendiente from "../../tramite/components/TramitePendiente";
 import TramiteRecibido from "../../tramite/components/TramiteRecibido";
 import Usuario from "../../usuario/components/Usuario";
 import Empresa from "../../empresa/components/Empresa";
+import TramiteEmitido from "../../tramite/components/TramiteEmitido";
 
 const AllRoutes = () => {
   return (
@@ -41,6 +42,7 @@ const AllRoutes = () => {
 
               <Route path="tramite/pendiente" element={<TramitePendiente />}></Route>
               <Route path="tramite/recibido" element={<TramiteRecibido />}></Route>
+              <Route path="tramite/emitido" element={<TramiteEmitido />}></Route>
               
               <Route path="mantenimiento/usuario" element={<Usuario />}></Route>
               <Route path="mantenimiento/empresa" element={<Empresa />}></Route>

@@ -1,17 +1,17 @@
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ColumnMeta } from "../../utils/Interfaces";
 import { DataTableFilterMeta } from "primereact/datatable";
-import { EstadoEntity } from "../interfaces/EstadoInterface";
+import { TramiteEntity } from "../interfaces/TramiteInterface";
 
 export const columns: ColumnMeta[] = [
   {
-    field: "IdEstado",
-    filterField: "IdEstado",
-    header: "IdEstado",
+    field: "IdTramite",
+    filterField: "IdTramite",
+    header: "IdTramite",
     dataType: "numeric",
     width: "5%",
     show: true,
-    filterPlaceholder: "Buscar por IdEstado",
+    filterPlaceholder: "Buscar por IdTramite",
   },
   {
     field: "Descripcion",
@@ -23,13 +23,13 @@ export const columns: ColumnMeta[] = [
     filterPlaceholder: "Buscar por Descripcion",
   },
   {
-    field: "EsquemaEstado",
-    filterField: "EsquemaEstado.Descripcion",
-    header: "EsquemaEstado",
+    field: "EsquemaTramite",
+    filterField: "EsquemaTramite.Descripcion",
+    header: "EsquemaTramite",
     dataType: "text",
     width: "20%",
     show: true,
-    filterPlaceholder: "Buscar por Esquema Estado",
+    filterPlaceholder: "Buscar por Esquema Tramite",
   },
   {
     field: "Activo",
@@ -76,7 +76,7 @@ export const columns: ColumnMeta[] = [
 export const defaultFilters: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
 
-  IdEstado: {
+  IdTramite: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
@@ -84,7 +84,7 @@ export const defaultFilters: DataTableFilterMeta = {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
-  "EsquemaEstado.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
+  "EsquemaTramite.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
   Activo: { value: null, matchMode: FilterMatchMode.EQUALS },
   CreadoEl: {
     operator: FilterOperator.AND,
@@ -104,13 +104,41 @@ export const defaultFilters: DataTableFilterMeta = {
   },
 };
 
-export let emptyEstado: EstadoEntity = {
-  IdEstado: 0,
+export let emptyTramite: TramiteEntity = {
+  IdTramite: 0,
+  CodigoReferencia: "",
+  Asunto: "",
   Descripcion: "",
-  IdEsquemaEstado: 0,
-  EsquemaEstado: {
-    IdEsquemaEstado: 0,
+  Observaciones: "",
+  FechaInicio: null,
+  FechaFin: null,
+  Folios: 0,
+  IdTipoTramite: 0,
+  TipoTramite: {
+    IdTipoTramite: 0,
     Descripcion: "",
+  },
+  IdTipoDocumento: 0,
+  TipoDocumento: {
+    IdTipoDocumento: 0,
+    Descripcion: "",
+  },
+  IdAreaEmision: 0,
+  Area: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  IdEstado: 0,
+  Estado: {
+    IdEstado: 0,
+    Descripcion: "",
+  },
+  IdRemitente: 0,
+  Remitente: {
+    IdUsuario: 0,
+    Nombres: "",
+    ApellidoPaterno: "",
+    ApellidoMaterno: "",
   },
   Activo: true,
   CreadoEl: new Date(),

@@ -1,6 +1,6 @@
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { EstadoEntity } from "../interfaces/EstadoInterface";
+import { EstadoEntity } from "../interfaces/TramiteInterface";
 
 type EstadoRemoveProps = {
   estado: EstadoEntity;
