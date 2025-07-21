@@ -4,6 +4,8 @@ export const REACT_APP_SALT = import.meta.env.REACT_APP_SALT;
 
 export const VITE_ID_OAUTH2_GOOGLE = import.meta.env.VITE_ID_OAUTH2_GOOGLE;
 
+export const MAX_FILE_SIZE = 2_000_000; // 2MB
+
 export const filterBodyRequest = {
   cantidad_max: "0",
   Language: "ES",
@@ -46,3 +48,4 @@ export const filterSpanish = {
   upload: "Subir",
   cancel: "Cancelar",
 };
+

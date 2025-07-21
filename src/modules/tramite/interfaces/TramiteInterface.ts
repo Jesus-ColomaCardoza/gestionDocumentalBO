@@ -43,6 +43,7 @@ export interface TramiteEntity {
     ApellidoMaterno: string;
   };
 }
+
 export interface TramiteCreate {
   IdTramite?: number;
   Descripcion: string;

@@ -1,30 +1,10 @@
-import { Toolbar } from "primereact/toolbar";
 import { Button } from "primereact/button";
-import { MenuItem } from "primereact/menuitem";
-import { SplitButton } from "primereact/splitbutton";
 import { InputText } from "primereact/inputtext";
-import { IconField } from "primereact/iconfield";
-import { InputIcon } from "primereact/inputicon";
-import { DataTable, DataTableFilterMeta } from "primereact/datatable";
-import { Column, ColumnFilterElementTemplateOptions } from "primereact/column";
-import { MultiSelect, MultiSelectChangeEvent } from "primereact/multiselect";
 import { useState, useEffect, useRef } from "react";
 import UseTramite from "../hooks/UseTramite";
-import { ColumnMeta } from "../../utils/Interfaces";
-import {
-  TriStateCheckbox,
-  TriStateCheckboxChangeEvent,
-} from "primereact/tristatecheckbox";
-import {
-  TramiteCreate,
-  TramiteEntity,
-  TramiteOut,
-  TramitesOut,
-} from "../interfaces/TramiteInterface";
-import { classNames } from "primereact/utils";
+import { TramiteEntity } from "../interfaces/TramiteInterface";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyTramite } from "../utils/Constants";
-import { RadioButtonChangeEvent } from "primereact/radiobutton";
+import { emptyTramite } from "../utils/Constants";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useTheme } from "../../../ThemeContext";
@@ -34,18 +14,32 @@ import { UsuarioEntity } from "../../usuario/interfaces/UsuarioInterface";
 import UseUsuario from "../../usuario/hooks/UseUsuario";
 import { AreaEntity } from "../../area/interfaces/AreaInterface";
 import UseArea from "../../area/hooks/UseArea";
-import TipoDocumento from "../../tipo-documento/components/TipoDocumento";
-import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import FileManagerModal from "../../file-manager/components/FileMangerModal";
 import { FileManagerEntity } from "../../file-manager/interfaces/FileMangerInterface";
 import { Tooltip } from "primereact/tooltip";
+import UseFileManager from "../../file-manager/hooks/UseFileManger";
+import { useAuth } from "../../auth/context/AuthContext";
+import { MAX_FILE_SIZE } from "../../utils/Constants";
+import { formatFileSize } from "../../utils/Methods";
+import TramiteDestinosModal from "./TramiteDestinosModal";
+import { MovimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
+import { emptyMovimiento } from "../../movimiento/utils/Constants";
+import { InputSwitchChangeEvent } from "primereact/inputswitch";
+import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
+import UseFile from "../../file/hooks/UseFile";
 
 const TramiteEmitido = () => {
   // custom hooks
   const { themePrimeFlex } = useTheme();
 
+  const { userAuth } = useAuth()!;
+
   const { create, createEmitido, findAll, findOne, update, remove } =
     UseTramite();
+
+  const { createDocumento } = UseFileManager();
+
+  const { create: createFile, remove: removeFile } = UseFile();
 
   const { findAll: findAllTipoDocumento } = UseTipoDocumento();
 
@@ -55,6 +49,10 @@ const TramiteEmitido = () => {
 
   //useRefs
   const toast = useRef<Toast>(null);
+
+  const loadFilesRef = useRef<HTMLInputElement>(null);
+
+  const anexosRef = useRef<HTMLInputElement>(null);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -66,7 +64,12 @@ const TramiteEmitido = () => {
 
   const [tramite, setTramite] = useState<TramiteEntity>(emptyTramite);
 
+  const [movimiento, setMovimiento] =
+    useState<MovimientoEntity>(emptyMovimiento);
+
   const [tramiteErrors, setTramiteErrors] = useState<any>({});
+
+  const [tramiteDestinosErrors, setTramiteDestinosErrors] = useState<any>({});
 
   const [tramites, setTramites] = useState<TramiteEntity[]>([]);
 
@@ -89,6 +92,9 @@ const TramiteEmitido = () => {
 
   const [fileManagerDialog, setFileManagerDialog] = useState<boolean>(false);
 
+  const [tramiteDestinosDialog, setTramiteDestinosDialog] =
+    useState<boolean>(false);
+
   const [tramiteDialog, setTramiteDialog] = useState<{
     type?: "create" | "update" | undefined;
     state: boolean;
@@ -105,6 +111,14 @@ const TramiteEmitido = () => {
   const [selectedDigitalFiles, setSelectedDigitalFiles] = useState<
     FileManagerEntity[]
   >([]);
+
+  const [selectedTramiteDestinos, setSelectedTramiteDestinos] = useState<
+    MovimientoEntity[]
+  >([]);
+
+  const [selectedLoadFiles, setSelectedLoadFiles] = useState<File[]>([]);
+
+  const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
   //functions
   const createTramiteEmitido = async () => {
@@ -305,23 +319,206 @@ const TramiteEmitido = () => {
   };
 
   // templates to dialogs
-  const hideFilerManagerDialog = () => {
+  const hideFileManagerDialog = () => {
     setSubmitted(false);
     setFileManagerDialog(false);
   };
 
-  const showFilerManagerDialog = () => {
+  const showFileManagerDialog = () => {
     setSubmitted(false);
     setFileManagerDialog(true);
   };
 
-  const onActivoChange = (e: RadioButtonChangeEvent) => {
-    let _tramite = { ...tramite };
-
-    _tramite["Activo"] = e.value;
-    setTramite(_tramite);
+  const hideTramiteDestinosDialog = () => {
+    setSubmitted(false);
+    setTramiteDestinosErrors({});
+    setMovimiento(emptyMovimiento);
+    setTramiteDestinosDialog(false);
   };
 
+  const showTramiteDestinosDialog = () => {
+    setSubmitted(false);
+    setTramiteDestinosDialog(true);
+  };
+
+  const onChangeLoadFiles = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = event.target.files;
+
+    if (files && files.length > 0) {
+      // setLoadingDocumentoCreateOrUpdate(true);
+
+      // we validate if there is some file exceeds the limit size
+      const invalidFiles = Array.from(files).filter(
+        (file) => file.size > MAX_FILE_SIZE
+      );
+
+      if (invalidFiles.length > 0) {
+        toast.current?.show({
+          severity: "warn",
+          detail: `El archivo "${invalidFiles[0].name}" supera el límite de 2MB.`,
+          life: 3000,
+        });
+
+        // clear input file
+        if (loadFilesRef.current) {
+          loadFilesRef.current.value = "";
+        }
+
+        return;
+      }
+
+      const formData = new FormData();
+
+      Array.from(files).forEach((fileUpload) => {
+        formData.append("file", fileUpload);
+      });
+
+      const fileUpload = await createFile(formData);
+
+      if (fileUpload?.message.msgId == 0) {
+        let documentoCreate = await createDocumento({
+          FormatoDocumento: fileUpload.registro?.mimetype,
+          NombreDocumento: fileUpload.registro?.filename,
+          UrlDocumento: fileUpload.registro?.url,
+          SizeDocumento: fileUpload.registro?.size,
+          UrlBase: fileUpload.registro?.path,
+          Titulo: fileUpload.registro?.parseoriginalname,
+          Descripcion: fileUpload.registro?.filename,
+          IdUsuario: userAuth?.IdUsuario,
+          FirmaDigital: true,
+          IdCarpeta: null,
+          Categoria: "MF",
+          IdEstado: 1, // set at diagram state
+          Activo: true,
+        });
+
+        // setLoadingDocumentoCreateOrUpdate(false);
+
+        if (documentoCreate?.message.msgId == 0 && documentoCreate.registro) {
+          setSelectedDigitalFiles((prev) => [
+            ...prev,
+            documentoCreate.registro!,
+          ]);
+
+          toast.current?.show({
+            severity: "success",
+            detail: `${documentoCreate.message.msgTxt}`,
+            life: 3000,
+          });
+        } else {
+          toast.current?.show({
+            severity: "error",
+            detail: `${fileUpload?.message.msgTxt}`,
+            life: 3000,
+          });
+        }
+      } else {
+        toast.current?.show({
+          severity: "error",
+          detail: `${fileUpload?.message.msgTxt}`,
+          life: 3000,
+        });
+      }
+
+      // clear input file
+      if (loadFilesRef.current) {
+        loadFilesRef.current.value = "";
+      }
+    }
+  };
+
+  const onChangeAnexos = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+
+    if (files && files.length > 0) {
+      // setLoadingDocumentoCreateOrUpdate(true);
+
+      // we validate if there is some file exceeds the limit size
+      const invalidFiles = Array.from(files).filter(
+        (file) => file.size > MAX_FILE_SIZE
+      );
+
+      if (invalidFiles.length > 0) {
+        toast.current?.show({
+          severity: "warn",
+          detail: `El archivo "${invalidFiles[0].name}" supera el límite de 2MB.`,
+          life: 3000,
+        });
+
+        // clear input file
+        if (anexosRef.current) {
+          anexosRef.current.value = "";
+        }
+
+        return;
+      }
+
+      console.log(Array.from(files));
+
+      setSelectedAnexos((prev) => [...prev, ...Array.from(files)]);
+      // const formData = new FormData();
+
+      // Array.from(files).forEach((fileUpload) => {
+      //   formData.append("file", fileUpload);
+      // });
+
+      // const fileUpload = await createFile(formData);
+
+      // if (fileUpload?.message.msgId == 0) {
+      //   let documentoCreate = await createDocumento({
+      //     FormatoDocumento: fileUpload.registro?.mimetype,
+      //     NombreDocumento: fileUpload.registro?.filename,
+      //     UrlDocumento: fileUpload.registro?.url,
+      //     SizeDocumento: fileUpload.registro?.size,
+      //     UrlBase: fileUpload.registro?.path,
+      //     Titulo: fileUpload.registro?.parseoriginalname,
+      //     Descripcion: fileUpload.registro?.filename,
+      //     IdUsuario: userAuth?.IdUsuario,
+      //     FirmaDigital: true,
+      //     IdCarpeta: null,
+      //     Categoria: "MF",
+      //     IdEstado: 1, // set at diagram state
+      //     Activo: true,
+      //   });
+
+      //   // setLoadingDocumentoCreateOrUpdate(false);
+
+      //   if (documentoCreate?.message.msgId == 0 && documentoCreate.registro) {
+      //     setSelectedDigitalFiles((prev) => [
+      //       ...prev,
+      //       documentoCreate.registro!,
+      //     ]);
+
+      //     toast.current?.show({
+      //       severity: "success",
+      //       detail: `${documentoCreate.message.msgTxt}`,
+      //       life: 3000,
+      //     });
+      //   } else {
+      //     toast.current?.show({
+      //       severity: "error",
+      //       detail: `${fileUpload?.message.msgTxt}`,
+      //       life: 3000,
+      //     });
+      //   }
+      // } else {
+      //   toast.current?.show({
+      //     severity: "error",
+      //     detail: `${fileUpload?.message.msgTxt}`,
+      //     life: 3000,
+      //   });
+      // }
+
+      // clear input file
+      if (anexosRef.current) {
+        anexosRef.current.value = "";
+      }
+    }
+  };
+
+  // onChanges
   const onInputTextChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
@@ -372,31 +569,52 @@ const TramiteEmitido = () => {
     setTramite(_tramite);
   };
 
-  // const onInputTextTramiteChange = (
-  //   e: React.ChangeEvent<HTMLTextTramiteElement>,
-  //   name: string
-  // ) => {
-  //   const val = (e.target && e.target.value) || "";
-  //   let _tramite = { ...tramite };
+  const onDropdownChangeMovimiento = (
+    e: DropdownChangeEvent,
+    nameObj: string,
+    nameFK: string,
+    nameTagFK?: string
+  ) => {
+    const val = (e.target && e.target.value) || "";
 
-  //   // @ts-ignore
-  //   _tramite[name] = val;
+    let _movimiento: any = { ...movimiento };
 
-  //   setTramite(_tramite);
-  // };
+    _movimiento[nameTagFK ? nameTagFK : nameFK] = val[nameFK];
 
-  // const onInputNumberChange = (
-  //   e: InputNumberValueChangeEvent,
-  //   name: string
-  // ) => {
-  //   const val = e.value ?? 0;
-  //   let _tramite = { ...tramite };
+    if (nameObj !== "") {
+      _movimiento[nameObj] = { ...val };
+    }
 
-  //   // @ts-ignore
-  //   _tramite[name] = val;
+    setMovimiento(_movimiento);
+  };
 
-  //   setTramite(_tramite);
-  // };
+  const onDropdownChangeX = (
+    //onchangegeneral of text , to do: number
+    e: DropdownChangeEvent,
+    state: any,
+    setState: React.Dispatch<React.SetStateAction<any>>,
+    nameObj: string,
+    nameFK: string,
+    nameTagFK?: string
+  ) => {
+    const val = (e.target && e.target.value) || "";
+
+    let _state: any = { ...state };
+
+    _state[nameTagFK ? nameTagFK : nameFK] = val[nameFK];
+
+    if (nameObj !== "") {
+      _state[nameObj] = { ...val };
+    }
+
+    setState(_state);
+  };
+
+  const onSwitchChange = (e: InputSwitchChangeEvent, name: string) => {
+    let _movimiento: any = { ...movimiento };
+    _movimiento[name] = e.value;
+    setMovimiento(_movimiento);
+  };
 
   const validateForm = () => {
     let fieldErrors: any = {};
@@ -446,7 +664,7 @@ const TramiteEmitido = () => {
           className="flex flex-column flex-wrap gap-1  border-solid border-1 border-gray-500 border-round-md"
           style={{ width: "49%" }}
         >
-          <div className="flex flex-row align-items-center pb-3 mb-3  py-2 px-4 border-bottom-1 border-gray-500">
+          <div className="flex flex-row justify-content-between align-items-center pb-3 mb-3  py-2 px-4 border-bottom-1 border-gray-500">
             <label
               className="block text-900 font-medium"
               style={{
@@ -459,18 +677,17 @@ const TramiteEmitido = () => {
             <div
               className="flex flex-row flex-wrap justify-content-end align-items-center"
               style={{
-                width: "80%",
                 gap: "1rem",
               }}
             >
               <Button
                 type="button"
-                onClick={showFilerManagerDialog}
+                onClick={showFileManagerDialog}
                 size="small"
                 severity="secondary"
                 style={{
                   padding: "0",
-                  width: "10rem",
+                  width: "9rem",
                   height: "2.5rem",
                   margin: "0",
                   color: "#fff",
@@ -481,13 +698,16 @@ const TramiteEmitido = () => {
                   <span>Buscar archivo</span>
                 </span>
               </Button>
+
               <Button
                 type="button"
-                // onClick={} ga
+                onClick={() => {
+                  loadFilesRef.current?.click();
+                }}
                 size="small"
                 style={{
                   padding: "0",
-                  width: "10rem",
+                  width: "9rem",
                   height: "2.5rem",
                   margin: "0",
                   color: "#fff",
@@ -498,6 +718,13 @@ const TramiteEmitido = () => {
                   <span>Cargar archivo</span>
                 </span>
               </Button>
+              <input
+                ref={loadFilesRef}
+                type="file"
+                accept="application/pdf"
+                onChange={onChangeLoadFiles}
+                style={{ display: "none" }}
+              />
             </div>
           </div>
 
@@ -508,7 +735,7 @@ const TramiteEmitido = () => {
               }}
             >
               <label
-                htmlFor="ApellidoPaterno"
+                htmlFor="Archivo digital"
                 className="block text-900 text-sm font-medium mb-2"
               >
                 Archivo digital
@@ -544,21 +771,29 @@ const TramiteEmitido = () => {
                         <div className="flex align-items-center justify-content-center pr-2">
                           <i
                             className="pi pi-file-pdf"
-                            style={{ color: "#559", fontSize: "2rem" }}
+                            style={{ color: "#559", fontSize: "1.5rem" }}
                           ></i>
                         </div>
                         {/* descripcion */}
                         <div className="flex flex-column gap-2">
-                          <span className="hover:text-blue-500">
+                          <a
+                            className="hover:underline hover:text-blue-300 text-xs"
+                            style={{
+                              textDecoration: "none",
+                              color: "var(--text-color)",
+                            }}
+                            href={`${df.UrlFM}`}
+                            target="_blank"
+                          >
                             {df.Descripcion}
-                          </span>
+                          </a>
                           <span className="flex flex-row gap-2  m-0">
                             <span className="text-sm">
                               {df.Estado.Descripcion}
                             </span>
                             <span className="text-sm">-</span>
                             <span className="text-sm">
-                              {df.Estado.Descripcion}
+                              {formatFileSize(df.Size || 0)}
                             </span>
                           </span>
                         </div>
@@ -804,291 +1039,310 @@ const TramiteEmitido = () => {
         </div>
 
         <div
-          className="flex flex-column flex-wrap gap-3 border-solid border-1 border-gray-500 border-round-md"
+          className="flex flex-column justify-content-between border-solid border-1 border-gray-500 border-round-md"
           style={{ width: "49%" }}
         >
-          <div className="flex flex-row align-items-center py-3 mb-3 px-4 border-bottom-1 border-gray-500">
-            <label
-              className="block text-900 font-medium"
-              style={{
-                width: "30%",
-              }}
-            >
-              Trámite
-            </label>
-          </div>
-
-          <div className="flex flex-row  px-4" style={{ gap: "1rem" }}>
-            <div
-              style={{
-                width: "100%",
-              }}
-            >
+          <div className="flex flex-column gap-3">
+            <div className="flex flex-row align-items-center py-3 mb-3 px-4 border-bottom-1 border-gray-500">
               <label
-                htmlFor="AreaEmision"
-                className="block text-900 text-sm font-medium mb-2"
-              >
-                Área Emisión
-              </label>
-              <div className="flex flex-column  gap-1">
-                <div className="p-inputgroup">
-                  <Dropdown
-                    value={tramite.Area}
-                    onChange={(e) => {
-                      onDropdownChange(e, "Area", "IdArea", "IdAreaEmision");
-                    }}
-                    options={areas}
-                    optionLabel="Descripcion"
-                    filter
-                    placeholder="Seleccionar Área de Emisión"
-                    className="w-full flex flex-row align-items-center p-inputtext-sm"
-                    showClear
-                    style={{
-                      paddingTop: "1.2rem",
-                      paddingBottom: "1.2rem",
-                      width: "16rem",
-                      height: "2rem",
-                    }}
-                  />
-                </div>
-                {tramiteErrors.IdAreaEmision && (
-                  <small className="p-error">
-                    {tramiteErrors.IdAreaEmision}
-                  </small>
-                )}
-              </div>
-            </div>
-          </div>
-
-          <div className=" px-4">
-            <div className="flex flex-row justify-content-between align-items-center mb-2">
-              <label
-                htmlFor="ApellidoPaterno"
-                className="block text-900 text-sm font-medium"
+                className="block text-900 font-medium"
                 style={{
                   width: "30%",
                 }}
               >
-                Destino
+                Trámite
+              </label>
+            </div>
+
+            <div className="flex flex-row  px-4" style={{ gap: "1rem" }}>
+              <div
+                style={{
+                  width: "100%",
+                }}
+              >
+                <label
+                  htmlFor="AreaEmision"
+                  className="block text-900 text-sm font-medium mb-2"
+                >
+                  Área Emisión
+                </label>
+                <div className="flex flex-column  gap-1">
+                  <div className="p-inputgroup">
+                    <Dropdown
+                      value={tramite.Area}
+                      onChange={(e) => {
+                        onDropdownChange(e, "Area", "IdArea", "IdAreaEmision");
+                      }}
+                      options={areas}
+                      optionLabel="Descripcion"
+                      filter
+                      placeholder="Seleccionar Área de Emisión"
+                      className="w-full flex flex-row align-items-center p-inputtext-sm"
+                      showClear
+                      style={{
+                        paddingTop: "1.2rem",
+                        paddingBottom: "1.2rem",
+                        width: "16rem",
+                        height: "2rem",
+                      }}
+                    />
+                  </div>
+                  {tramiteErrors.IdAreaEmision && (
+                    <small className="p-error">
+                      {tramiteErrors.IdAreaEmision}
+                    </small>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className=" px-4">
+              <div className="flex flex-row justify-content-between align-items-center mb-2">
+                <label
+                  htmlFor="ApellidoPaterno"
+                  className="block text-900 text-sm font-medium"
+                  style={{
+                    width: "30%",
+                  }}
+                >
+                  Destino
+                </label>
+
+                <Button
+                  type="button"
+                  onClick={showTramiteDestinosDialog}
+                  size="small"
+                  severity="secondary"
+                  style={{
+                    padding: "0",
+                    width: "6.5rem",
+                    height: "2.5rem",
+                    margin: "0",
+                    color: "#fff",
+                    background: "#293",
+                    border: "none",
+                  }}
+                >
+                  <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+                    <i className="pi pi-plus text-sm"></i>
+                    <span>Agregar</span>
+                  </span>
+                </Button>
+              </div>
+
+              <div
+                className="mt-3 border-round-md"
+                style={{
+                  backgroundColor:
+                    themePrimeFlex === "dark" ? "#111827" : "#ffffffde",
+                  border:
+                    themePrimeFlex === "dark"
+                      ? "1px solid #424b57"
+                      : "1px solid #d1d5db",
+                  minHeight: "3rem",
+                }}
+              >
+                {selectedTramiteDestinos.map((destino, index) => {
+                  return (
+                    <div
+                      key={index}
+                      className="flex flex-row justify-content-between p-2"
+                      style={{
+                        gap: "1rem",
+                        borderBottom:
+                          themePrimeFlex === "dark"
+                            ? "1px solid #424b57"
+                            : "1px solid #d1d5db",
+                      }}
+                    >
+                      <div className="flex flex-row gap-2">
+                        {/* icon */}
+                        <div className="flex align-items-center justify-content-center pr-2">
+                          <i
+                            className={
+                              destino.NombreCompleto
+                                ? "pi pi-user"
+                                : "pi pi-building"
+                            }
+                            style={{ color: "#559", fontSize: "1.5rem" }}
+                          ></i>
+                        </div>
+                        {/* descripcion */}
+                        <div className="flex flex-column gap-2">
+                          <span
+                            className="hover:underline hover:text-blue-300 text-xs"
+                            style={{
+                              textDecoration: "none",
+                              color: "var(--text-color)",
+                            }}
+                          >
+                            {destino.NombreCompleto
+                              ? `${destino.NombreCompleto} | Responsable de oficina`
+                              : destino.AreaDestino.Descripcion}
+                          </span>
+                          <span className="flex flex-row gap-2 m-0">
+                            {destino.FirmaDigital && (
+                              <span className="text-xs">Para Firma -</span>
+                            )}
+
+                            {destino.NombreCompleto && (
+                              <span className="text-xs">
+                                {destino.AreaDestino.Descripcion}
+                              </span>
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                      {/* icon trash */}
+                      <div className="flex align-items-center justify-content-center pr-1">
+                        <Tooltip target=".icon-bolt" />
+
+                        <i
+                          className="pi pi-trash m-1"
+                          style={{ color: "#559", fontSize: "1rem" }}
+                          onClick={() => {
+                            setSelectedTramiteDestinos((prev) => {
+                              return prev.filter(
+                                (p) => p.IdMovimiento != destino.IdMovimiento
+                              );
+                            });
+                          }}
+                        ></i>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex flex-row justify-content-between align-items-center mt-3 py-2 px-4  pb-3 border-bottom-1 border-top-1 border-gray-500">
+              <label
+                htmlFor="ApellidoPaterno"
+                className="block text-900 font-medium"
+                style={{
+                  width: "30%",
+                }}
+              >
+                Anexos
               </label>
 
               <Button
                 type="button"
-                // onClick={findAllTramite}
+                onClick={() => {
+                  anexosRef.current?.click();
+                }}
                 size="small"
-                severity="secondary"
+                severity="contrast"
                 style={{
                   padding: "0",
-                  width: "7rem",
+                  width: "6.5rem",
                   height: "2.5rem",
                   margin: "0",
-                  color: "#fff",
-                  background: "#293",
+                  color: "#000",
+                  background: "#eee",
                   border: "none",
                 }}
               >
-                <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+                <span className="flex justify-content-between gap-2 align-items-center m-auto">
                   <i className="pi pi-plus text-sm"></i>
                   <span>Agregar</span>
                 </span>
               </Button>
+              <input
+                ref={anexosRef}
+                type="file"
+                accept="application/pdf"
+                onChange={onChangeAnexos}
+                style={{ display: "none" }}
+              />
             </div>
 
-            <div
-              className="mt-3 border-round-md"
-              style={{
-                backgroundColor:
-                  themePrimeFlex === "dark" ? "#111827" : "#ffffffde",
-                border:
-                  themePrimeFlex === "dark"
-                    ? "1px solid #424b57"
-                    : "1px solid #d1d5db",
-                minHeight: "3rem",
-              }}
-            >
+            <div className="px-4">
               <div
-                className="flex flex-row justify-content-between p-2"
+                className="border-round-md"
                 style={{
-                  gap: "1rem",
-                  borderBottom:
+                  backgroundColor:
+                    themePrimeFlex === "dark" ? "#111827" : "#ffffffde",
+                  border:
                     themePrimeFlex === "dark"
                       ? "1px solid #424b57"
                       : "1px solid #d1d5db",
+                  minHeight: "3rem",
                 }}
               >
-                <div className="flex flex-row gap-2">
-                  {/* icon */}
-                  <div className="flex align-items-center justify-content-center pr-2">
-                    <i
-                      className="pi pi-user"
-                      style={{ color: "#e55", fontSize: "2rem" }}
-                    ></i>
-                  </div>
-                  {/* descripcion */}
-                  <div className="flex flex-column gap-2">
-                    <span className="hover:text-orange-500">Descripcion</span>
-                    <span className="text-sm m-0">kk</span>
-                  </div>
-                </div>
-                {/* icon trash */}
-                <div className="flex align-items-center justify-content-center pr-1">
-                  <i
-                    className="pi pi-trash"
-                    style={{ color: "#e55", fontSize: "1rem" }}
-                  ></i>
-                </div>
-              </div>
+                {selectedAnexos.map((anexo) => {
+                  return (
+                    <div
+                      key={anexo.lastModified}
+                      className="flex flex-row justify-content-between p-2"
+                      style={{
+                        gap: "1rem",
+                        borderBottom:
+                          themePrimeFlex === "dark"
+                            ? "1px solid #424b57"
+                            : "1px solid #d1d5db",
+                      }}
+                    >
+                      <div className="flex flex-row gap-2">
+                        {/* icon */}
+                        <div className="flex align-items-center justify-content-center pr-2">
+                          <i
+                            className="pi pi-file-pdf"
+                            style={{ color: "#559", fontSize: "1.5rem" }}
+                          ></i>
+                        </div>
+                        {/* descripcion */}
+                        <div className="flex flex-column gap-2">
+                          <a
+                            className="hover:underline hover:text-blue-300 text-xs"
+                            style={{
+                              textDecoration: "none",
+                              color: "var(--text-color)",
+                            }}
+                            href={`${URL.createObjectURL(anexo)}`}
+                            onClick={() => {
+                              const url = URL.createObjectURL(anexo);
+                              console.log(url);
+                            }}
+                            target="_blank"
+                          >
+                            {anexo.name}
+                          </a>
+                          <span className="flex flex-row gap-2  m-0">
+                            <span className="text-sm">
+                              {anexo.type.split("/")[1].toUpperCase()}
+                            </span>
+                            <span className="text-sm">-</span>
+                            <span className="text-sm">
+                              {formatFileSize(anexo.size)}
+                            </span>
+                          </span>
+                        </div>
+                      </div>
+                      {/* icon trash */}
+                      <div className="flex align-items-center justify-content-center pr-1">
+                        <Tooltip target=".icon-bolt" />
 
-              <div
-                className="flex flex-row justify-content-between p-2"
-                style={{
-                  gap: "1rem",
-                  borderBottom:
-                    themePrimeFlex === "dark"
-                      ? "1px solid #424b57"
-                      : "1px solid #d1d5db",
-                }}
-              >
-                <div className="flex flex-row gap-2">
-                  {/* icon */}
-                  <div className="flex align-items-center justify-content-center pr-2">
-                    <i
-                      className="pi pi-building"
-                      style={{ color: "#e55", fontSize: "2rem" }}
-                    ></i>
-                  </div>
-                  {/* descripcion */}
-                  <div className="flex flex-column gap-2">
-                    <span className="hover:text-orange-500">Descripcion</span>
-                    <span className="text-sm m-0">kk</span>
-                  </div>
-                </div>
-                {/* icon trash */}
-                <div className="flex align-items-center justify-content-center pr-1">
-                  <i
-                    className="pi pi-trash"
-                    style={{ color: "#e55", fontSize: "1rem" }}
-                  ></i>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-row justify-content-between align-items-center mt-3 py-2 px-4  pb-3 border-bottom-1 border-top-1 border-gray-500">
-            <label
-              htmlFor="ApellidoPaterno"
-              className="block text-900 font-medium"
-              style={{
-                width: "30%",
-              }}
-            >
-              Anexos
-            </label>
-
-            <Button
-              type="button"
-              // onClick={findAllTramite}
-              size="small"
-              severity="contrast"
-              style={{
-                padding: "0",
-                width: "7rem",
-                height: "2.5rem",
-                margin: "0",
-                color: "#000",
-                background: "#eee",
-                border: "none",
-              }}
-            >
-              <span className="flex justify-content-between gap-2 align-items-center m-auto">
-                <i className="pi pi-plus text-sm"></i>
-                <span>Agregar</span>
-              </span>
-            </Button>
-          </div>
-
-          <div className="px-4">
-            <div
-              className="border-round-md"
-              style={{
-                backgroundColor:
-                  themePrimeFlex === "dark" ? "#111827" : "#ffffffde",
-                border:
-                  themePrimeFlex === "dark"
-                    ? "1px solid #424b57"
-                    : "1px solid #d1d5db",
-                minHeight: "3rem",
-              }}
-            >
-              <div
-                className="flex flex-row justify-content-between p-2"
-                style={{
-                  gap: "1rem",
-                  borderBottom:
-                    themePrimeFlex === "dark"
-                      ? "1px solid #424b57"
-                      : "1px solid #d1d5db",
-                }}
-              >
-                <div className="flex flex-row gap-2">
-                  {/* icon */}
-                  <div className="flex align-items-center justify-content-center pr-2">
-                    <i
-                      className="pi pi-user"
-                      style={{ color: "#e55", fontSize: "2rem" }}
-                    ></i>
-                  </div>
-                  {/* descripcion */}
-                  <div className="flex flex-column gap-2">
-                    <span className="hover:text-orange-500">Descripcion</span>
-                    <span className="text-sm m-0">kk</span>
-                  </div>
-                </div>
-                {/* icon trash */}
-                <div className="flex align-items-center justify-content-center pr-1">
-                  <i
-                    className="pi pi-trash"
-                    style={{ color: "#e55", fontSize: "1rem" }}
-                  ></i>
-                </div>
-              </div>
-
-              <div
-                className="flex flex-row justify-content-between p-2 "
-                style={{
-                  gap: "1rem",
-                  borderBottom:
-                    themePrimeFlex === "dark"
-                      ? "1px solid #424b57"
-                      : "1px solid #d1d5db",
-                }}
-              >
-                <div className="flex flex-row gap-2">
-                  {/* icon */}
-                  <div className="flex align-items-center justify-content-center pr-2">
-                    <i
-                      className="pi pi-building"
-                      style={{ color: "#e55", fontSize: "2rem" }}
-                    ></i>
-                  </div>
-                  {/* descripcion */}
-                  <div className="flex flex-column gap-2">
-                    <span className="hover:text-orange-500">Descripcion</span>
-                    <span className="text-sm m-0">kk</span>
-                  </div>
-                </div>
-                {/* icon trash */}
-                <div className="flex align-items-center justify-content-center pr-1">
-                  <i
-                    className="pi pi-trash"
-                    style={{ color: "#e55", fontSize: "1rem" }}
-                  ></i>
-                </div>
+                        <i
+                          className="pi pi-trash m-1"
+                          style={{ color: "#559", fontSize: "1rem" }}
+                          onClick={() => {
+                            setSelectedAnexos((prev) => {
+                              return prev.filter(
+                                (p) => p.lastModified != anexo.lastModified
+                              );
+                            });
+                          }}
+                        ></i>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          <div className="flex flex-row py-2 px-4" style={{ gap: "1rem" }}>
+          <div className="flex flex-row pb-3 px-4" style={{ gap: "1rem" }}>
             <Button
               type="button"
               // onClick={findAllTramite}
@@ -1133,25 +1387,30 @@ const TramiteEmitido = () => {
 
       <FileManagerModal
         submitted={submitted}
-        hideFilerManagerDialog={hideFilerManagerDialog}
+        hideFileManagerDialog={hideFileManagerDialog}
         fileManagerDialog={fileManagerDialog}
         selectedDigitalFiles={selectedDigitalFiles}
         setSelectedDigitalFiles={setSelectedDigitalFiles}
       />
-      {/* <TramiteCreateOrUpdate
+
+      <TramiteDestinosModal
         submitted={submitted}
-        tramite={tramite}
-        esquemaTramites={esquemaTramites}
-        tramiteDialog={tramiteDialog}
-        hideDialog={hideDialog}
-        createTramite={createTramite}
-        updateTramite={updateTramite}
-        onInputTextChange ={onInputTextChange }
-        onDropdownChange={onDropdownChange}
-        onActivoChange={onActivoChange}
-        loadingTramiteCreateOrUpdate={loadingTramiteCreateOrUpdate}
+        hideTramiteDestinosDialog={hideTramiteDestinosDialog}
+        tramiteDestinosDialog={tramiteDestinosDialog}
+        selectedTramiteDestinos={selectedTramiteDestinos}
+        setSelectedTramiteDestinos={setSelectedTramiteDestinos}
+        tramiteDestinosErrors={tramiteDestinosErrors}
+        setTramiteDestinosErrors={setTramiteDestinosErrors}
+        movimiento={movimiento}
+        areas={areas}
+        remitentes={remitentes}
+        setMovimiento={setMovimiento}
+        onInputTextChange={onInputTextChange}
+        onDropdownChangeMovimiento={onDropdownChangeMovimiento}
+        onSwitchChange={onSwitchChange}
       />
 
+      {/*
       <TramiteRemove
         tramite={tramite}
         removeTramiteDialog={removeTramiteDialog}

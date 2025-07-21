@@ -18,7 +18,7 @@ import {
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
 import { columns, defaultFilters,  } from "../utils/Constants";
-import EstadoCreateOrUpdate from "./EstadoCreateOrUpdate";
+import EstadoCreateOrUpdate from "./TramiteDestinosModal";
 import EstadoRemove from "./EstadoRemove";
 import EstadosRemove from "./EstadosRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
@@ -892,7 +892,7 @@ const TramiteRecibido = () => {
         ></Column>
       </DataTable>
 
-      <EstadoCreateOrUpdate
+      {/* <EstadoCreateOrUpdate
         submitted={submitted}
         estado={estado}
         esquemaEstados={esquemaEstados}
@@ -904,7 +904,7 @@ const TramiteRecibido = () => {
         onDropdownChange={onDropdownChange}
         onActivoChange={onActivoChange}
         loadingEstadoCreateOrUpdate={loadingEstadoCreateOrUpdate}
-      />
+      /> */}
 
       <EstadoRemove
         estado={estado}

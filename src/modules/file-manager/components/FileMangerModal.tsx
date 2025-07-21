@@ -54,7 +54,7 @@ import { Dropdown } from "primereact/dropdown";
 type FileManagerModalProps = {
   submitted: boolean;
 
-  hideFilerManagerDialog: () => void;
+  hideFileManagerDialog: () => void;
 
   fileManagerDialog: boolean;
 
@@ -1277,7 +1277,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
                 props.setSelectedDigitalFiles((prev) => [...prev, rowData]);
 
                 // we close the fileMangerModal
-                props.hideFilerManagerDialog()
+                props.hideFileManagerDialog()
               }}
               aria-controls="popup_menu_right"
               aria-haspopup
@@ -1315,7 +1315,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
         icon="pi pi-times"
         outlined
         onClick={() => {
-          props.hideFilerManagerDialog();
+          props.hideFileManagerDialog();
         }}
       />
     </>
@@ -1331,7 +1331,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
       modal
       className="p-fluid"
       footer={FilerManagerDialogFooter}
-      onHide={props.hideFilerManagerDialog}
+      onHide={props.hideFileManagerDialog}
     >
       <Toast ref={toastx} position={"bottom-right"} />
 
