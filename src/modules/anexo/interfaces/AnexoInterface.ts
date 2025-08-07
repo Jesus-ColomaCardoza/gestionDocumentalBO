@@ -2,7 +2,7 @@ import { Message } from "../../utils/Interfaces";
 
 type Fecha = Date | string | null;
 export interface AnexoEntity {
-  IdAnexo: number;
+  IdAnexo?: number;
   Titulo: string;
   FormatoAnexo?: string;
   NombreAnexo?: string;

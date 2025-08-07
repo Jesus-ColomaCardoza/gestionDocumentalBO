@@ -9,7 +9,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex", flexDirection: "column"}}>
         <MenuBar setVisible={setVisible} />
         <div
           style={{

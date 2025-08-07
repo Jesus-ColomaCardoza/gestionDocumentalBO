@@ -13,9 +13,8 @@ const MainContainer = ({ visible }: MainContainerProps) => {
     <Card
       ref={refMainContainer}
       style={{
-        width: visible ? "calc(100% - 20rem)" : "100%",
-        margin: "1em",
-        marginLeft: ".5em",
+        width: visible ? "calc(100% - 20rem)" : "calc(100% - 2rem)",
+        margin: "1rem",
         minHeight: "calc(100vh - 6rem)",
         transition: ".5s width ease-in-out",
       }}

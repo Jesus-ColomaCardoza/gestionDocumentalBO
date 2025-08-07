@@ -20,7 +20,10 @@ import TramitePendiente from "../../tramite/components/TramitePendiente";
 import TramiteRecibido from "../../tramite/components/TramiteRecibido";
 import Usuario from "../../usuario/components/Usuario";
 import Empresa from "../../empresa/components/Empresa";
+import TramiteEmitidoNuevo from "../../tramite/components/TramiteEmitidoNuevo";
 import TramiteEmitido from "../../tramite/components/TramiteEmitido";
+import TramiteDocumento from "../../tramite/components/TramiteDocumento";
+import TramiteSeguimiento from "../../tramite/components/TramiteSeguimiento";
 
 const AllRoutes = () => {
   return (
@@ -40,9 +43,12 @@ const AllRoutes = () => {
             <Route path="/" element={<Dashboard />}>
               <Route path="firma_digital/archivos_digitales" element={<FileManager />}></Route>
 
+              <Route path="tramite/seguimiento" element={<TramiteSeguimiento/>}></Route>
+              <Route path="tramite/documento" element={<TramiteDocumento/>}></Route>
               <Route path="tramite/pendiente" element={<TramitePendiente />}></Route>
               <Route path="tramite/recibido" element={<TramiteRecibido />}></Route>
               <Route path="tramite/emitido" element={<TramiteEmitido />}></Route>
+              <Route path="tramite/emitido/nuevo" element={<TramiteEmitidoNuevo />}></Route>
               
               <Route path="mantenimiento/usuario" element={<Usuario />}></Route>
               <Route path="mantenimiento/empresa" element={<Empresa />}></Route>

@@ -66,7 +66,7 @@ const TramiteDestinosModal = (props: EstadoCreateOrUpdateProps) => {
           if (validateForm()) {
             props.setSelectedTramiteDestinos((prev) => [
               ...prev,
-              {...props.movimiento,IdMovimiento:new Date().getTime()},
+              {...props.movimiento,IdMovimiento:new Date().getTime(), FechaMovimiento: new Date().toISOString()},
             ]);
             props.hideTramiteDestinosDialog();
           }

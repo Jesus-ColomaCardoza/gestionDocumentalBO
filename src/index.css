@@ -6,3 +6,30 @@ body {
 .p-datatable .p-datatable-header {
   padding: 1rem 0rem;
 }
+
+.scroll-container {
+  overflow-y: auto;
+  scrollbar-width: thin;            /* Firefox */
+  scrollbar-color: #83787875 transparent;  /* Firefox */
+}
+
+/* WebKit (Chrome, Safari, Edge) */
+.scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 4px;
+}
+
+.scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scroll-container::-webkit-scrollbar-button {
+  display: none; /* Oculta las flechas de arriba y abajo */
+    height: 0;
+  display: block;
+  background: transparent;
+}

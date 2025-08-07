@@ -17,6 +17,7 @@ const SideBar = (props: SideBarProps) => {
   const btnRef1 = useRef<any>(null);
   const btnRef2 = useRef<any>(null);
   const btnRef3 = useRef<any>(null);
+  const btnRef4 = useRef<any>(null);
 
   const refSideBar = useRef<Card>(null);
 
@@ -33,12 +34,12 @@ const SideBar = (props: SideBarProps) => {
         // marginRight: ".5em",
         height: "calc(100vh - 6rem)",
         width: props.visible ? "20rem" : "0rem",
-        margin: props.visible ? "1rem" : "0rem",
+        margin: props.visible ? "1rem 0 1rem 1rem" : "0rem",
         transform: props.visible ? "translateX(0rem)" : "translateX(-20rem)",
         transition:
           ".5s transform ease-in-out,.5s width ease-in-out,.5s margin ease-in-out",
       }}
-      className="flex flex-column"
+      className="flex flex-column scroll-container"
     >
       {/* Sidebar-header */}
       <div
@@ -220,14 +221,48 @@ const SideBar = (props: SideBarProps) => {
                 </Link>
               </li>
               <li>
-                <Link
-                  to={"../tramite/emitido"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-send mr-2"></i>
-                  <span className="font-medium text-sm">Emitidos</span>
-                  <Ripple />
-                </Link>
+                <li>
+                  <StyleClass
+                    nodeRef={btnRef4}
+                    selector="@next"
+                    enterFromClassName="hidden"
+                    enterActiveClassName="slidedown"
+                    leaveToClassName="hidden"
+                    leaveActiveClassName="slideup"
+                  >
+                    <a
+                      ref={btnRef4}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                    >
+                      <i className="pi pi-send mr-2"></i>
+                      <span className="font-medium text-sm">Emitidos</span>
+                      <i className="pi pi-chevron-down ml-auto mr-1"></i>
+                      <Ripple />
+                    </a>
+                  </StyleClass>
+                  <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                    <li>
+                      <Link
+                        to={"../tramite/emitido/nuevo"}
+                        className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                      >
+                        <i className="pi pi-circle text-sm mr-2"></i>
+                        <span className="font-medium text-sm">Nuevo</span>
+                        <Ripple />
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to={"../tramite/emitido"}
+                        className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                      >
+                        <i className="pi pi-circle text-sm mr-2"></i>
+                        <span className="font-medium text-sm">Lista</span>
+                        <Ripple />
+                      </Link>
+                    </li>
+                  </ul>
+                </li>
               </li>
             </ul>
           </li>
@@ -371,7 +406,7 @@ const SideBar = (props: SideBarProps) => {
                   <Ripple />
                 </a>
               </li>
-              <li>
+               <li>
                 <StyleClass
                   nodeRef={btnRef3}
                   selector="@next"

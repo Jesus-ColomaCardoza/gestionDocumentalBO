@@ -34,7 +34,7 @@ const UseTramite = () => {
   ): Promise<TramiteOut | undefined> => {
     try {
       const tramite = await axios.post<TramiteOut>(
-        `${VITE_API_URL_GDS + TRAMITE.CREATE}`,
+        `${VITE_API_URL_GDS + TRAMITE.CREATE_EMITIDO}`,
         TramiteEmitidoCreate
       );
       return tramite.data;
