@@ -22,6 +22,7 @@ import Usuario from "../../usuario/components/Usuario";
 import Empresa from "../../empresa/components/Empresa";
 import TramiteEmitidoNuevo from "../../tramite/components/TramiteEmitidoNuevo";
 import TramiteEmitido from "../../tramite/components/TramiteEmitido";
+import Constante from "../../constante/components/Constante";
 import TramiteDocumento from "../../tramite/components/TramiteDocumento";
 import TramiteSeguimiento from "../../tramite/components/TramiteSeguimiento";
 
@@ -52,6 +53,7 @@ const AllRoutes = () => {
               
               <Route path="mantenimiento/usuario" element={<Usuario />}></Route>
               <Route path="mantenimiento/empresa" element={<Empresa />}></Route>
+              <Route path="mantenimiento/constante" element={<Constante />}></Route>
               <Route path="mantenimiento/area" element={<Area />}></Route>
               <Route path="mantenimiento/cargo" element={<Cargo />}></Route>
               <Route path="mantenimiento/estado" element={<Estado />}></Route>
