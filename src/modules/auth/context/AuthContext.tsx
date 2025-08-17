@@ -64,6 +64,9 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/auth/forgot_password",
     "/auth/reset_password/:token",
 
+    //perfil Usuario
+    "/perfil_Usuario",
+
     //firma digital
     "/firma_digital/archivos_digitales",
 
@@ -72,6 +75,10 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/tramite/documento",
     "/tramite/pendiente",
     "/tramite/recibido",
+    "/tramite/recibido/externo",
+    "/tramite/recibido/atendido",
+    "/tramite/recibido/derivado",
+    "/tramite/recibido/derivados",
     "/tramite/emitido",
     "/tramite/emitido/nuevo",
 
@@ -107,10 +114,6 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
 
         if (validateUser.data.message.msgId == 0) {
           setUserAuth(validateUser.data.registro || null);
-
-          console.log("entra");
-          console.log(validateRoutes);
-          console.log(pathname);
 
           if (origin === "login") {
             navigate("/dashboard");

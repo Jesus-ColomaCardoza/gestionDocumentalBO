@@ -31,12 +31,19 @@ import { DropdownChangeEvent } from "primereact/dropdown";
 import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
 import { emptyEstado } from "../../estado/utils/Constants";
 import UseEstado from "../../estado/hooks/UseEstado";
+import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../utils/shared/ConfirmModal";
+import TramiteDestinosModal from "./TramiteDestinosModal";
+import TramiteDestailsModal from "./TramiteDetailsModal";
+import TramiteDetailsModal from "./TramiteDetailsModal";
 
 const TramitePendiente = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseEstado();
 
   const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
+
+  const navigate = useNavigate();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -80,6 +87,11 @@ const TramitePendiente = () => {
 
   const [removeEstadosDialog, setRemoveEstadosDialog] =
     useState<boolean>(false);
+
+  const [tramiteDetailsDialog, setTramiteDetailsDialog] =
+    useState<boolean>(true);
+
+  const [confirmModal, setConfirmModal] = useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -305,6 +317,16 @@ const TramitePendiente = () => {
     setRemoveEstadosDialog(false);
   };
 
+  const hideTramiteDetailsDialog = () => {
+    setSubmitted(false);
+    // setMovimiento(emptyMovimiento);
+    setTramiteDetailsDialog(false);
+  };
+
+  const hideConfirmModal = () => {
+    setConfirmModal(false);
+  };
+
   const confirmRemoveEstado = (estado: EstadoEntity) => {
     setEstado(estado);
     setRemoveEstadoDialog(true);
@@ -466,7 +488,9 @@ const TramitePendiente = () => {
         />
         <Button
           type="button"
-          onClick={showCreateEstadoDialog}
+          onClick={() => {
+            navigate("../tramite/recibido/externo");
+          }}
           size="small"
           style={{
             padding: "0",
@@ -479,12 +503,14 @@ const TramitePendiente = () => {
         >
           <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
             <i className="pi pi-eject text-sm"></i>
-            <span>Pendiente Externo</span>
+            <span>Recibir Externo</span>
           </span>
         </Button>
         <Button
           type="button"
-          onClick={findAllEstado}
+          onClick={() => {
+            navigate("../tramite/emitido/nuevo");
+          }}
           size="small"
           style={{
             padding: "0",
@@ -502,7 +528,9 @@ const TramitePendiente = () => {
         <Button
           type="button"
           severity="warning"
-          onClick={findAllEstado}
+          onClick={() => {
+            setConfirmModal(true);
+          }}
           size="small"
           style={{
             padding: "0",
@@ -849,19 +877,23 @@ const TramitePendiente = () => {
         ></Column>
       </DataTable>
 
-      {/* <EstadoCreateOrUpdate
+      <TramiteDetailsModal
         submitted={submitted}
-        estado={estado}
-        esquemaEstados={esquemaEstados}
-        estadoDialog={estadoDialog}
-        hideDialog={hideDialog}
-        createEstado={createEstado}
-        updateEstado={updateEstado}
-        onInputChange={onInputChange}
-        onDropdownChange={onDropdownChange}
-        onActivoChange={onActivoChange}
-        loadingEstadoCreateOrUpdate={loadingEstadoCreateOrUpdate}
-      /> */}
+        hideTramiteDetailsDialog={hideTramiteDetailsDialog}
+        tramiteDetailsDialog={tramiteDetailsDialog}
+        // selectedTramiteDestinos={selectedTramiteDestinos}
+        // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
+      />
+
+      <ConfirmModal
+        titleModal="Confirmación"
+        typeMessage="info"
+        message="¿Esta seguro que desea recibir estos trámites?"
+        typeButton="info"
+        state={confirmModal}
+        hideDialog={hideConfirmModal}
+        callBack={() => {}}
+      />
 
       <EstadoRemove
         estado={estado}

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Ripple } from "primereact/ripple";
 import { StyleClass } from "primereact/styleclass";
@@ -19,16 +19,16 @@ const SideBar = (props: SideBarProps) => {
   const btnRef3 = useRef<any>(null);
   const btnRef4 = useRef<any>(null);
 
-  const refSideBar = useRef<Card>(null);
+  const navigate = useNavigate();
 
   const { userAuth } = useAuth()!;
 
   return (
-    <Card
-      ref={refSideBar}
+    <div
       style={{
         backgroundColor: "var(--surface-50)",
 
+        borderRadius: "6px",
         position: "sticky",
         top: "5rem",
         // marginRight: ".5em",
@@ -43,12 +43,12 @@ const SideBar = (props: SideBarProps) => {
     >
       {/* Sidebar-header */}
       <div
-        className="flex align-items-center justify-content-between px-2 flex-shrink-0"
+        className="flex align-items-center justify-content-between pr-3 pl-3 pb-1"
         style={{
-          position: "fixed",
-          top: 20,
+          position: "sticky",
+          top: 10,
           boxSizing: "border-box",
-          width: "90%",
+          width: "100%",
         }}
       >
         <span className="inline-flex align-items-center gap-2">
@@ -115,9 +115,7 @@ const SideBar = (props: SideBarProps) => {
           </svg> */}
 
           {/* text logo */}
-          <span className="font-semibold text-2xl text-primary px-2">
-            MDSMF
-          </span>
+          <span className="font-semibold text-2xl text-primary">MDSMF</span>
         </span>
 
         {/* button close */}
@@ -140,8 +138,8 @@ const SideBar = (props: SideBarProps) => {
       {/* Sidebar-body */}
       <div
         style={{
-          marginTop: "1rem",
-          height: "calc(100vh - 13rem)",
+          padding: "0 .5rem 0 0rem",
+          height: "calc(100vh - 12rem)",
           overflowY: "auto",
         }}
       >
@@ -164,7 +162,7 @@ const SideBar = (props: SideBarProps) => {
                 <Ripple />
               </div>
             </StyleClass>
-            <ul className="list-none p-0 m-0 overflow-hidden">
+            <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
               <li>
                 <Link
                   to={"../firma_digital/archivos_digitales"}
@@ -199,7 +197,7 @@ const SideBar = (props: SideBarProps) => {
                 <Ripple />
               </div>
             </StyleClass>
-            <ul className="list-none p-0 m-0 overflow-hidden">
+            <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
               <li>
                 <Link
                   to={"../tramite/pendiente"}
@@ -221,48 +219,46 @@ const SideBar = (props: SideBarProps) => {
                 </Link>
               </li>
               <li>
-                <li>
-                  <StyleClass
-                    nodeRef={btnRef4}
-                    selector="@next"
-                    enterFromClassName="hidden"
-                    enterActiveClassName="slidedown"
-                    leaveToClassName="hidden"
-                    leaveActiveClassName="slideup"
+                <StyleClass
+                  nodeRef={btnRef4}
+                  selector="@next"
+                  enterFromClassName="hidden"
+                  enterActiveClassName="slidedown"
+                  leaveToClassName="hidden"
+                  leaveActiveClassName="slideup"
+                >
+                  <a
+                    ref={btnRef4}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
                   >
-                    <a
-                      ref={btnRef4}
-                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full"
+                    <i className="pi pi-send mr-2"></i>
+                    <span className="font-medium text-sm">Emitidos</span>
+                    <i className="pi pi-chevron-down ml-auto mr-1"></i>
+                    <Ripple />
+                  </a>
+                </StyleClass>
+                <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
+                  <li>
+                    <Link
+                      to={"../tramite/emitido/nuevo"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
                     >
-                      <i className="pi pi-send mr-2"></i>
-                      <span className="font-medium text-sm">Emitidos</span>
-                      <i className="pi pi-chevron-down ml-auto mr-1"></i>
+                      <i className="pi pi-circle text-sm mr-2"></i>
+                      <span className="font-medium text-sm">Nuevo</span>
                       <Ripple />
-                    </a>
-                  </StyleClass>
-                  <ul className="list-none py-0 pl-3 pr-0 m-0 hidden overflow-y-hidden transition-all transition-duration-400 transition-ease-in-out">
-                    <li>
-                      <Link
-                        to={"../tramite/emitido/nuevo"}
-                        className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                      >
-                        <i className="pi pi-circle text-sm mr-2"></i>
-                        <span className="font-medium text-sm">Nuevo</span>
-                        <Ripple />
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to={"../tramite/emitido"}
-                        className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                      >
-                        <i className="pi pi-circle text-sm mr-2"></i>
-                        <span className="font-medium text-sm">Lista</span>
-                        <Ripple />
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to={"../tramite/emitido"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                    >
+                      <i className="pi pi-circle text-sm mr-2"></i>
+                      <span className="font-medium text-sm">Lista</span>
+                      <Ripple />
+                    </Link>
+                  </li>
+                </ul>
               </li>
             </ul>
           </li>
@@ -286,7 +282,8 @@ const SideBar = (props: SideBarProps) => {
                 <Ripple />
               </div>
             </StyleClass>
-            <ul className="list-none p-0 m-0 overflow-hidden">
+            <ul className="list-none p-0 m-0 ml-2 hidden overflow-hidden">
+              {/* <ul className="list-none p-0 m-0  overflow-hidden"> */}
               <li>
                 <Link
                   to={"../mantenimiento/usuario"}
@@ -573,11 +570,16 @@ const SideBar = (props: SideBarProps) => {
           position: "fixed",
           bottom: 0,
           boxSizing: "border-box",
-          width: "90%",
+          width: "100%",
         }}
       >
         <hr className="border-top-1 border-none surface-border" />
-        <a className="my-2 mx-3 flex align-items-center justify-content-center cursor-pointer p-1 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple">
+        <a
+          onClick={() => {
+            navigate("/perfil_Usuario");
+          }}
+          className="my-2 mx-3 flex align-items-center justify-content-center cursor-pointer p-1 gap-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors p-ripple"
+        >
           <Avatar
             label={`${
               userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
@@ -594,7 +596,7 @@ const SideBar = (props: SideBarProps) => {
           </span>
         </a>
       </div>
-    </Card>
+    </div>
   );
 };
 

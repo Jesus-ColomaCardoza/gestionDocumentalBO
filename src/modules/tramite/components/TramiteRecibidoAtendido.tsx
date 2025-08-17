@@ -24,15 +24,18 @@ import { formatFileSize } from "../../utils/Methods";
 import TramiteDestinosModal from "./TramiteDestinosModal";
 import { MovimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
 import { emptyMovimiento } from "../../movimiento/utils/Constants";
-import { InputSwitchChangeEvent } from "primereact/inputswitch";
+import { InputSwitch, InputSwitchChangeEvent } from "primereact/inputswitch";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import UseFile from "../../file/hooks/UseFile";
 import UseAnexo from "../../anexo/hooks/UseAnexo";
 import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
 import { useNavigate } from "react-router-dom";
+import { RadioButton } from "primereact/radiobutton";
 import { Toolbar } from "primereact/toolbar";
+import { TabPanel, TabView, TabViewTabChangeEvent } from "primereact/tabview";
+import TramiteRecibidoAtendidoModal from "./TramiteRecibidoAtendidoModal";
 
-const TramiteEmitidoNuevo = () => {
+const TramiteRecibidoAtendido = () => {
   // custom hooks
   const { themePrimeFlex } = useTheme();
 
@@ -60,6 +63,8 @@ const TramiteEmitidoNuevo = () => {
   const loadFilesRef = useRef<HTMLInputElement>(null);
 
   const anexosRef = useRef<HTMLInputElement>(null);
+
+  const [showAnexos, setShowAnexos] = useState<boolean>(false);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -655,17 +660,17 @@ const TramiteEmitidoNuevo = () => {
         }}
         start={
           <div className="flex flex-column p-1 gap-2">
-            <h3 className="m-0">Iniciar nuevo trámite</h3>
+            <h3 className="m-0">Atender con adjunto</h3>
           </div>
         }
       />
-      
+
       <div className="flex flex-row flex-wrap justify-content-between">
         <div
           className="flex flex-column flex-wrap gap-1  border-solid border-1 border-gray-500 border-round-md"
           style={{ width: "49%" }}
         >
-          <div className="flex flex-row justify-content-between align-items-center pb-3 mb-3  py-2 px-4 border-bottom-1 border-gray-500">
+          <div className="flex flex-row justify-content-between align-items-center mb-3 py-2 px-4 border-bottom-1 border-gray-500">
             <label
               className="block text-900 font-medium"
               style={{
@@ -729,21 +734,18 @@ const TramiteEmitidoNuevo = () => {
             </div>
           </div>
 
-          <div className="flex flex-row py-2 px-4" style={{ gap: "1rem" }}>
+          <div className="flex flex-row px-4" style={{ gap: "1rem" }}>
             <div
               style={{
                 width: "100%",
               }}
             >
-              <label
-                htmlFor="Archivo digital"
-                className="block text-900 text-sm font-medium mb-2"
-              >
+              <label className="block text-900 text-sm font-medium">
                 Archivo digital
               </label>
 
               <div
-                className="my-3 border-round-md"
+                className="mt-3 mb-1 border-round-md"
                 style={{
                   backgroundColor:
                     themePrimeFlex === "dark" ? "#111827" : "#ffffffde",
@@ -768,14 +770,12 @@ const TramiteEmitidoNuevo = () => {
                       }}
                     >
                       <div className="flex flex-row gap-2">
-                        {/* icon */}
                         <div className="flex align-items-center justify-content-center pr-2">
                           <i
                             className="pi pi-file-pdf"
                             style={{ color: "#559", fontSize: "1.5rem" }}
                           ></i>
                         </div>
-                        {/* descripcion */}
                         <div className="flex flex-column gap-2">
                           <a
                             className="hover:underline hover:text-blue-300 text-xs"
@@ -799,7 +799,6 @@ const TramiteEmitidoNuevo = () => {
                           </span>
                         </div>
                       </div>
-                      {/* icon trash */}
                       <div className="flex align-items-center justify-content-center pr-1">
                         <Tooltip target=".icon-bolt" />
                         <i
@@ -823,6 +822,19 @@ const TramiteEmitidoNuevo = () => {
                     </div>
                   );
                 })}
+              </div>
+
+              <div className="flex justify-content-start align-items-center mb-2">
+                <InputSwitch
+                  id="Copia"
+                  // checked={props.movimiento.Copia ?? false}
+                  checked={false}
+                  // onChange={(e) => props.onSwitchChange(e, "Copia")}
+                  className="small-switch"
+                />
+                <label htmlFor="Copia" className="text-sm m-0">
+                  visible
+                </label>
               </div>
             </div>
           </div>
@@ -1043,7 +1055,7 @@ const TramiteEmitidoNuevo = () => {
           className="flex flex-column justify-content-between border-solid border-1 border-gray-500 border-round-md"
           style={{ width: "49%" }}
         >
-          <div className="flex flex-column gap-3">
+          <div className="flex flex-column">
             <div className="flex flex-row align-items-center py-3 mb-3 px-4 border-bottom-1 border-gray-500">
               <label
                 className="block text-900 font-medium"
@@ -1055,168 +1067,152 @@ const TramiteEmitidoNuevo = () => {
               </label>
             </div>
 
-            <div className="flex flex-row  px-4" style={{ gap: "1rem" }}>
+            <div className="flex flex-row px-4" style={{ gap: "1rem" }}>
               <div
                 style={{
-                  width: "100%",
+                  width: "50%",
                 }}
               >
                 <label
-                  htmlFor="AreaEmision"
+                  htmlFor="CodigoReferencia"
                   className="block text-900 text-sm font-medium mb-2"
                 >
-                  Área Emisión
+                  Trámite
                 </label>
-                <div className="flex flex-column  gap-1">
+                <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
-                    <Dropdown
-                      value={tramite.Area}
+                    <InputText
+                      id="CodigoReferencia"
+                      value={tramite.CodigoReferencia}
                       onChange={(e) => {
-                        onDropdownChange(e, "Area", "IdArea", "IdAreaEmision");
+                        onInputTextChange(e, "CodigoReferencia");
                       }}
-                      options={areas}
-                      optionLabel="Descripcion"
-                      filter
-                      placeholder="Seleccionar Área de Emisión"
-                      className="w-full flex flex-row align-items-center p-inputtext-sm"
-                      showClear
-                      style={{
-                        paddingTop: "1.2rem",
-                        paddingBottom: "1.2rem",
-                        width: "16rem",
-                        height: "2rem",
-                      }}
+                      type="text"
+                      className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.IdAreaEmision && (
+                  {tramiteErrors.CodigoReferencia && (
                     <small className="p-error">
-                      {tramiteErrors.IdAreaEmision}
+                      {tramiteErrors.CodigoReferencia}
+                    </small>
+                  )}
+                </div>
+              </div>
+
+              <div
+                style={{
+                  width: "50%",
+                }}
+              >
+                <label
+                  htmlFor="CodigoReferencia"
+                  className="block text-900 text-sm font-medium mb-2"
+                >
+                  Documento
+                </label>
+                <div className="flex flex-column mb-3 gap-1">
+                  <div className="p-inputgroup">
+                    <InputText
+                      id="CodigoReferencia"
+                      value={tramite.CodigoReferencia}
+                      onChange={(e) => {
+                        onInputTextChange(e, "CodigoReferencia");
+                      }}
+                      type="text"
+                      className="p-inputtext-sm "
+                    />
+                  </div>
+                  {tramiteErrors.CodigoReferencia && (
+                    <small className="p-error">
+                      {tramiteErrors.CodigoReferencia}
                     </small>
                   )}
                 </div>
               </div>
             </div>
 
-            <div className=" px-4">
-              <div className="flex flex-row justify-content-between align-items-center mb-2">
-                <label
-                  htmlFor="ApellidoPaterno"
-                  className="block text-900 text-sm font-medium"
-                  style={{
-                    width: "30%",
-                  }}
-                >
-                  Destino
-                </label>
-
-                <Button
-                  type="button"
-                  onClick={showTramiteDestinosDialog}
-                  size="small"
-                  severity="secondary"
-                  style={{
-                    padding: "0",
-                    width: "6.5rem",
-                    height: "2.5rem",
-                    margin: "0",
-                    color: "#fff",
-                    background: "#293",
-                    border: "none",
-                  }}
-                >
-                  <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-                    <i className="pi pi-plus text-sm"></i>
-                    <span>Agregar</span>
-                  </span>
-                </Button>
-              </div>
-
-              <div
-                className="mt-3 border-round-md"
-                style={{
-                  backgroundColor:
-                    themePrimeFlex === "dark" ? "#111827" : "#ffffffde",
-                  border:
-                    themePrimeFlex === "dark"
-                      ? "1px solid #424b57"
-                      : "1px solid #d1d5db",
-                  minHeight: "3rem",
-                }}
+            <div className="flex flex-column px-4">
+              <label
+                htmlFor="CodigoReferencia"
+                className="block text-900 text-sm font-medium mb-2"
               >
-                {selectedTramiteDestinos.map((destino, index) => {
-                  return (
-                    <div
-                      key={index}
-                      className="flex flex-row justify-content-between p-2"
-                      style={{
-                        gap: "1rem",
-                        borderBottom:
-                          themePrimeFlex === "dark"
-                            ? "1px solid #424b57"
-                            : "1px solid #d1d5db",
-                      }}
-                    >
-                      <div className="flex flex-row gap-2">
-                        {/* icon */}
-                        <div className="flex align-items-center justify-content-center pr-2">
-                          <i
-                            className={
-                              destino.NombreCompleto
-                                ? "pi pi-user"
-                                : "pi pi-building"
-                            }
-                            style={{ color: "#559", fontSize: "1.5rem" }}
-                          ></i>
-                        </div>
-                        {/* descripcion */}
-                        <div className="flex flex-column gap-2">
-                          <span
-                            className="hover:underline hover:text-blue-300 text-xs"
-                            style={{
-                              textDecoration: "none",
-                              color: "var(--text-color)",
-                            }}
-                          >
-                            {destino.NombreCompleto
-                              ? `${destino.NombreCompleto} | Responsable de oficina`
-                              : destino.AreaDestino.Descripcion}
-                          </span>
-                          <span className="flex flex-row gap-2 m-0">
-                            {destino.FirmaDigital && (
-                              <span className="text-xs">Para Firma -</span>
-                            )}
-
-                            {destino.NombreCompleto && (
-                              <span className="text-xs">
-                                {destino.AreaDestino.Descripcion}
-                              </span>
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                      {/* icon trash */}
-                      <div className="flex align-items-center justify-content-center pr-1">
-                        <Tooltip target=".icon-bolt" />
-
-                        <i
-                          className="pi pi-trash m-1"
-                          style={{ color: "#559", fontSize: "1rem" }}
-                          onClick={() => {
-                            setSelectedTramiteDestinos((prev) => {
-                              return prev.filter(
-                                (p) => p.IdMovimiento != destino.IdMovimiento
-                              );
-                            });
-                          }}
-                        ></i>
-                      </div>
-                    </div>
-                  );
-                })}
+                Asunto
+              </label>
+              <div className="flex flex-column mb-3 gap-1">
+                <div className="p-inputgroup">
+                  <InputText
+                    id="CodigoReferencia"
+                    value={tramite.CodigoReferencia}
+                    onChange={(e) => {
+                      onInputTextChange(e, "CodigoReferencia");
+                    }}
+                    type="text"
+                    className="p-inputtext-sm "
+                  />
+                </div>
+                {tramiteErrors.CodigoReferencia && (
+                  <small className="p-error">
+                    {tramiteErrors.CodigoReferencia}
+                  </small>
+                )}
               </div>
             </div>
 
-            <div className="flex flex-row justify-content-between align-items-center mt-3 py-2 px-4  pb-3 border-bottom-1 border-top-1 border-gray-500">
+            <div className="flex flex-column px-4">
+              <label
+                htmlFor="CodigoReferencia"
+                className="block text-900 text-sm font-medium mb-2"
+              >
+                Ubicación
+              </label>
+              <div className="flex flex-column mb-3 gap-1">
+                <div className="p-inputgroup">
+                  <InputText
+                    id="CodigoReferencia"
+                    value={tramite.CodigoReferencia}
+                    onChange={(e) => {
+                      onInputTextChange(e, "CodigoReferencia");
+                    }}
+                    type="text"
+                    className="p-inputtext-sm "
+                  />
+                </div>
+                {tramiteErrors.CodigoReferencia && (
+                  <small className="p-error">
+                    {tramiteErrors.CodigoReferencia}
+                  </small>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-column px-4">
+              <label
+                htmlFor="CodigoReferencia"
+                className="block text-900 text-sm font-medium mb-2"
+              >
+                Personal
+              </label>
+              <div className="flex flex-column mb-3 gap-1">
+                <div className="p-inputgroup">
+                  <InputText
+                    id="CodigoReferencia"
+                    value={tramite.CodigoReferencia}
+                    onChange={(e) => {
+                      onInputTextChange(e, "CodigoReferencia");
+                    }}
+                    type="text"
+                    className="p-inputtext-sm "
+                  />
+                </div>
+                {tramiteErrors.CodigoReferencia && (
+                  <small className="p-error">
+                    {tramiteErrors.CodigoReferencia}
+                  </small>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-row justify-content-between align-items-center py-2 px-4  pb-3 border-bottom-1 border-top-1 border-gray-500">
               <label
                 htmlFor="ApellidoPaterno"
                 className="block text-900 font-medium"
@@ -1258,7 +1254,7 @@ const TramiteEmitidoNuevo = () => {
               />
             </div>
 
-            <div className="px-4">
+            <div className="py-2 px-4">
               <div
                 className="border-round-md"
                 style={{
@@ -1343,7 +1339,7 @@ const TramiteEmitidoNuevo = () => {
             </div>
           </div>
 
-          <div className="flex flex-row pb-3 px-4" style={{ gap: "1rem" }}>
+          <div className="flex flex-row py-3 px-4" style={{ gap: "1rem" }}>
             <Button
               type="button"
               // onClick={findAllTramite}
@@ -1418,4 +1414,4 @@ const TramiteEmitidoNuevo = () => {
   );
 };
 
-export default TramiteEmitidoNuevo;
+export default TramiteRecibidoAtendido;

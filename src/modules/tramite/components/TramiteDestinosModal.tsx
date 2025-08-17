@@ -7,7 +7,7 @@ import { InputSwitch, InputSwitchChangeEvent } from "primereact/inputswitch";
 import { AreaEntity } from "../../area/interfaces/AreaInterface";
 import { UsuarioEntity } from "../../usuario/interfaces/UsuarioInterface";
 
-type EstadoCreateOrUpdateProps = {
+type TramiteDestinosModalProps = {
   submitted: boolean;
   hideTramiteDestinosDialog: () => void;
   tramiteDestinosDialog: boolean;
@@ -35,7 +35,7 @@ type EstadoCreateOrUpdateProps = {
   onSwitchChange: (e: InputSwitchChangeEvent, name: string) => void;
 };
 
-const TramiteDestinosModal = (props: EstadoCreateOrUpdateProps) => {
+const TramiteDestinosModal = (props: TramiteDestinosModalProps) => {
   const validateForm = () => {
     let fieldErrors: any = {};
 

@@ -9,8 +9,8 @@ body {
 
 .scroll-container {
   overflow-y: auto;
-  scrollbar-width: thin;            /* Firefox */
-  scrollbar-color: #83787875 transparent;  /* Firefox */
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #83787875 transparent; /* Firefox */
 }
 
 /* WebKit (Chrome, Safari, Edge) */
@@ -29,7 +29,27 @@ body {
 
 .scroll-container::-webkit-scrollbar-button {
   display: none; /* Oculta las flechas de arriba y abajo */
-    height: 0;
+  height: 0;
   display: block;
   background: transparent;
+}
+
+/* Cambia el tamaño total del switch */
+.small-switch {
+  transform: scale(0.7) translate(-.5em); /* Ajusta la escala (0.7 = 70%) */
+}
+
+
+.p-menubar .p-menuitem-link:focus,
+.p-menubar .p-menuitem-link:active {
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important; /* quita el outline de PrimeReact */
+}
+
+/* Menubar item con foco (cuando PrimeReact le pone data-p-focused="true") */
+.p-menubar .p-menuitem-link[data-p-focused="true"] {
+  background: transparent !important;
+  color: inherit !important;
+  box-shadow: none !important;
 }

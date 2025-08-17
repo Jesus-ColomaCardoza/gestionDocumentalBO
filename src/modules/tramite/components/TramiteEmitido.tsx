@@ -103,21 +103,21 @@ const TramiteEmitido = () => {
                 ...af,
                 FechaInicio: af.FechaInicio ? new Date(af.FechaInicio) : null,
                 Detalle:
-                  af.TipoDocumento.Descripcion +
-                  " " +
-                  af.CodigoReferencia +
-                  " " +
-                  af.Folios +
-                  " " +
-                  af.Asunto,
+                  af.TipoDocumento?.Descripcion ||
+                  "" +
+                    " " +
+                    af.CodigoReferencia +
+                    " " +
+                    af.Folios +
+                    " " +
+                    af.Asunto,
                 Remitente: {
                   ...af.Remitente,
                   NombreCompleto:
-                    af.Remitente.Nombres +
-                    " " +
-                    af.Remitente.ApellidoPaterno +
-                    " " +
-                    af.Remitente.ApellidoMaterno,
+                    af.Remitente?.Nombres ||
+                    "" + " " + af.Remitente?.ApellidoPaterno ||
+                    "" + " " + af.Remitente?.ApellidoMaterno ||
+                    "",
                 },
                 Destinos:
                   (af.Movimiento?.length || 0) > 1
@@ -329,17 +329,31 @@ const TramiteEmitido = () => {
     </div>
   );
 
-  // templates to column tipoIdentificacion
+  // templates to column detalle
+  const idTramiteBodyTemplate = (rowData: TramiteEntity) => {
+    return (
+      <span className="hover:underline hover:text-blue-500" onClick={() => {
+        //call endpoint findone
+        //navigate tramite/seguimiento
+        navigate('../tramite/seguimiento')
+      }}>
+        {rowData.IdTramite.toString().padStart(6, "0")}
+      </span>
+    );
+  };
+
+  // templates to column detalle
   const detalleBodyTemplate = (rowData: TramiteEntity) => {
     return (
       <div className="flex flex-column gap-2">
         <p className="text-sm m-0">
-          {rowData.TipoDocumento.Descripcion.substring(0, 3) +
-            ". " +
-            rowData.CodigoReferencia +
-            " [" +
-            rowData.Folios +
-            " Folio(s)]"}
+          {rowData.TipoDocumento?.Descripcion.substring(0, 3) ||
+            "Doc" +
+              ". " +
+              rowData?.CodigoReferencia +
+              " [" +
+              rowData.Folios +
+              " Folio(s)]"}
         </p>
         <span className="text-xs text-color-secondary m-0">
           {rowData.Asunto}
@@ -353,11 +367,12 @@ const TramiteEmitido = () => {
     return (
       <div className="flex flex-column gap-2">
         <p className="text-sm m-0">
-          {rowData.Remitente.Nombres +
-            " " +
-            rowData.Remitente.ApellidoPaterno +
-            " " +
-            rowData.Remitente.ApellidoMaterno}
+          {rowData.Remitente?.Nombres || "" !== ""
+            ? rowData.Remitente.Nombres ||
+              "" + " " + rowData.Remitente.ApellidoPaterno ||
+              "" + " " + rowData.Remitente.ApellidoMaterno ||
+              ""
+            : ""}
         </p>
       </div>
     );
@@ -367,7 +382,7 @@ const TramiteEmitido = () => {
   const areaBodyTemplate = (rowData: TramiteEntity) => {
     return (
       <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.Area.Descripcion}</p>
+        <p className="text-sm m-0">{rowData.Area?.Descripcion}</p>
       </div>
     );
   };
@@ -546,6 +561,22 @@ const TramiteEmitido = () => {
                 filter
                 filterPlaceholder={col.filterPlaceholder}
                 body={detalleBodyTemplate}
+              />
+            );
+          } else if (col.field == "IdTramite") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={idTramiteBodyTemplate}
               />
             );
           } else if (col.field == "Remitente") {

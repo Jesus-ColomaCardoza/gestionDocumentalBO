@@ -17,7 +17,7 @@ import {
 
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters,  } from "../utils/Constants";
+import { columns, defaultFilters } from "../utils/Constants";
 import EstadoCreateOrUpdate from "./TramiteDestinosModal";
 import EstadoRemove from "./EstadoRemove";
 import EstadosRemove from "./EstadosRemove";
@@ -31,12 +31,17 @@ import { DropdownChangeEvent } from "primereact/dropdown";
 import UseEstado from "../../estado/hooks/UseEstado";
 import { emptyEstado } from "../../estado/utils/Constants";
 import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
+import TramiteRecibidoAtendidoModal from "./TramiteRecibidoAtendidoModal";
+import ConfirmModal from "../../utils/shared/ConfirmModal";
+import { useNavigate } from "react-router-dom";
 
 const TramiteRecibido = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseEstado();
 
   const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
+
+  const navigate = useNavigate();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -80,6 +85,14 @@ const TramiteRecibido = () => {
 
   const [removeEstadosDialog, setRemoveEstadosDialog] =
     useState<boolean>(false);
+
+  const [tramiteRecibidoAtendidoDialog, setTramiteRecibidoAtendidoDialog] =
+    useState<{
+      type: "multiple" | "simple";
+      state: boolean;
+    }>({ type: "simple", state: true });
+
+  const [confirmModal, setConfirmModal] = useState<boolean>(true);
 
   // actions CRUD - TramiteRecibido (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEstado = async () => {
@@ -278,6 +291,21 @@ const TramiteRecibido = () => {
     setRemoveEstadosDialog(false);
   };
 
+  const hideConfirmModal = () => {
+    setConfirmModal(false);
+  };
+
+  const hideTramiteRecibidoAtendidoDialog = (type: "multiple" | "simple") => {
+    setSubmitted(false);
+    // setMovimiento(emptyMovimiento);
+    setTramiteRecibidoAtendidoDialog({ type: type, state: false });
+  };
+
+  const showTramiteRecibidoAtendidoDialog = (type: "multiple" | "simple") => {
+    // setMovimiento(emptyMovimiento);
+    setTramiteRecibidoAtendidoDialog({ type: type, state: true });
+  };
+
   const confirmRemoveEstado = (estado: EstadoEntity) => {
     setEstado(estado);
     setRemoveEstadoDialog(true);
@@ -439,7 +467,9 @@ const TramiteRecibido = () => {
         />
         <Button
           type="button"
-          onClick={findAllEstado}
+          onClick={() => {
+            navigate("./derivado");
+          }}
           size="small"
           style={{
             padding: "0",
@@ -456,7 +486,7 @@ const TramiteRecibido = () => {
         </Button>
         <Button
           type="button"
-          onClick={showCreateEstadoDialog}
+          onClick={() => showTramiteRecibidoAtendidoDialog("multiple")}
           size="small"
           style={{
             padding: "0",
@@ -543,7 +573,7 @@ const TramiteRecibido = () => {
     </div>
   );
 
-    // templates to component Toolbar
+  // templates to component Toolbar
   const items: MenuItem[] = [
     {
       label: "Update",
@@ -892,19 +922,24 @@ const TramiteRecibido = () => {
         ></Column>
       </DataTable>
 
-      {/* <EstadoCreateOrUpdate
+      <TramiteRecibidoAtendidoModal
         submitted={submitted}
-        estado={estado}
-        esquemaEstados={esquemaEstados}
-        estadoDialog={estadoDialog}
-        hideDialog={hideDialog}
-        createEstado={createEstado}
-        updateEstado={updateEstado}
-        onInputChange={onInputChange}
-        onDropdownChange={onDropdownChange}
-        onActivoChange={onActivoChange}
-        loadingEstadoCreateOrUpdate={loadingEstadoCreateOrUpdate}
-      /> */}
+        hideTramiteRecibidoAtendidoDialog={hideTramiteRecibidoAtendidoDialog}
+        showTramiteRecibidoAtendidoDialog={showTramiteRecibidoAtendidoDialog}
+        tramiteRecibidoAtendidoDialog={tramiteRecibidoAtendidoDialog}
+        // selectedTramiteDestinos={selectedTramiteDestinos}
+        // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
+      />
+
+      <ConfirmModal
+        titleModal="Atención!!!"
+        typeMessage="info"
+        message="¿Estás seguro que desea anular el estado atendido?"
+        typeButton="info"
+        state={confirmModal}
+        hideDialog={hideConfirmModal}
+        callBack={() => {}}
+      />
 
       <EstadoRemove
         estado={estado}

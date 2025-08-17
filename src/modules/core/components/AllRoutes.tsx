@@ -25,6 +25,11 @@ import TramiteEmitido from "../../tramite/components/TramiteEmitido";
 import Constante from "../../constante/components/Constante";
 import TramiteDocumento from "../../tramite/components/TramiteDocumento";
 import TramiteSeguimiento from "../../tramite/components/TramiteSeguimiento";
+import TramiteRecibidoDerivado from "../../tramite/components/TramiteRecibidoDerivado";
+import TramiteRecibidoDerivados from "../../tramite/components/TramiteRecibidoDerivados";
+import TramiteRecibidoExterno from "../../tramite/components/TramiteRecibidoExterno";
+import TramiteRecibidoAtendido from "../../tramite/components/TramiteRecibidoAtendido";
+import UsuarioPerfil from "../../usuario/components/UsuarioPerfil";
 
 const AllRoutes = () => {
   return (
@@ -42,12 +47,18 @@ const AllRoutes = () => {
             <Route path="/dashboard" element={<Dashboard />}></Route>
 
             <Route path="/" element={<Dashboard />}>
+              <Route path="perfil_Usuario" element={<UsuarioPerfil />}></Route>
+
               <Route path="firma_digital/archivos_digitales" element={<FileManager />}></Route>
 
               <Route path="tramite/seguimiento" element={<TramiteSeguimiento/>}></Route>
               <Route path="tramite/documento" element={<TramiteDocumento/>}></Route>
               <Route path="tramite/pendiente" element={<TramitePendiente />}></Route>
               <Route path="tramite/recibido" element={<TramiteRecibido />}></Route>
+              <Route path="tramite/recibido/externo" element={<TramiteRecibidoExterno />}></Route>
+              <Route path="tramite/recibido/atendido" element={<TramiteRecibidoAtendido />}></Route>
+              <Route path="tramite/recibido/derivado" element={<TramiteRecibidoDerivado />}></Route>
+              <Route path="tramite/recibido/derivados" element={<TramiteRecibidoDerivados />}></Route>
               <Route path="tramite/emitido" element={<TramiteEmitido />}></Route>
               <Route path="tramite/emitido/nuevo" element={<TramiteEmitidoNuevo />}></Route>
               
