@@ -30,6 +30,7 @@ import TramiteRecibidoDerivados from "../../tramite/components/TramiteRecibidoDe
 import TramiteRecibidoExterno from "../../tramite/components/TramiteRecibidoExterno";
 import TramiteRecibidoAtendido from "../../tramite/components/TramiteRecibidoAtendido";
 import UsuarioPerfil from "../../usuario/components/UsuarioPerfil";
+import Archivador from "../../archivador/components/Archivador";
 
 const AllRoutes = () => {
   return (
@@ -74,6 +75,8 @@ const AllRoutes = () => {
               <Route path="mantenimiento/tipo_usuario" element={<TipoUsuario />}></Route>
               <Route path="mantenimiento/tipo_tramite" element={<TipoTramite />}></Route>
               <Route path="mantenimiento/tipo_identificacion" element={<TipoIdentificacion />}></Route>
+
+              <Route path="otros/archivador" element={<Archivador />}></Route>
             </Route>
 
             <Route path="nofound" element={<NotFound />}></Route>

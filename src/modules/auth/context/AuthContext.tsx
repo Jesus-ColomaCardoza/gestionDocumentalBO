@@ -94,6 +94,9 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/mantenimiento/tipo_usuario",
     "/mantenimiento/tipo_tramite",
     "/mantenimiento/tipo_identificacion",
+
+    //otros
+    "/otros/archivador", 
   ];
 
   //functions

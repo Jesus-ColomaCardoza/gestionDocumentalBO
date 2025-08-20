@@ -518,6 +518,41 @@ const SideBar = (props: SideBarProps) => {
             </ul>
           </li>
         </ul>
+        <ul className="list-none px-2">
+          <li>
+            <StyleClass
+              nodeRef={btnRef1}
+              selector="@next"
+              enterFromClassName="hidden"
+              enterActiveClassName="slidedown"
+              leaveToClassName="hidden"
+              leaveActiveClassName="slideup"
+            >
+              <div
+                ref={btnRef1}
+                className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
+              >
+                <span className="font-medium">Otros</span>
+                <i className="pi pi-chevron-down"></i>
+                <Ripple />
+              </div>
+            </StyleClass>
+            <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
+              <li>
+                <Link
+                  to={"../otros/archivador"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-file mr-2"></i>
+                  <span className="font-medium text-sm">
+                    Archivadores
+                  </span>
+                  <Ripple />
+                </Link>
+              </li>
+            </ul>
+          </li>
+        </ul>
         {/* <ul className="list-none px-2">
           <li>
             <StyleClass
