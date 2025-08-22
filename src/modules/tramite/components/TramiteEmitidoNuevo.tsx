@@ -2,9 +2,12 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState, useEffect, useRef } from "react";
 import UseTramite from "../hooks/UseTramite";
-import { TramiteEntity } from "../interfaces/TramiteInterface";
+import {
+  TramiteEmitidoCreate,
+  TramiteEntity,
+} from "../interfaces/TramiteInterface";
 import { Toast } from "primereact/toast";
-import { emptyTramite } from "../utils/Constants";
+import { emptyTramite, emptyTramiteEmitidoCreate } from "../utils/Constants";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useTheme } from "../../../ThemeContext";
@@ -69,7 +72,8 @@ const TramiteEmitidoNuevo = () => {
   const [loadingTramiteCreateOrUpdate, setLoadingTramiteCreateOrUpdate] =
     useState<boolean>(false);
 
-  const [tramite, setTramite] = useState<TramiteEntity>(emptyTramite);
+  const [tramiteEmitidoCreate, setTramiteEmitidoCreate] =
+    useState<TramiteEmitidoCreate>(emptyTramiteEmitidoCreate);
 
   const [movimiento, setMovimiento] =
     useState<MovimientoEntity>(emptyMovimiento);
@@ -116,11 +120,11 @@ const TramiteEmitidoNuevo = () => {
   const createTramiteEmitido = async () => {
     setSubmitted(true);
     if (
-      tramite.Asunto.trim() &&
-      tramite.IdTipoDocumento != 0 &&
-      tramite.CodigoReferencia.trim() &&
-      tramite.IdRemitente != 0 &&
-      tramite.Folios != 0
+      tramiteEmitidoCreate.Asunto.trim() &&
+      tramiteEmitidoCreate.IdTipoDocumento != 0 &&
+      tramiteEmitidoCreate.CodigoReferenciaDoc.trim() &&
+      tramiteEmitidoCreate.IdRemitente != 0 &&
+      tramiteEmitidoCreate.Folios != 0
     ) {
       // setLoadingTramiteCreateOrUpdate(true);
       let arrayAnexosUpload: AnexoEntity[] = [];
@@ -176,24 +180,24 @@ const TramiteEmitidoNuevo = () => {
         return;
       }
 
-      //2 we create tramite
+      //2 we create tramiteEmitidoCreate
       let tramiteCreateEmitido = await createEmitido({
-        CodigoReferencia: tramite.CodigoReferencia,
-        Asunto: tramite.Asunto,
-        // Descripcion: tramite.Descripcion,
-        Observaciones: tramite.Observaciones,
+        //data documento
+        CodigoReferenciaDoc: tramiteEmitidoCreate.CodigoReferenciaDoc,
+        Asunto: tramiteEmitidoCreate.Asunto,
+        Observaciones: tramiteEmitidoCreate.Observaciones,
+        Folios: tramiteEmitidoCreate.Folios,
+        IdTipoDocumento: tramiteEmitidoCreate.IdTipoDocumento,
+
+        //data tramite
         FechaInicio: new Date().toISOString(),
-        // FechaFin:tramite.FechaFin,
-        Folios: tramite.Folios,
+        IdTipoTramite: tramiteEmitidoCreate.IdTipoTramite || 1, // IdTipoTramite - Interno - 1
+        IdAreaEmision: tramiteEmitidoCreate.IdAreaEmision,
+        IdEstado: tramiteEmitidoCreate.IdEstado || 12, // IdTipoTramite - Pendiente - 12
+        IdRemitente: tramiteEmitidoCreate.IdRemitente,
+        Activo: tramiteEmitidoCreate.Activo,
 
-        IdTipoTramite: tramite.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
-
-        IdTipoDocumento: tramite.IdTipoDocumento,
-        IdAreaEmision: tramite.IdAreaEmision,
-        IdEstado: tramite.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
-        IdRemitente: tramite.IdRemitente,
-        Activo: tramite.Activo,
-
+        //others
         DigitalFiles: selectedDigitalFiles,
         TramiteDestinos: selectedTramiteDestinos,
         Anexos: arrayAnexosUpload,
@@ -224,7 +228,7 @@ const TramiteEmitidoNuevo = () => {
 
       // setSelectedAnexos([])
       // setFileManagerDialog(false);
-      // setTramite(emptyTramite);
+      // setTramiteEmitidoCreate(emptyTramite);
     }
   };
 
@@ -501,7 +505,7 @@ const TramiteEmitidoNuevo = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    setTramite((prev) => ({
+    setTramiteEmitidoCreate((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -512,7 +516,7 @@ const TramiteEmitidoNuevo = () => {
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
     const val = e.value ?? null;
 
-    setTramite((prev) => ({
+    setTramiteEmitidoCreate((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -525,12 +529,12 @@ const TramiteEmitidoNuevo = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _tramite = { ...tramite };
+    let _tramite = { ...tramiteEmitidoCreate };
 
     // @ts-ignore
     _tramite[name] = val;
 
-    setTramite(_tramite);
+    setTramiteEmitidoCreate(_tramite);
 
     setTramiteErrors((prev: any) => ({ ...prev, [name]: undefined }));
   };
@@ -543,12 +547,12 @@ const TramiteEmitidoNuevo = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    let _tramite: any = { ...tramite };
+    let _tramite: any = { ...tramiteEmitidoCreate };
 
     _tramite[nameTagFK ? nameTagFK : nameFK] = val[nameFK];
     _tramite[nameObj] = { ...val };
 
-    setTramite(_tramite);
+    setTramiteEmitidoCreate(_tramite);
 
     setTramiteErrors((prev: any) => ({
       ...prev,
@@ -606,27 +610,27 @@ const TramiteEmitidoNuevo = () => {
   const validateForm = () => {
     let fieldErrors: any = {};
 
-    if (!tramite.Asunto.trim()) {
+    if (!tramiteEmitidoCreate.Asunto.trim()) {
       fieldErrors.Asunto = "Asunto es obligatorio.";
     }
 
-    if (tramite.IdTipoDocumento == 0) {
+    if (tramiteEmitidoCreate.IdTipoDocumento == 0) {
       fieldErrors.IdTipoDocumento = "Tipo de documento es obligatorio.";
     }
 
-    if (!tramite.CodigoReferencia.trim()) {
-      fieldErrors.CodigoReferencia = "Codigo de referencia es obligatoria.";
+    if (!tramiteEmitidoCreate.CodigoReferenciaDoc.trim()) {
+      fieldErrors.CodigoReferenciaDoc = "Codigo de referencia es obligatoria.";
     }
 
-    if (tramite.IdRemitente == 0) {
+    if (tramiteEmitidoCreate.IdRemitente == 0) {
       fieldErrors.IdRemitente = "Remitente es obligatorio.";
     }
 
-    if (tramite.Folios == 0) {
+    if (tramiteEmitidoCreate.Folios == 0) {
       fieldErrors.Folios = "Folios es obligatorio.";
     }
 
-    if (tramite.IdAreaEmision == 0) {
+    if (tramiteEmitidoCreate.IdAreaEmision == 0) {
       fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
     }
 
@@ -659,7 +663,7 @@ const TramiteEmitidoNuevo = () => {
           </div>
         }
       />
-      
+
       <div className="flex flex-row flex-wrap justify-content-between">
         <div
           className="flex flex-column flex-wrap gap-1  border-solid border-1 border-gray-500 border-round-md"
@@ -683,7 +687,17 @@ const TramiteEmitidoNuevo = () => {
             >
               <Button
                 type="button"
-                onClick={showFileManagerDialog}
+                onClick={() => {
+                  if (selectedDigitalFiles.length < 1) {
+                    showFileManagerDialog();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Ya tiene un archivo digital seleccionado`,
+                      life: 3000,
+                    });
+                  }
+                }}
                 size="small"
                 severity="secondary"
                 style={{
@@ -703,7 +717,15 @@ const TramiteEmitidoNuevo = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  loadFilesRef.current?.click();
+                  if (selectedDigitalFiles.length < 1) {
+                    loadFilesRef.current?.click();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Ya tiene un archivo digital seleccionado`,
+                      life: 3000,
+                    });
+                  }
                 }}
                 size="small"
                 style={{
@@ -842,7 +864,7 @@ const TramiteEmitidoNuevo = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={tramite.TipoDocumento}
+                    value={tramiteEmitidoCreate.TipoDocumento}
                     onChange={(e) => {
                       onDropdownChange(e, "TipoDocumento", "IdTipoDocumento");
                     }}
@@ -874,27 +896,27 @@ const TramiteEmitidoNuevo = () => {
               }}
             >
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="CodigoReferenciaDoc"
                 className="block text-900 text-sm font-medium mb-2"
               >
-                Nº de referencia
+                Código de referencia
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
+                    id="CodigoReferenciaDoc"
+                    value={tramiteEmitidoCreate.CodigoReferenciaDoc}
                     onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
+                      onInputTextChange(e, "CodigoReferenciaDoc");
                     }}
                     type="text"
-                    placeholder="Nº de referencia"
+                    placeholder="Código de referencia"
                     className="p-inputtext-sm "
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
+                {tramiteErrors.CodigoReferenciaDoc && (
                   <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
+                    {tramiteErrors.CodigoReferenciaDoc}
                   </small>
                 )}
               </div>
@@ -916,7 +938,7 @@ const TramiteEmitidoNuevo = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={tramite.Remitente}
+                    value={tramiteEmitidoCreate.Remitente}
                     onChange={(e) => {
                       onDropdownChange(
                         e,
@@ -960,7 +982,7 @@ const TramiteEmitidoNuevo = () => {
                 <div className="p-inputgroup">
                   <InputNumber
                     id="Folios"
-                    value={tramite.Folios}
+                    value={tramiteEmitidoCreate.Folios}
                     onChange={(e) => {
                       onInputNumberChange(e, "Folios");
                     }}
@@ -992,7 +1014,7 @@ const TramiteEmitidoNuevo = () => {
                 <div className="p-inputgroup">
                   <InputTextarea
                     id="Asunto"
-                    value={tramite.Asunto}
+                    value={tramiteEmitidoCreate.Asunto}
                     onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                     autoFocus
                     rows={2}
@@ -1024,7 +1046,7 @@ const TramiteEmitidoNuevo = () => {
                 <div className="p-inputgroup">
                   <InputTextarea
                     id="Observaciones"
-                    value={tramite.Observaciones}
+                    value={tramiteEmitidoCreate.Observaciones}
                     onChange={(e) => onInputTextAreaChange(e, "Observaciones")}
                     rows={3}
                   />
@@ -1065,12 +1087,12 @@ const TramiteEmitidoNuevo = () => {
                   htmlFor="AreaEmision"
                   className="block text-900 text-sm font-medium mb-2"
                 >
-                  Área Emisión
+                  Área emisión
                 </label>
                 <div className="flex flex-column  gap-1">
                   <div className="p-inputgroup">
                     <Dropdown
-                      value={tramite.Area}
+                      value={tramiteEmitidoCreate.Area}
                       onChange={(e) => {
                         onDropdownChange(e, "Area", "IdArea", "IdAreaEmision");
                       }}
@@ -1343,7 +1365,7 @@ const TramiteEmitidoNuevo = () => {
             </div>
           </div>
 
-          <div className="flex flex-row pb-3 px-4" style={{ gap: "1rem" }}>
+          <div className="flex flex-row py-3 px-4" style={{ gap: "1rem" }}>
             <Button
               type="button"
               // onClick={findAllTramite}

@@ -34,6 +34,7 @@ import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
 import TramiteRecibidoAtendidoModal from "./TramiteRecibidoAtendidoModal";
 import ConfirmModal from "../../utils/shared/ConfirmModal";
 import { useNavigate } from "react-router-dom";
+import TramiteArchivarModal from "./TramiteArchivarModal";
 
 const TramiteRecibido = () => {
   // custom hooks
@@ -90,9 +91,12 @@ const TramiteRecibido = () => {
     useState<{
       type: "multiple" | "simple";
       state: boolean;
-    }>({ type: "simple", state: true });
+    }>({ type: "simple", state: false }); //close
 
-  const [confirmModal, setConfirmModal] = useState<boolean>(true);
+  const [tramiteArchivarDialog, setTramiteArchivarDialog] =
+    useState<boolean>(true);
+
+  const [confirmModal, setConfirmModal] = useState<boolean>(false);//close
 
   // actions CRUD - TramiteRecibido (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEstado = async () => {
@@ -289,6 +293,12 @@ const TramiteRecibido = () => {
 
   const hideRemoveEstadosDialog = () => {
     setRemoveEstadosDialog(false);
+  };
+
+  const hideTramiteArchivarDialog = () => {
+    setSubmitted(false);
+    // setMovimiento(emptyMovimiento);
+    setTramiteArchivarDialog(false);
   };
 
   const hideConfirmModal = () => {
@@ -929,6 +939,12 @@ const TramiteRecibido = () => {
         tramiteRecibidoAtendidoDialog={tramiteRecibidoAtendidoDialog}
         // selectedTramiteDestinos={selectedTramiteDestinos}
         // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
+      />
+
+      <TramiteArchivarModal
+        submitted={submitted}
+        hideTramiteArchivarDialog={hideTramiteArchivarDialog}
+        tramiteArchivarDialog={tramiteArchivarDialog}
       />
 
       <ConfirmModal

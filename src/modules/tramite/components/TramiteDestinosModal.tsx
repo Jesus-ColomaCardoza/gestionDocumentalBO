@@ -91,7 +91,7 @@ const TramiteDestinosModal = (props: TramiteDestinosModalProps) => {
           htmlFor="AreaEmision"
           className="block text-900 text-sm font-medium mb-2"
         >
-          Área Emisión
+          Área destino
         </label>
         <div className="flex flex-column  gap-1">
           <div className="p-inputgroup">

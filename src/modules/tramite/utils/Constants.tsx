@@ -1,7 +1,10 @@
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ColumnMeta } from "../../utils/Interfaces";
 import { DataTableFilterMeta } from "primereact/datatable";
-import { TramiteEntity } from "../interfaces/TramiteInterface";
+import {
+  TramiteEmitidoCreate,
+  TramiteEntity,
+} from "../interfaces/TramiteInterface";
 
 export const columns: ColumnMeta[] = [
   {
@@ -97,21 +100,14 @@ export const defaultFilters: DataTableFilterMeta = {
 
 export let emptyTramite: TramiteEntity = {
   IdTramite: 0,
-  CodigoReferencia: "",
-  Asunto: "",
+  CodigoReferenciaTram: "",
   Descripcion: "",
-  Observaciones: "",
+  Detalle: "",
   FechaInicio: null,
   FechaFin: null,
-  Folios: 0,
   IdTipoTramite: 0,
   TipoTramite: {
     IdTipoTramite: 0,
-    Descripcion: "",
-  },
-  IdTipoDocumento: 0,
-  TipoDocumento: {
-    IdTipoDocumento: 0,
     Descripcion: "",
   },
   IdAreaEmision: 0,
@@ -124,6 +120,21 @@ export let emptyTramite: TramiteEntity = {
     IdEstado: 0,
     Descripcion: "",
   },
+  IdDocumento: 0,
+  Documento: {
+    IdDocumento: 0,
+    NombreDocumento: "",
+    UrlDocumento: "",
+    CodigoReferenciaDoc: "",
+    Asunto: "",
+    Observaciones: "",
+    Folios: 0,
+    TipoDocumento: {
+      IdTipoDocumento: 0,
+      Descripcion: "",
+    },
+    Anexo: [],
+  },
   IdRemitente: 0,
   Remitente: {
     IdUsuario: 0,
@@ -131,9 +142,47 @@ export let emptyTramite: TramiteEntity = {
     ApellidoPaterno: "",
     ApellidoMaterno: "",
   },
+  IdArchivador: 0,
+  Archivador: {
+    IdArchivador: 0,
+    Nombre: "",
+  },
   Activo: true,
   CreadoEl: new Date(),
   CreadoPor: "",
   ModificadoEl: new Date(),
   ModificadoPor: "",
+};
+
+export let emptyTramiteEmitidoCreate: TramiteEmitidoCreate = {
+  IdTramite: 0,
+  FechaInicio: null,
+  IdTipoTramite: 0,
+  IdAreaEmision: 0,
+  Area: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  IdRemitente: 0,
+  Remitente: {
+    IdUsuario: 0,
+    Nombres: "",
+    ApellidoPaterno: "",
+    ApellidoMaterno: "",
+  },
+  IdEstado: 0,
+  Activo: true,
+  CreadoEl: new Date(),
+  CreadoPor: "",
+
+  //data documento
+  CodigoReferenciaDoc: "",
+  Asunto: "",
+  Observaciones: "",
+  Folios: 0,
+  IdTipoDocumento: 0,
+  TipoDocumento: {
+    IdTipoDocumento: 0,
+    Descripcion: "",
+  },
 };

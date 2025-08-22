@@ -6,18 +6,17 @@ import { Message } from "../../utils/Interfaces";
 type Fecha = Date | string | null;
 export interface TramiteEntity {
   IdTramite: number;
-  CodigoReferencia: string;
-  Asunto: string;
+  CodigoReferenciaTram: string;
   Descripcion: string;
-  Observaciones: string;
+  Detalle: string;
   FechaInicio: Fecha;
   FechaFin: Fecha;
-  Folios: number;
-  IdRemitente: number;
   IdTipoTramite: number;
-  IdTipoDocumento: number;
   IdAreaEmision: number;
+  IdRemitente: number;
   IdEstado: number;
+  IdDocumento: number;
+  IdArchivador: number;
   Activo: boolean;
   CreadoEl: Date;
   CreadoPor: string;
@@ -25,10 +24,6 @@ export interface TramiteEntity {
   ModificadoPor: string;
   TipoTramite: {
     IdTipoTramite: number;
-    Descripcion: string;
-  };
-  TipoDocumento: {
-    IdTipoDocumento: number;
     Descripcion: string;
   };
   Area: {
@@ -45,16 +40,35 @@ export interface TramiteEntity {
     IdEstado: number;
     Descripcion: string;
   };
+  Documento: {
+    IdDocumento: number,
+    NombreDocumento: string,
+    UrlDocumento: string,
+    CodigoReferenciaDoc: string,
+    Asunto: string,
+    Observaciones: string,
+    Folios: number,
+    TipoDocumento: {
+      IdTipoDocumento: number,
+      Descripcion: string,
+    },
+    Anexo: {
+      IdAnexo: number,
+      NombreAnexo: string,
+      UrlAnexo: string,
+    }[]
+  },
+  Archivador: {
+    IdArchivador: number;
+    Nombre: string;
+  };
+
   Anexo?: {
     IdAnexo: number,
     NombreAnexo: string,
     UrlAnexo: string,
   }[];
-  Documento?: {
-    IdDocumento: number,
-    NombreDocumento: string,
-    UrlDocumento: string,
-  }[];
+
   Movimiento?: {
     IdMovimiento: number,
     AreaDestino: {
@@ -72,25 +86,42 @@ export interface TramiteCreate {
   CreadoPor?: string;
 }
 export interface TramiteEmitidoCreate {
+  //data tramite
   IdTramite?: number;
-  CodigoReferencia: string;
-  Asunto: string;
-  Descripcion?: string;//
-  Observaciones: string;
   FechaInicio: Fecha;
-  FechaFin?: Fecha;//
-  Folios: number;
-  IdRemitente: number;
   IdTipoTramite: number;
-  IdTipoDocumento: number;
-  IdAreaEmision: number;
   IdEstado: number;
+  IdRemitente: number;
+  Remitente?: {
+    IdUsuario: number,
+    Nombres: string,
+    ApellidoPaterno: string,
+    ApellidoMaterno: string,
+  },
+  IdAreaEmision: number;
+  Area?: {
+    IdArea: number;
+    Descripcion: string;
+  };
   Activo: boolean;
   CreadoEl?: Date;
   CreadoPor?: string;
-  DigitalFiles: FileManagerEntity[];
-  TramiteDestinos: MovimientoEntity[];
-  Anexos: AnexoEntity[]
+
+  //data documento
+  CodigoReferenciaDoc: string;
+  Asunto: string;
+  Observaciones: string;
+  Folios: number;
+  IdTipoDocumento: number;
+  TipoDocumento?: {
+    IdTipoDocumento: number;
+    Descripcion: string;
+  };
+
+  //data others
+  DigitalFiles?: FileManagerEntity[];
+  TramiteDestinos?: MovimientoEntity[];
+  Anexos?: AnexoEntity[]
 }
 export interface TramiteUpdate {
   IdTramite?: number;

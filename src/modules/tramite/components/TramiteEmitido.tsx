@@ -103,21 +103,21 @@ const TramiteEmitido = () => {
                 ...af,
                 FechaInicio: af.FechaInicio ? new Date(af.FechaInicio) : null,
                 Detalle:
-                  af.TipoDocumento?.Descripcion ||
-                  "" +
-                    " " +
-                    af.CodigoReferencia +
-                    " " +
-                    af.Folios +
-                    " " +
-                    af.Asunto,
+                  (af.Documento?.TipoDocumento?.Descripcion || "") +
+                  " " +
+                  (af.Documento?.CodigoReferenciaDoc || "") +
+                  " " +
+                  (af.Documento?.Folios || "") +
+                  " " +
+                  (af.Documento?.Asunto || ""),
                 Remitente: {
                   ...af.Remitente,
                   NombreCompleto:
-                    af.Remitente?.Nombres ||
-                    "" + " " + af.Remitente?.ApellidoPaterno ||
-                    "" + " " + af.Remitente?.ApellidoMaterno ||
-                    "",
+                    (af.Remitente?.Nombres || "") +
+                    " " +
+                    (af.Remitente?.ApellidoPaterno || "") +
+                    " " +
+                    (af.Remitente?.ApellidoMaterno || ""),
                 },
                 Destinos:
                   (af.Movimiento?.length || 0) > 1
@@ -332,11 +332,14 @@ const TramiteEmitido = () => {
   // templates to column detalle
   const idTramiteBodyTemplate = (rowData: TramiteEntity) => {
     return (
-      <span className="hover:underline hover:text-blue-500" onClick={() => {
-        //call endpoint findone
-        //navigate tramite/seguimiento
-        navigate('../tramite/seguimiento')
-      }}>
+      <span
+        className="hover:underline hover:text-blue-500"
+        onClick={() => {
+          //call endpoint findone
+          //navigate tramite/seguimiento
+          navigate("../tramite/seguimiento");
+        }}
+      >
         {rowData.IdTramite.toString().padStart(6, "0")}
       </span>
     );
@@ -347,16 +350,17 @@ const TramiteEmitido = () => {
     return (
       <div className="flex flex-column gap-2">
         <p className="text-sm m-0">
-          {rowData.TipoDocumento?.Descripcion.substring(0, 3) ||
-            "Doc" +
-              ". " +
-              rowData?.CodigoReferencia +
-              " [" +
-              rowData.Folios +
-              " Folio(s)]"}
+          {rowData.Documento
+            ? `${
+                rowData.Documento.TipoDocumento?.Descripcion?.substring(0, 3) ??
+                "Doc"
+              }. ${rowData.Documento.CodigoReferenciaDoc ?? ""} [${
+                rowData.Documento.Folios ?? 0
+              } Folio(s)]`
+            : ""}
         </p>
         <span className="text-xs text-color-secondary m-0">
-          {rowData.Asunto}
+          {rowData.Documento?.Asunto || ""}
         </span>
       </div>
     );
@@ -367,11 +371,10 @@ const TramiteEmitido = () => {
     return (
       <div className="flex flex-column gap-2">
         <p className="text-sm m-0">
-          {rowData.Remitente?.Nombres || "" !== ""
-            ? rowData.Remitente.Nombres ||
-              "" + " " + rowData.Remitente.ApellidoPaterno ||
-              "" + " " + rowData.Remitente.ApellidoMaterno ||
-              ""
+          {rowData.Remitente
+            ? `${rowData.Remitente.Nombres ?? ""} ${
+                rowData.Remitente.ApellidoPaterno ?? ""
+              } ${rowData.Remitente.ApellidoMaterno ?? ""}`
             : ""}
         </p>
       </div>
