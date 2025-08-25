@@ -164,7 +164,7 @@ const TramiteArchivarModal = (props: TramiteArchivarModalProps) => {
             htmlFor="CodigoReferencia"
             className="block text-900 text-sm font-medium mb-2"
           >
-            Asunto
+            Detalle
           </label>
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">

@@ -77,10 +77,67 @@ export interface TramiteEntity {
   }[]
 }
 
+export interface TramitePendienteEntity {
+  Documento: {
+    IdDocumento: number,
+    CodigoReferenciaDoc: string,
+    Asunto: string,
+    Observaciones: string,
+    Folios: number,
+    TipoDocumento: {
+      IdTipoDocumento: number,
+      Descripcion: string,
+    },
+  },
+  AreaOrigen: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  AreaDestino: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  Motivo: string;
+  FechaMovimiento: Fecha,
+  Tramite: {
+    IdTramite: number;
+    CodigoReferenciaTram: string;
+    Descripcion: string;
+    FechaInicio: Fecha;
+    FechaFin: Fecha;
+    IdTipoTramite: number;
+    IdRemitente: number;
+    IdEstado: number;
+    IdDocumento: number;
+    TipoTramite: {
+      IdTipoTramite: number;
+      Descripcion: string;
+    };
+    Remitente: {
+      IdUsuario: number;
+      Nombres: string;
+      ApellidoPaterno: string;
+      ApellidoMaterno: string;
+    };
+    Estado: {
+      IdEstado: number;
+      Descripcion: string;
+    };
+    Documento: {
+      IdDocumento: number,
+      CodigoReferenciaDoc: string,
+      Asunto: string,
+      Observaciones: string,
+      Folios: number,
+      TipoDocumento: {
+        IdTipoDocumento: number,
+        Descripcion: string,
+      },
+    },
+  }
+}
+
 export interface TramiteCreate {
-  IdTramite?: number;
-  Descripcion: string;
-  IdEsquemaTramite?: number;
   Activo: boolean;
   CreadoEl?: Date | string;
   CreadoPor?: string;
@@ -124,9 +181,6 @@ export interface TramiteEmitidoCreate {
   Anexos?: AnexoEntity[]
 }
 export interface TramiteUpdate {
-  IdTramite?: number;
-  Descripcion?: string;
-  IdEsquemaTramite?: number;
   Activo?: boolean;
   ModificadoEl?: Date | string;
   ModificadoPor?: string;

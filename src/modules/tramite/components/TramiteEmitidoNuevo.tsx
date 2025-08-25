@@ -351,10 +351,13 @@ const TramiteEmitidoNuevo = () => {
 
       const formData = new FormData();
 
+      
+      
       Array.from(files).forEach((fileUpload) => {
         formData.append("file", fileUpload);
+        console.log(fileUpload);
       });
-
+      
       const fileUpload = await createFile(formData);
 
       if (fileUpload?.message.msgId == 0) {
@@ -717,7 +720,7 @@ const TramiteEmitidoNuevo = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  if (selectedDigitalFiles.length < 1) {
+                  if (selectedDigitalFiles?.length < 1) {
                     loadFilesRef.current?.click();
                   } else {
                     toast.current?.show({
