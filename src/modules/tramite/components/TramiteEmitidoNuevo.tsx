@@ -72,6 +72,9 @@ const TramiteEmitidoNuevo = () => {
   const [loadingTramiteCreateOrUpdate, setLoadingTramiteCreateOrUpdate] =
     useState<boolean>(false);
 
+  const [loadingTramiteEmitidoNuevo, setLoadingTramiteEmitidoNuevo] =
+    useState<boolean>(false);
+
   const [tramiteEmitidoCreate, setTramiteEmitidoCreate] =
     useState<TramiteEmitidoCreate>(emptyTramiteEmitidoCreate);
 
@@ -126,7 +129,7 @@ const TramiteEmitidoNuevo = () => {
       tramiteEmitidoCreate.IdRemitente != 0 &&
       tramiteEmitidoCreate.Folios != 0
     ) {
-      // setLoadingTramiteCreateOrUpdate(true);
+      setLoadingTramiteEmitidoNuevo(true);
       let arrayAnexosUpload: AnexoEntity[] = [];
 
       //1 we create anexos physical files
@@ -203,7 +206,7 @@ const TramiteEmitidoNuevo = () => {
         Anexos: arrayAnexosUpload,
       });
 
-      // setLoadingTramiteCreateOrUpdate(false);
+      setLoadingTramiteEmitidoNuevo(false);
 
       if (
         tramiteCreateEmitido?.message.msgId == 0 &&
@@ -327,7 +330,7 @@ const TramiteEmitidoNuevo = () => {
     const files = event.target.files;
 
     if (files && files.length > 0) {
-      // setLoadingDocumentoCreateOrUpdate(true);
+      // setLoadingTramiteEmitidoNuevo(true);
 
       // we validate if there is some file exceeds the limit size
       const invalidFiles = Array.from(files).filter(
@@ -351,13 +354,11 @@ const TramiteEmitidoNuevo = () => {
 
       const formData = new FormData();
 
-      
-      
       Array.from(files).forEach((fileUpload) => {
         formData.append("file", fileUpload);
         console.log(fileUpload);
       });
-      
+
       const fileUpload = await createFile(formData);
 
       if (fileUpload?.message.msgId == 0) {
@@ -377,7 +378,7 @@ const TramiteEmitidoNuevo = () => {
           Activo: true,
         });
 
-        // setLoadingDocumentoCreateOrUpdate(false);
+        // setLoadingTramiteEmitidoNuevo(false);
 
         if (documentoCreate?.message.msgId == 0 && documentoCreate.registro) {
           setSelectedDigitalFiles((prev) => [
@@ -1391,6 +1392,8 @@ const TramiteEmitidoNuevo = () => {
             </Button>
 
             <Button
+              className="px-2"
+              loading={loadingTramiteEmitidoNuevo}
               type="button"
               onClick={() => {
                 if (validateForm()) {

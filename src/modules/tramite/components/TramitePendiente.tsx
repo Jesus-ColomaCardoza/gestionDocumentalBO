@@ -17,7 +17,11 @@ import {
 
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters } from "../utils/Constants";
+import {
+  columnsTramitePendiente,
+  defaultFiltersTramitePendiente,
+  emptyTramitePendiente,
+} from "../utils/Constants";
 import EstadoCreateOrUpdate from "./TramiteDestinosModal";
 import EstadoRemove from "./EstadoRemove";
 import EstadosRemove from "./EstadosRemove";
@@ -36,14 +40,24 @@ import ConfirmModal from "../../utils/shared/ConfirmModal";
 import TramiteDestinosModal from "./TramiteDestinosModal";
 import TramiteDestailsModal from "./TramiteDetailsModal";
 import TramiteDetailsModal from "./TramiteDetailsModal";
+import UseTramite from "../hooks/UseTramite";
+import { useAuth } from "../../auth/context/AuthContext";
+import { TramitePendienteEntity } from "../interfaces/TramiteInterface";
+import { useTheme } from "../../../ThemeContext";
 
 const TramitePendiente = () => {
   // custom hooks
+  const { userAuth } = useAuth()!;
+
   const { create, findAll, findOne, update, remove } = UseEstado();
+
+  const { findAllPendientes } = UseTramite();
 
   const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
 
   const navigate = useNavigate();
+
+  const { themePrimeFlex, switchTheme } = useTheme();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -53,12 +67,14 @@ const TramitePendiente = () => {
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
 
-  const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
+  const [filters, setFilters] = useState<DataTableFilterMeta>(
+    defaultFiltersTramitePendiente
+  );
 
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
 
   const [visibleColumns, setVisibleColumns] = useState<ColumnMeta[]>(
-    columns.filter((col: ColumnMeta) => col.show)
+    columnsTramitePendiente.filter((col: ColumnMeta) => col.show)
   );
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -68,7 +84,18 @@ const TramitePendiente = () => {
 
   const [estado, setEstado] = useState<EstadoEntity>(emptyEstado);
 
+  const [tramitePendiente, setTramitePendiente] =
+    useState<TramitePendienteEntity>(emptyTramitePendiente);
+
+  const [tramitesPendientes, setTramitesPendientes] = useState<
+    TramitePendienteEntity[]
+  >([]);
+
   const [estados, setEstados] = useState<EstadoEntity[]>([]);
+
+  const [selectedTramitesPendientes, setSelectedTramitesPendientes] = useState<
+    TramitePendienteEntity[]
+  >([]);
 
   const [selectedEstados, setSelectedEstados] = useState<EstadoEntity[]>([]);
 
@@ -89,7 +116,7 @@ const TramitePendiente = () => {
     useState<boolean>(false);
 
   const [tramiteDetailsDialog, setTramiteDetailsDialog] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
   const [confirmModal, setConfirmModal] = useState<boolean>(false);
 
@@ -130,6 +157,64 @@ const TramitePendiente = () => {
       ></SplitButton>
     </>
   );
+
+  // actions CRUD - Tramite (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllTramitePendinte = async () => {
+    setLoading(true);
+    const tramitesFindAllPendientes = await findAllPendientes({
+      IdAreaDestino: userAuth?.Area.IdArea!,
+    });
+    setLoading(false);
+
+    if (
+      tramitesFindAllPendientes?.message.msgId == 0 &&
+      tramitesFindAllPendientes.registro
+    ) {
+      //gg
+      setTramitesPendientes(
+        Array.isArray(tramitesFindAllPendientes.registro)
+          ? tramitesFindAllPendientes.registro?.map((af) => {
+              // TipoTramite: 1 - Interno
+              // TipoTramite: 2 - Externo
+              const idTipoTramite = af.Tramite.TipoTramite.IdTipoTramite == 1;
+
+              return {
+                ...af,
+                Detalle:
+                  (af.Documento?.TipoDocumento?.Descripcion || "") +
+                  " " +
+                  (af.Documento?.CodigoReferenciaDoc || "") +
+                  " " +
+                  (af.Documento?.Folios || "") +
+                  " " +
+                  (af.Documento?.Asunto || ""),
+
+                Origen: idTipoTramite
+                  ? af.AreaOrigen.Descripcion || ""
+                  : (af.Tramite.TipoTramite.Descripcion || "") +
+                    " " +
+                    (af.Tramite.Remitente.NroIdentificacion || "") +
+                    " " +
+                    (af.Tramite.Remitente.Nombres || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoPaterno || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoMaterno || ""),
+
+                Motivo_Acciones: af.Motivo + " " + af.Acciones,
+
+                FechaMovimiento: af.FechaMovimiento
+                  ? new Date(af.FechaMovimiento)
+                  : null,
+              };
+            })
+          : []
+      );
+    }
+
+    setLoading(false);
+    onGlobalFilterChange();
+  };
 
   // actions CRUD - TramitePendiente (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEstado = async () => {
@@ -309,6 +394,13 @@ const TramitePendiente = () => {
     setEstadoDialog({ type: "update", state: true });
   };
 
+  const showTramiteDetailsDialog = (
+    tramitePendiente: TramitePendienteEntity
+  ) => {
+    setTramitePendiente(tramitePendiente);
+    setTramiteDetailsDialog(true);
+  };
+
   const hideRemoveEstadoDialog = () => {
     setRemoveEstadoDialog(false);
   };
@@ -452,7 +544,7 @@ const TramitePendiente = () => {
   const onColumnToggle = (event: MultiSelectChangeEvent) => {
     let selectedColumns = event.value;
 
-    let orderedSelectedColumns = columns.filter((col) =>
+    let orderedSelectedColumns = columnsTramitePendiente.filter((col) =>
       selectedColumns.some((sCol: ColumnMeta) => sCol.field === col.field)
     );
     setVisibleColumns(orderedSelectedColumns);
@@ -478,7 +570,7 @@ const TramitePendiente = () => {
           type="button"
           icon="pi pi-refresh"
           severity="info"
-          onClick={findAllEstado}
+          onClick={findAllTramitePendinte}
           style={{
             width: "2rem",
             height: "2rem",
@@ -525,26 +617,28 @@ const TramitePendiente = () => {
             <span>Nuevo trámite</span>
           </span>
         </Button>
-        <Button
-          type="button"
-          severity="warning"
-          onClick={() => {
-            setConfirmModal(true);
-          }}
-          size="small"
-          style={{
-            padding: "0",
-            width: "10rem",
-            height: "2rem",
-            margin: "auto 0",
-            color: "#fff",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-            <i className="pi pi-list-check text-sm"></i>
-            <span>Recibir en bloque</span>
-          </span>
-        </Button>
+        {selectedTramitesPendientes.length > 1 && (
+          <Button
+            type="button"
+            severity="warning"
+            onClick={() => {
+              setConfirmModal(true);
+            }}
+            size="small"
+            style={{
+              padding: "0",
+              width: "10rem",
+              height: "2rem",
+              margin: "auto 0",
+              color: "#fff",
+            }}
+          >
+            <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+              <i className="pi pi-list-check text-sm"></i>
+              <span>Recibir en bloque</span>
+            </span>
+          </Button>
+        )}
       </div>
 
       <div className="flex justify-content-between gap-2 ">
@@ -565,7 +659,7 @@ const TramitePendiente = () => {
         </IconField>
         <MultiSelect
           value={visibleColumns}
-          options={columns}
+          options={columnsTramitePendiente}
           optionLabel="header"
           onChange={onColumnToggle}
           display="comma"
@@ -615,75 +709,109 @@ const TramitePendiente = () => {
     );
   };
 
-  // templates to column Activo
-  const activoBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column detalle
+  const detalleBodyTemplate = (rowData: TramitePendienteEntity) => {
     return (
-      <i
-        className={classNames("pi", {
-          "text-green-500 pl-5 pi-check-circle": rowData.Activo,
-          "text-red-500 pl-5 pi-times-circle": !rowData.Activo,
-        })}
-      ></i>
-    );
-  };
-
-  const activoFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <div className="flex align-items-center justify-content-center gap-2 w-12rem">
-        <label htmlFor="verified-filter" className="font-bold">
-          Activo
-        </label>
-        <TriStateCheckbox
-          id="verified-filter"
-          value={options.value}
-          onChange={(e: TriStateCheckboxChangeEvent) =>
-            options.filterCallback(e.value)
-          }
-        />
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">
+          {rowData.Documento
+            ? `${
+                rowData.Documento.TipoDocumento?.Descripcion?.substring(0, 3) ??
+                "Doc"
+              }. ${rowData.Documento.CodigoReferenciaDoc ?? ""} [${
+                rowData.Documento.Folios ?? 0
+              } Folio(s)]`
+            : ""}
+        </p>
+        <span className="text-xs text-color-secondary m-0">
+          {rowData.Documento?.Asunto || ""}
+        </span>
       </div>
     );
   };
 
-  // templates to column ModificadoEl
-  const modifiadoElBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column IdTramite
+  const idTramiteBodyTemplate = (rowData: TramitePendienteEntity) => {
     return (
-      <p className="text-sm m-0">
-        {!rowData.ModificadoEl
-          ? "00/00/0000, 00:00 TM"
-          : formatDate(new Date(rowData.ModificadoEl))}
-      </p>
-    );
-  };
-
-  const modifiadoElFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <Calendar
-        value={options.value ? new Date(options.value) : null}
-        onChange={(e) => {
-          options.filterCallback(e.value, options.index);
+      <span
+        className="hover:underline hover:text-blue-500"
+        onClick={() => {
+          //call endpoint findone
+          //navigate tramite/seguimiento
+          navigate("../tramite/seguimiento");
         }}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-        showIcon
-      />
+      >
+        {rowData.Tramite?.IdTramite.toString().padStart(8, "0")}
+      </span>
     );
   };
 
-  // templates to column CreadoEl
-  const creadoElBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column Origen
+  const origenBodyTemplate = (rowData: TramitePendienteEntity) => {
+    return (
+      <>
+        {rowData.Tramite?.TipoTramite.IdTipoTramite == 1 ? (
+          <p className="text-sm m-0">
+            {`${rowData.AreaOrigen.Descripcion ?? ""}`}
+          </p>
+        ) : (
+          <div className="flex flex-row align-items-center gap-2">
+            <div
+              className="flex align-items-center justify-content-center text-center border-round-md"
+              style={{
+                background: themePrimeFlex === "light" ? "#eee" : "#333",
+              }}
+            >
+              <i
+                className="pi pi-globe px-2 py-2 "
+                style={{
+                  color: themePrimeFlex === "light" ? "#ee0a3cff" : "#db3458ff",
+                  fontSize: "1.3rem",
+                }}
+              ></i>
+            </div>
+            <div className="flex flex-column ">
+              <p className="text-sm m-0">
+                {rowData.Tramite?.TipoTramite.Descripcion ?? ""}
+              </p>
+              <span className="text-xs text-color-secondary m-0">
+                {rowData.Tramite?.Remitente.NroIdentificacion ?? ""}
+                {" | "}
+                {rowData.Tramite?.Remitente.Nombres ?? ""}{" "}
+                {rowData.Tramite?.Remitente.ApellidoPaterno ?? ""}{" "}
+                {rowData.Tramite?.Remitente.ApellidoMaterno ?? ""}
+              </span>
+            </div>
+          </div>
+        )}
+      </>
+    );
+  };
+
+  // templates to column Motivo_Acciones
+  const motivoAccionesBodyTemplate = (rowData: TramitePendienteEntity) => {
+    return (
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">{"SOLO DEPENDENCIA"}</p>
+        <span className="text-xs text-color-secondary m-0">
+          {rowData.Motivo ?? ""} {rowData.Acciones ?? ""}{" "}
+        </span>
+      </div>
+    );
+  };
+
+  // templates to column  FechaMovimiento
+  const fechaMocimientoBodyTemplate = (rowData: TramitePendienteEntity) => {
     return (
       <p className="text-sm m-0">
-        {!rowData.CreadoEl ? "__" : formatDate(new Date(rowData.CreadoEl))}
+        {!rowData.FechaMovimiento
+          ? "__"
+          : formatDate(new Date(rowData.FechaMovimiento))}
       </p>
     );
   };
 
-  const creadoElFilterTemplate = (
+  const fechaMocimientoFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
@@ -701,38 +829,39 @@ const TramitePendiente = () => {
   };
 
   // templates to actions update and remove on dataTable
-  const actionsBodyTemplate = (rowData: EstadoEntity) => {
+  const actionsBodyTemplate = (rowData: TramitePendienteEntity) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
-          icon="pi pi-pencil"
-          className="mr-2"
-          style={{
-            width: "2rem",
-            height: "1rem",
-            color: "#fff",
+          type="button"
+          onClick={() => {
+            // navigate("../tramite/emitido/nuevo");
+            showTramiteDetailsDialog(rowData);
           }}
-          onClick={() => showUpdateEstadoDialog(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          severity="danger"
+          size="small"
           style={{
-            width: "2rem",
-            height: "1rem",
+            padding: "0",
+            width: "6rem",
+            height: "2rem",
+            margin: "auto 0",
             color: "#fff",
+            background: "rgba(24, 61, 161, 1)",
+            border: "none",
           }}
-          onClick={() => confirmRemoveEstado(rowData)}
-        />
+        >
+          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+            <i className="pi pi-download text-sm"></i>
+            <span>Recibir</span>
+          </span>
+        </Button>
       </div>
     );
   };
 
   //useEffects
   useEffect(() => {
-    findAllEstado();
-    findAllEsquemaEstadoCombox();
-  }, []);
+    findAllTramitePendinte();
+  }, [userAuth?.IdUsuario]);
 
   return (
     <div className="card">
@@ -749,7 +878,7 @@ const TramitePendiente = () => {
       />
 
       <DataTable
-        value={estados}
+        value={tramitesPendientes}
         sortMode="multiple"
         removableSort
         paginator
@@ -763,24 +892,21 @@ const TramitePendiente = () => {
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
-          "IdEstado",
-          "Descripcion",
-          "EsquemaEstado.Descripcion",
-          "Activo",
-          "CreadoEl",
-          "CreadoPor",
-          "ModificadoEl",
-          "ModificadoPor",
+          "Tramite.IdTramite",
+          "Detalle",
+          "Origen",
+          "Motivo_Acciones",
+          "FechaMovimiento",
         ]}
         emptyMessage={<EmptyMessageData loading={loading} />}
         selectionMode="multiple"
-        selection={selectedEstados}
+        selection={selectedTramitesPendientes}
         onSelectionChange={(e) => {
           if (Array.isArray(e.value)) {
-            setSelectedEstados(e.value);
+            setSelectedTramitesPendientes(e.value);
           }
         }}
-        dataKey="IdEstado"
+        dataKey="Tramite.IdTramite"
         selectionPageOnly
         // loading={loading}
       >
@@ -790,13 +916,12 @@ const TramitePendiente = () => {
           headerStyle={{ width: "0%" }}
         />
         {visibleColumns.map((col) => {
-          if (col.field == "EsquemaEstado") {
+          if (col.field == "Detalle") {
             return (
               <Column
                 key={col.field}
                 field={col.filterField}
                 filterField={col.filterField}
-                showFilterMatchModes={false}
                 sortField={col.filterField}
                 header={col.header}
                 dataType={col.dataType}
@@ -804,26 +929,58 @@ const TramitePendiente = () => {
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={esquemaEstadoBodyTemplate}
-                filterElement={esquemaEstadoFilterTemplate}
+                body={detalleBodyTemplate}
               />
             );
-          } else if (col.field == "Activo") {
+          } else if (col.field == "IdTramite") {
             return (
               <Column
                 key={col.field}
                 field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
                 header={col.header}
                 dataType={col.dataType}
                 sortable
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={activoBodyTemplate}
-                filterElement={activoFilterTemplate}
+                body={idTramiteBodyTemplate}
               />
             );
-          } else if (col.field == "CreadoEl") {
+          } else if (col.field == "Origen") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={origenBodyTemplate}
+              />
+            );
+          } else if (col.field == "Motivo_Acciones") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={motivoAccionesBodyTemplate}
+              />
+            );
+          } else if (col.field == "FechaMovimiento") {
             return (
               <Column
                 key={col.field}
@@ -835,24 +992,8 @@ const TramitePendiente = () => {
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={creadoElBodyTemplate}
-                filterElement={creadoElFilterTemplate}
-              />
-            );
-          } else if (col.field == "ModificadoEl") {
-            return (
-              <Column
-                key={col.field}
-                field={col.field}
-                filterField={col.field}
-                header={col.header}
-                dataType={col.dataType}
-                sortable
-                style={{ width: col.width, padding: 5 }}
-                filter
-                filterPlaceholder={col.filterPlaceholder}
-                body={modifiadoElBodyTemplate}
-                filterElement={modifiadoElFilterTemplate}
+                body={fechaMocimientoBodyTemplate}
+                filterElement={fechaMocimientoFilterTemplate}
               />
             );
           } else {
@@ -878,6 +1019,7 @@ const TramitePendiente = () => {
       </DataTable>
 
       <TramiteDetailsModal
+        tramitePendiente={tramitePendiente}
         submitted={submitted}
         hideTramiteDetailsDialog={hideTramiteDetailsDialog}
         tramiteDetailsDialog={tramiteDetailsDialog}

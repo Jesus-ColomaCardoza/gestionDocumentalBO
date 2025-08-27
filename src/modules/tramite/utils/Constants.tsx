@@ -4,6 +4,7 @@ import { DataTableFilterMeta } from "primereact/datatable";
 import {
   TramiteEmitidoCreate,
   TramiteEntity,
+  TramitePendienteEntity,
 } from "../interfaces/TramiteInterface";
 
 export const columns: ColumnMeta[] = [
@@ -98,6 +99,78 @@ export const defaultFilters: DataTableFilterMeta = {
   },
 };
 
+// tramite pendiente
+export const columnsTramitePendiente: ColumnMeta[] = [
+  {
+    field: "IdTramite",
+    filterField: "Tramite.IdTramite",
+    header: "Id",
+    dataType: "numeric",
+    width: "5%",
+    show: true,
+    filterPlaceholder: "Buscar por IdTramite",
+  },
+  {
+    field: "Detalle",
+    filterField: "Detalle",
+    header: "Detalle",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Detalle",
+  },
+  {
+    field: "Origen",
+    filterField: "Origen",
+    header: "Origen",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Origen",
+  },
+  {
+    field: "Motivo_Acciones",
+    filterField: "Motivo_Acciones",
+    header: "Motivo/Acciones",
+    dataType: "text",
+    width: "15%",
+    show: true,
+    filterPlaceholder: "Buscar por Motivo/Acciones",
+  },
+  {
+    field: "FechaMovimiento",
+    header: "Fecha",
+    dataType: "date",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Fecha",
+  },
+];
+
+export const defaultFiltersTramitePendiente: DataTableFilterMeta = {
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  "Tramite.IdTramite": {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Detalle: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Origen: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Motivo_Acciones: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  FechaMovimiento: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+  },
+};
+
 export let emptyTramite: TramiteEntity = {
   IdTramite: 0,
   CodigoReferenciaTram: "",
@@ -152,6 +225,68 @@ export let emptyTramite: TramiteEntity = {
   CreadoPor: "",
   ModificadoEl: new Date(),
   ModificadoPor: "",
+};
+
+export let emptyTramitePendiente: TramitePendienteEntity = {
+  Documento: {
+    IdDocumento: 0,
+    CodigoReferenciaDoc: "",
+    Asunto: "",
+    Observaciones: "",
+    Folios: 0,
+    TipoDocumento: {
+      IdTipoDocumento: 0,
+      Descripcion: "",
+    },
+  },
+  AreaOrigen: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  AreaDestino: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  Acciones: "",
+  Motivo: "",
+  FechaMovimiento: null,
+  Tramite: {
+    IdTramite: 0,
+    CodigoReferenciaTram: "",
+    Descripcion: "",
+    FechaInicio: null,
+    FechaFin: null,
+    IdTipoTramite: 0,
+    IdRemitente: 0,
+    IdEstado: 0,
+    IdDocumento: 0,
+    TipoTramite: {
+      IdTipoTramite: 0,
+      Descripcion: "",
+    },
+    Remitente: {
+      IdUsuario: 0,
+      Nombres: "",
+      ApellidoPaterno: "",
+      ApellidoMaterno: "",
+      NroIdentificacion: "",
+    },
+    Estado: {
+      IdEstado: 0,
+      Descripcion: "",
+    },
+    // Documento: {
+    //   IdDocumento: 0,
+    //   CodigoReferenciaDoc: "",
+    //   Asunto: "",
+    //   Observaciones: "",
+    //   Folios: 0,
+    //   TipoDocumento: {
+    //     IdTipoDocumento: 0,
+    //     Descripcion: "",
+    //   },
+    // },
+  },
 };
 
 export let emptyTramiteEmitidoCreate: TramiteEmitidoCreate = {

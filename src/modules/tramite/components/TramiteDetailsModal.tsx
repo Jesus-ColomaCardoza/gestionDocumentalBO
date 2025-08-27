@@ -6,12 +6,16 @@ import { MovimientoEntity } from "../../movimiento/interfaces/MovimientoInterfac
 import { InputSwitch, InputSwitchChangeEvent } from "primereact/inputswitch";
 import { AreaEntity } from "../../area/interfaces/AreaInterface";
 import { UsuarioEntity } from "../../usuario/interfaces/UsuarioInterface";
-import { TramiteEntity } from "../interfaces/TramiteInterface";
+import {
+  TramiteEntity,
+  TramitePendienteEntity,
+} from "../interfaces/TramiteInterface";
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 
 type TramiteDetailsModalProps = {
+  tramitePendiente: TramitePendienteEntity;
   submitted: boolean;
   hideTramiteDetailsDialog: () => void;
   tramiteDetailsDialog: boolean;
@@ -57,7 +61,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="CodigoReferencia"
+            htmlFor="IdTramite"
             className="block text-900 text-sm font-medium mb-2"
           >
             Trámite
@@ -65,18 +69,22 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputText
-                id="CodigoReferencia"
-                // value={tramite.CodigoReferencia}
+                disabled
+                id="IdTramite"
+                value={props.tramitePendiente?.Tramite?.IdTramite.toString().padStart(
+                  8,
+                  "0"
+                )}
                 onChange={(e) => {
-                  // onInputTextChange(e, "CodigoReferencia");
+                  // onInputTextChange(e, "IdTramite");
                 }}
                 type="text"
                 className="p-inputtext-sm "
               />
             </div>
-            {/* {tramiteErrors.CodigoReferencia && (
+            {/* {tramiteErrors.IdTramite && (
               <small className="p-error">
-                {tramiteErrors.CodigoReferencia}
+                {tramiteErrors.IdTramite}
               </small>
             )} */}
           </div>
@@ -88,7 +96,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="CodigoReferencia"
+            htmlFor="Documento"
             className="block text-900 text-sm font-medium mb-2"
           >
             Documento
@@ -96,18 +104,26 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputText
-                id="CodigoReferencia"
-                // value={tramite.CodigoReferencia}
+                disabled
+                id="Documento"
+                value={`${
+                  props.tramitePendiente?.Documento?.TipoDocumento?.Descripcion?.substring(
+                    0,
+                    3
+                  ) ?? "Doc"
+                }. ${
+                  props.tramitePendiente?.Documento?.CodigoReferenciaDoc ?? ""
+                }`}
                 onChange={(e) => {
-                  // onInputTextChange(e, "CodigoReferencia");
+                  // onInputTextChange(e, "Documento");
                 }}
                 type="text"
                 className="p-inputtext-sm "
               />
             </div>
-            {/* {tramiteErrors.CodigoReferencia && (
+            {/* {tramiteErrors.Documento && (
               <small className="p-error">
-                {tramiteErrors.CodigoReferencia}
+                {tramiteErrors.Documento}
               </small>
             )} */}
           </div>
@@ -121,7 +137,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="CodigoReferencia"
+            htmlFor="Remitente"
             className="block text-900 text-sm font-medium mb-2"
           >
             Remitente
@@ -129,18 +145,27 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputText
-                id="CodigoReferencia"
-                // value={tramite.CodigoReferencia}
+                disabled
+                id="Remitente"
+                value={`${
+                  (props.tramitePendiente?.Tramite?.Remitente?.Nombres || "") +
+                  " " +
+                  (props.tramitePendiente?.Tramite?.Remitente?.ApellidoPaterno ||
+                    "") +
+                  " " +
+                  (props.tramitePendiente?.Tramite?.Remitente?.ApellidoMaterno ||
+                    "")
+                }`}
                 onChange={(e) => {
-                  // onInputTextChange(e, "CodigoReferencia");
+                  // onInputTextChange(e, "Remitente");
                 }}
                 type="text"
                 className="p-inputtext-sm "
               />
             </div>
-            {/* {tramiteErrors.CodigoReferencia && (
+            {/* {tramiteErrors.Remitente && (
               <small className="p-error">
-                {tramiteErrors.CodigoReferencia}
+                {tramiteErrors.Remitente}
               </small>
             )} */}
           </div>
@@ -152,7 +177,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="CodigoReferencia"
+            htmlFor="Folios"
             className="block text-900 text-sm font-medium mb-2"
           >
             Folios
@@ -160,8 +185,9 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputNumber
+                disabled
                 id="Folios"
-                // value={tramite.Folios}
+                value={props.tramitePendiente?.Documento?.Folios}
                 onChange={(e) => {
                   // onInputNumberChange(e, "Folios");
                 }}
@@ -183,7 +209,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="CodigoReferencia"
+            htmlFor="Asunto"
             className="block text-900 text-sm font-medium mb-2"
           >
             Asunto
@@ -191,18 +217,19 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputText
-                id="CodigoReferencia"
-                // value={tramite.CodigoReferencia}
+                disabled
+                id="Asunto"
+                value={props.tramitePendiente?.Documento?.Asunto}
                 onChange={(e) => {
-                  // onInputTextChange(e, "CodigoReferencia");
+                  // onInputTextChange(e, "Asunto");
                 }}
                 type="text"
                 className="p-inputtext-sm "
               />
             </div>
-            {/* {tramiteErrors.CodigoReferencia && (
+            {/* {tramiteErrors.Asunto && (
               <small className="p-error">
-                {tramiteErrors.CodigoReferencia}
+                {tramiteErrors.Asunto}
               </small>
             )} */}
           </div>
@@ -216,7 +243,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="CodigoReferencia"
+            htmlFor="Motivo"
             className="block text-900 text-sm font-medium mb-2"
           >
             Motivo
@@ -224,18 +251,19 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputText
-                id="CodigoReferencia"
-                // value={tramite.CodigoReferencia}
+                disabled
+                id="Motivo"
+                value={props.tramitePendiente?.Motivo}
                 onChange={(e) => {
-                  // onInputTextChange(e, "CodigoReferencia");
+                  // onInputTextChange(e, "Motivo");
                 }}
                 type="text"
                 className="p-inputtext-sm "
               />
             </div>
-            {/* {tramiteErrors.CodigoReferencia && (
+            {/* {tramiteErrors.Motivo && (
               <small className="p-error">
-                {tramiteErrors.CodigoReferencia}
+                {tramiteErrors.Motivo}
               </small>
             )} */}
           </div>
@@ -249,7 +277,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           }}
         >
           <label
-            htmlFor="Asunto"
+            htmlFor="Observaciones"
             className="block text-900 text-sm font-medium mb-2"
           >
             Observaciones
@@ -257,18 +285,18 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
               <InputTextarea
-                id="Asunto"
-                // value={tramite.Asunto}
-                // onChange={(e) => onInputTextAreaChange(e, "Asunto")}
+                id="Observaciones"
+                // value={tramite.Observaciones}
+                // onChange={(e) => onInputTextAreaChange(e, "Observaciones")}
                 autoFocus
                 rows={2}
                 // className={classNames({
-                //   "p-invalid": props.submitted && !props.documento.Asunto,
+                //   "p-invalid": props.submitted && !props.documento.Observaciones,
                 // })}
               />
             </div>
-            {/* {tramiteErrors.Asunto && (
-              <small className="p-error">{tramiteErrors.Asunto}</small>
+            {/* {tramiteErrors.Observaciones && (
+              <small className="p-error">{tramiteErrors.Observaciones}</small>
             )} */}
           </div>
         </div>

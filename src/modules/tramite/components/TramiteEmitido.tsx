@@ -329,7 +329,7 @@ const TramiteEmitido = () => {
     </div>
   );
 
-  // templates to column detalle
+  // templates to column IdTramite
   const idTramiteBodyTemplate = (rowData: TramiteEntity) => {
     return (
       <span
@@ -416,7 +416,7 @@ const TramiteEmitido = () => {
     );
   };
 
-  // templates to column CreadoEl
+  // templates to column  FechaInicio
   const fechaInicioBodyTemplate = (rowData: TramiteEntity) => {
     return (
       <p className="text-sm m-0">

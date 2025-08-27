@@ -87,58 +87,58 @@ const MenuBar = (props: MenuBarProps) => {
       },
       template: itemRenderer3,
     },
-    {
-      label: "Projects",
-      icon: "pi pi-search",
-      template: itemRenderer3,
-      items: [
-        {
-          label: "Core",
-          icon: "pi pi-bolt",
-          shortcut: "⌘+S",
-          template: itemRenderer,
-        },
-        {
-          label: "Blocks",
-          icon: "pi pi-server",
-          shortcut: "⌘+B",
-          template: itemRenderer,
-        },
-        {
-          label: "UI Kit",
-          icon: "pi pi-pencil",
-          shortcut: "⌘+U",
-          template: itemRenderer,
-        },
-        {
-          separator: true,
-        },
-        {
-          label: "Templates",
-          icon: "pi pi-palette",
-          items: [
-            {
-              label: "Apollo",
-              icon: "pi pi-palette",
-              badge: 2,
-              template: itemRenderer,
-            },
-            {
-              label: "Ultima",
-              icon: "pi pi-palette",
-              badge: 3,
-              template: itemRenderer,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      label: "Home v2",
-      icon: "pi pi-envelope",
-      badge: 6,
-      template: itemRenderer,
-    },
+    // {
+    //   label: "Projects",
+    //   icon: "pi pi-search",
+    //   template: itemRenderer3,
+    //   items: [
+    //     {
+    //       label: "Core",
+    //       icon: "pi pi-bolt",
+    //       shortcut: "⌘+S",
+    //       template: itemRenderer,
+    //     },
+    //     {
+    //       label: "Blocks",
+    //       icon: "pi pi-server",
+    //       shortcut: "⌘+B",
+    //       template: itemRenderer,
+    //     },
+    //     {
+    //       label: "UI Kit",
+    //       icon: "pi pi-pencil",
+    //       shortcut: "⌘+U",
+    //       template: itemRenderer,
+    //     },
+    //     {
+    //       separator: true,
+    //     },
+    //     {
+    //       label: "Templates",
+    //       icon: "pi pi-palette",
+    //       items: [
+    //         {
+    //           label: "Apollo",
+    //           icon: "pi pi-palette",
+    //           badge: 2,
+    //           template: itemRenderer,
+    //         },
+    //         {
+    //           label: "Ultima",
+    //           icon: "pi pi-palette",
+    //           badge: 3,
+    //           template: itemRenderer,
+    //         },
+    //       ],
+    //     },
+    //   ],
+    // },
+    // {
+    //   label: "Home v2",
+    //   icon: "pi pi-envelope",
+    //   badge: 6,
+    //   template: itemRenderer,
+    // },
   ];
 
   const start = (

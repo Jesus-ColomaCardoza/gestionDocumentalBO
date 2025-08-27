@@ -3,7 +3,9 @@ import {
   TramiteOut,
   TramitesOut,
   TramiteUpdate,
-  TramiteEmitidoCreate, 
+  TramiteEmitidoCreate,
+  GetAllTramitePendienteDto,
+  TramitesPendientesOut,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -57,6 +59,22 @@ const UseTramite = () => {
     }
   };
 
+  const findAllPendientes = async (
+    getAllTramitePendienteDto: GetAllTramitePendienteDto
+  ): Promise<TramitesPendientesOut | undefined> => {
+    console.log(getAllTramitePendienteDto);
+    
+    try {
+      const tramites = await axios.post<TramitesPendientesOut>(
+        `${VITE_API_URL_GDS + TRAMITE.FIND_ALL_PENDIENTES}`,
+        getAllTramitePendienteDto
+      );
+      return tramites.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const findOne = async (id: string): Promise<TramiteOut | undefined> => {
     try {
       const tramite = await axios.get<TramiteOut>(
@@ -98,6 +116,7 @@ const UseTramite = () => {
     create,
     createEmitido,
     findAll,
+    findAllPendientes,
     findOne,
     update,
     remove,

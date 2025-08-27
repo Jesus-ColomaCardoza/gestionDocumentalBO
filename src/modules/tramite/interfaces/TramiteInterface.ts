@@ -97,43 +97,45 @@ export interface TramitePendienteEntity {
     IdArea: number,
     Descripcion: string,
   },
-  Motivo: string;
+  Acciones: string,
+  Motivo: string,
   FechaMovimiento: Fecha,
   Tramite: {
-    IdTramite: number;
-    CodigoReferenciaTram: string;
-    Descripcion: string;
-    FechaInicio: Fecha;
-    FechaFin: Fecha;
-    IdTipoTramite: number;
-    IdRemitente: number;
-    IdEstado: number;
-    IdDocumento: number;
+    IdTramite: number,
+    CodigoReferenciaTram: string,
+    Descripcion: string,
+    FechaInicio: Fecha,
+    FechaFin: Fecha,
+    IdTipoTramite: number,
+    IdRemitente: number,
+    IdEstado: number,
+    IdDocumento: number,
     TipoTramite: {
-      IdTipoTramite: number;
-      Descripcion: string;
-    };
-    Remitente: {
-      IdUsuario: number;
-      Nombres: string;
-      ApellidoPaterno: string;
-      ApellidoMaterno: string;
-    };
-    Estado: {
-      IdEstado: number;
-      Descripcion: string;
-    };
-    Documento: {
-      IdDocumento: number,
-      CodigoReferenciaDoc: string,
-      Asunto: string,
-      Observaciones: string,
-      Folios: number,
-      TipoDocumento: {
-        IdTipoDocumento: number,
-        Descripcion: string,
-      },
+      IdTipoTramite: number,
+      Descripcion: string,
     },
+    Remitente: {
+      IdUsuario: number,
+      Nombres: string,
+      ApellidoPaterno: string,
+      ApellidoMaterno: string,
+      NroIdentificacion: string,
+    },
+    Estado: {
+      IdEstado: number,
+      Descripcion: string,
+    };
+    // Documento: {
+    //   IdDocumento: number,
+    //   CodigoReferenciaDoc: string,
+    //   Asunto: string,
+    //   Observaciones: string,
+    //   Folios: number,
+    //   TipoDocumento: {
+    //     IdTipoDocumento: number,
+    //     Descripcion: string,
+    //   },
+    // },
   }
 }
 
@@ -193,3 +195,14 @@ export interface TramitesOut {
   message: Message;
   registro?: TramiteEntity[];
 }
+
+export interface TramitesPendientesOut {
+  message: Message;
+  registro?: TramitePendienteEntity[];
+}
+export interface GetAllTramitePendienteDto {
+  IdAreaDestino: number;
+
+}
+
+
