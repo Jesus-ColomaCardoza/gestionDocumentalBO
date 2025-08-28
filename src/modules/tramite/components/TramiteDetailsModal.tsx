@@ -19,6 +19,10 @@ type TramiteDetailsModalProps = {
   submitted: boolean;
   hideTramiteDetailsDialog: () => void;
   tramiteDetailsDialog: boolean;
+  observaciones: string;
+  setObservaciones: Dispatch<SetStateAction<string>>;
+  recibirTramitesPendintes: () => Promise<void>;
+
   // selectedTramiteDestinos: TramiteEntity[];
   // setSelectedTramiteDestinos: Dispatch<SetStateAction<MovimientoEntity[]>>;
 };
@@ -35,10 +39,10 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
         }}
       />
       <Button
-        // loading={props.loadingEstadoCreateOrUpdate}
+        loading={props.submitted}
         label="Guardar"
         icon="pi pi-check"
-        onClick={() => {}}
+        onClick={props.recibirTramitesPendintes}
       />
     </>
   );
@@ -71,10 +75,12 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
               <InputText
                 disabled
                 id="IdTramite"
-                value={props.tramitePendiente?.Tramite?.IdTramite.toString().padStart(
-                  8,
-                  "0"
-                )}
+                value={
+                  props.tramitePendiente?.Tramite?.IdTramite?.toString().padStart(
+                    8,
+                    "0"
+                  ) || ""
+                }
                 onChange={(e) => {
                   // onInputTextChange(e, "IdTramite");
                 }}
@@ -150,11 +156,11 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
                 value={`${
                   (props.tramitePendiente?.Tramite?.Remitente?.Nombres || "") +
                   " " +
-                  (props.tramitePendiente?.Tramite?.Remitente?.ApellidoPaterno ||
-                    "") +
+                  (props.tramitePendiente?.Tramite?.Remitente
+                    ?.ApellidoPaterno || "") +
                   " " +
-                  (props.tramitePendiente?.Tramite?.Remitente?.ApellidoMaterno ||
-                    "")
+                  (props.tramitePendiente?.Tramite?.Remitente
+                    ?.ApellidoMaterno || "")
                 }`}
                 onChange={(e) => {
                   // onInputTextChange(e, "Remitente");
@@ -187,7 +193,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
               <InputNumber
                 disabled
                 id="Folios"
-                value={props.tramitePendiente?.Documento?.Folios}
+                value={props.tramitePendiente?.Documento?.Folios || 0}
                 onChange={(e) => {
                   // onInputNumberChange(e, "Folios");
                 }}
@@ -219,7 +225,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
               <InputText
                 disabled
                 id="Asunto"
-                value={props.tramitePendiente?.Documento?.Asunto}
+                value={props.tramitePendiente?.Documento?.Asunto || ""}
                 onChange={(e) => {
                   // onInputTextChange(e, "Asunto");
                 }}
@@ -253,7 +259,7 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
               <InputText
                 disabled
                 id="Motivo"
-                value={props.tramitePendiente?.Motivo}
+                value={props.tramitePendiente?.Motivo || ""}
                 onChange={(e) => {
                   // onInputTextChange(e, "Motivo");
                 }}
@@ -286,8 +292,12 @@ const TramiteDetailsModal = (props: TramiteDetailsModalProps) => {
             <div className="p-inputgroup">
               <InputTextarea
                 id="Observaciones"
-                // value={tramite.Observaciones}
-                // onChange={(e) => onInputTextAreaChange(e, "Observaciones")}
+                value={props.observaciones || ""}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+                  const value = (e.target && e.target.value) || "";
+
+                  props.setObservaciones(value);
+                }}
                 autoFocus
                 rows={2}
                 // className={classNames({

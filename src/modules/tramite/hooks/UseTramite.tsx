@@ -4,8 +4,9 @@ import {
   TramitesOut,
   TramiteUpdate,
   TramiteEmitidoCreate,
-  GetAllTramitePendienteDto,
   TramitesPendientesOut,
+  GetAllTramitePendiente,
+  TramiteRecibir,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -32,12 +33,28 @@ const UseTramite = () => {
   };
 
   const createEmitido = async (
-    TramiteEmitidoCreate: TramiteEmitidoCreate
+    tramiteEmitidoCreate: TramiteEmitidoCreate
   ): Promise<TramiteOut | undefined> => {
     try {
       const tramite = await axios.post<TramiteOut>(
         `${VITE_API_URL_GDS + TRAMITE.CREATE_EMITIDO}`,
-        TramiteEmitidoCreate
+        tramiteEmitidoCreate
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const recibir = async (
+    tramiteRecibir: TramiteRecibir
+  ): Promise<TramiteOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteOut>(
+        `${VITE_API_URL_GDS + TRAMITE.RECIBIR}`,
+        tramiteRecibir
       );
       return tramite.data;
     } catch (error: any) {
@@ -60,14 +77,12 @@ const UseTramite = () => {
   };
 
   const findAllPendientes = async (
-    getAllTramitePendienteDto: GetAllTramitePendienteDto
+    getAllTramitePendiente: GetAllTramitePendiente
   ): Promise<TramitesPendientesOut | undefined> => {
-    console.log(getAllTramitePendienteDto);
-    
     try {
       const tramites = await axios.post<TramitesPendientesOut>(
         `${VITE_API_URL_GDS + TRAMITE.FIND_ALL_PENDIENTES}`,
-        getAllTramitePendienteDto
+        getAllTramitePendiente
       );
       return tramites.data;
     } catch (error) {
@@ -115,6 +130,7 @@ const UseTramite = () => {
   return {
     create,
     createEmitido,
+    recibir,
     findAll,
     findAllPendientes,
     findOne,

@@ -26,7 +26,7 @@ import EstadoCreateOrUpdate from "./TramiteDestinosModal";
 import EstadoRemove from "./EstadoRemove";
 import EstadosRemove from "./EstadosRemove";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
-import { formatDate } from "../../utils/Methods";
+import { delay, formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { UseEsquemaEstado } from "../../esquema-estado/hooks/UseEsquemaEstado";
@@ -44,6 +44,7 @@ import UseTramite from "../hooks/UseTramite";
 import { useAuth } from "../../auth/context/AuthContext";
 import { TramitePendienteEntity } from "../interfaces/TramiteInterface";
 import { useTheme } from "../../../ThemeContext";
+import { differenceInHours } from "date-fns";
 
 const TramitePendiente = () => {
   // custom hooks
@@ -51,7 +52,7 @@ const TramitePendiente = () => {
 
   const { create, findAll, findOne, update, remove } = UseEstado();
 
-  const { findAllPendientes } = UseTramite();
+  const { findAllPendientes, recibir } = UseTramite();
 
   const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
 
@@ -118,7 +119,7 @@ const TramitePendiente = () => {
   const [tramiteDetailsDialog, setTramiteDetailsDialog] =
     useState<boolean>(false);
 
-  const [confirmModal, setConfirmModal] = useState<boolean>(false);
+  const [confirmDialog, setConfirmDialog] = useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -131,6 +132,8 @@ const TramitePendiente = () => {
       icon: "pi pi-times",
     },
   ];
+
+  const [observaciones, setObservaciones] = useState<string>(" ");
 
   const startContent = (
     <div className="flex flex-column p-1 gap-2">
@@ -159,6 +162,50 @@ const TramitePendiente = () => {
   );
 
   // actions CRUD - Tramite (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const recibirTramitesPendintes = async () => {
+    setSubmitted(true);
+    let idMovimientos = selectedTramitesPendientes.map((stp) => {
+      return { IdMovimiento: stp.IdMovimiento };
+    });
+
+    const recibirTramitePendintes = await recibir({
+      Movimientos: idMovimientos,
+      Observaciones: observaciones,
+    });
+
+    if (
+      recibirTramitePendintes?.message.msgId == 0 &&
+      recibirTramitePendintes.registro
+    ) {
+      let idMovimientosArray = selectedTramitesPendientes.map((stp) => {
+        return stp.IdMovimiento;
+      });
+
+      setTramitesPendientes(
+        tramitesPendientes?.filter(
+          (tp) => !idMovimientosArray.includes(tp.IdMovimiento)
+        )
+      );
+      toast.current?.show({
+        severity: "success",
+        detail: `${recibirTramitePendintes.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (recibirTramitePendintes?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${recibirTramitePendintes.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setTramiteDetailsDialog(false);
+    setConfirmDialog(false);
+    setObservaciones("");
+    setSelectedTramitesPendientes([]);
+    setSubmitted(false);
+  };
+
   const findAllTramitePendinte = async () => {
     setLoading(true);
     const tramitesFindAllPendientes = await findAllPendientes({
@@ -170,13 +217,32 @@ const TramitePendiente = () => {
       tramitesFindAllPendientes?.message.msgId == 0 &&
       tramitesFindAllPendientes.registro
     ) {
-      //gg
+      const currentDate = new Date();
+      console.log(currentDate.toLocaleString());
+
       setTramitesPendientes(
         Array.isArray(tramitesFindAllPendientes.registro)
           ? tramitesFindAllPendientes.registro?.map((af) => {
               // TipoTramite: 1 - Interno
               // TipoTramite: 2 - Externo
               const idTipoTramite = af.Tramite.TipoTramite.IdTipoTramite == 1;
+
+              const tpo = af.FechaMovimiento
+                ? differenceInHours(currentDate, new Date(af.FechaMovimiento))
+                : 0;
+
+              let tpoColor = "";
+
+              if (tpo >= 0 && tpo <= 12) {
+                //a tiempo
+                tpoColor = "green";
+              } else if (tpo >= 13 && tpo <= 24) {
+                // accion urgente
+                tpoColor = "orage";
+              } else {
+                // retraso
+                tpoColor = "red";
+              }
 
               return {
                 ...af,
@@ -188,7 +254,14 @@ const TramitePendiente = () => {
                   (af.Documento?.Folios || "") +
                   " " +
                   (af.Documento?.Asunto || ""),
-
+                Remitente: {
+                  NombreCompleto:
+                    (af.Tramite.Remitente.Nombres || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoPaterno || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoMaterno || ""),
+                },
                 Origen: idTipoTramite
                   ? af.AreaOrigen.Descripcion || ""
                   : (af.Tramite.TipoTramite.Descripcion || "") +
@@ -200,9 +273,8 @@ const TramitePendiente = () => {
                     (af.Tramite.Remitente.ApellidoPaterno || "") +
                     " " +
                     (af.Tramite.Remitente.ApellidoMaterno || ""),
-
                 Motivo_Acciones: af.Motivo + " " + af.Acciones,
-
+                Tpo: tpoColor,
                 FechaMovimiento: af.FechaMovimiento
                   ? new Date(af.FechaMovimiento)
                   : null,
@@ -415,8 +487,8 @@ const TramitePendiente = () => {
     setTramiteDetailsDialog(false);
   };
 
-  const hideConfirmModal = () => {
-    setConfirmModal(false);
+  const hideConfirmDialog = () => {
+    setConfirmDialog(false);
   };
 
   const confirmRemoveEstado = (estado: EstadoEntity) => {
@@ -493,32 +565,6 @@ const TramitePendiente = () => {
 
     setEstado(_estado);
   };
-
-  // const onInputTextEstadoChange = (
-  //   e: React.ChangeEvent<HTMLTextEstadoElement>,
-  //   name: string
-  // ) => {
-  //   const val = (e.target && e.target.value) || "";
-  //   let _estado = { ...estado };
-
-  //   // @ts-ignore
-  //   _estado[name] = val;
-
-  //   setEstado(_estado);
-  // };
-
-  // const onInputNumberChange = (
-  //   e: InputNumberValueChangeEvent,
-  //   name: string
-  // ) => {
-  //   const val = e.value ?? 0;
-  //   let _estado = { ...estado };
-
-  //   // @ts-ignore
-  //   _estado[name] = val;
-
-  //   setEstado(_estado);
-  // };
 
   // templates to component DataTable
   const initFilters = () => {
@@ -622,7 +668,7 @@ const TramitePendiente = () => {
             type="button"
             severity="warning"
             onClick={() => {
-              setConfirmModal(true);
+              setConfirmDialog(true);
             }}
             size="small"
             style={{
@@ -788,6 +834,21 @@ const TramitePendiente = () => {
     );
   };
 
+  // templates to column Remitente
+  const remitenteBodyTemplate = (rowData: TramitePendienteEntity) => {
+    return (
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">
+          {rowData.Tramite?.Remitente
+            ? `${rowData.Tramite?.Remitente.Nombres ?? ""} ${
+                rowData.Tramite?.Remitente.ApellidoPaterno ?? ""
+              } ${rowData.Tramite?.Remitente.ApellidoMaterno ?? ""}`
+            : ""}
+        </p>
+      </div>
+    );
+  };
+
   // templates to column Motivo_Acciones
   const motivoAccionesBodyTemplate = (rowData: TramitePendienteEntity) => {
     return (
@@ -797,6 +858,43 @@ const TramitePendiente = () => {
           {rowData.Motivo ?? ""} {rowData.Acciones ?? ""}{" "}
         </span>
       </div>
+    );
+  };
+
+  // templates to column  Tpo
+  const tpoBodyTemplate = (rowData: any) => {
+    if (rowData.Tpo == "green") {
+    }
+    return (
+      <p className="text-sm m-0">
+        {rowData.Tpo == "green" && (
+          <i
+            className="pi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#0aee97ff" : "#85db34ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
+        {rowData.Tpo == "orange" && (
+          <i
+            className="ppi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#ee9e0aff" : "#dba134ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
+        {rowData.Tpo == "red" && (
+          <i
+            className="pi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#ee0a3cff" : "#db3458ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
+      </p>
     );
   };
 
@@ -835,8 +933,22 @@ const TramitePendiente = () => {
         <Button
           type="button"
           onClick={() => {
-            // navigate("../tramite/emitido/nuevo");
-            showTramiteDetailsDialog(rowData);
+            if (
+              selectedTramitesPendientes?.length == 0 ||
+              (selectedTramitesPendientes?.length == 1 &&
+                selectedTramitesPendientes[0].IdMovimiento ==
+                  rowData.IdMovimiento)
+            ) {
+              if (
+                selectedTramitesPendientes.find(
+                  (stp) => stp.IdMovimiento == rowData.IdMovimiento
+                ) == undefined
+              ) {
+                setSelectedTramitesPendientes((prev) => [...prev, rowData]);
+              }
+
+              showTramiteDetailsDialog(rowData);
+            }
           }}
           size="small"
           style={{
@@ -860,7 +972,9 @@ const TramitePendiente = () => {
 
   //useEffects
   useEffect(() => {
-    findAllTramitePendinte();
+    if (userAuth?.IdUsuario) {
+      findAllTramitePendinte();
+    }
   }, [userAuth?.IdUsuario]);
 
   return (
@@ -895,6 +1009,7 @@ const TramitePendiente = () => {
           "Tramite.IdTramite",
           "Detalle",
           "Origen",
+          "Remitente.NombreCompleto",
           "Motivo_Acciones",
           "FechaMovimiento",
         ]}
@@ -964,6 +1079,22 @@ const TramitePendiente = () => {
                 body={origenBodyTemplate}
               />
             );
+          } else if (col.field == "Remitente") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={remitenteBodyTemplate}
+              />
+            );
           } else if (col.field == "Motivo_Acciones") {
             return (
               <Column
@@ -996,6 +1127,21 @@ const TramitePendiente = () => {
                 filterElement={fechaMocimientoFilterTemplate}
               />
             );
+          } else if (col.field == "Tpo") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.field}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={tpoBodyTemplate}
+              />
+            );
           } else {
             return (
               <Column
@@ -1023,18 +1169,22 @@ const TramitePendiente = () => {
         submitted={submitted}
         hideTramiteDetailsDialog={hideTramiteDetailsDialog}
         tramiteDetailsDialog={tramiteDetailsDialog}
+        observaciones={observaciones}
+        setObservaciones={setObservaciones}
+        recibirTramitesPendintes={recibirTramitesPendintes}
         // selectedTramiteDestinos={selectedTramiteDestinos}
         // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
       />
 
       <ConfirmModal
+        submitted={submitted}
         titleModal="Confirmación"
         typeMessage="info"
         message="¿Esta seguro que desea recibir estos trámites?"
         typeButton="info"
-        state={confirmModal}
-        hideDialog={hideConfirmModal}
-        callBack={() => {}}
+        state={confirmDialog}
+        hideDialog={hideConfirmDialog}
+        callBack={recibirTramitesPendintes}
       />
 
       <EstadoRemove

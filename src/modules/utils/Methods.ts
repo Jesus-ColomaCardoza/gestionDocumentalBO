@@ -60,3 +60,8 @@ export const formatFileSize = (sizeInBytes: number): string => {
     return `${sizeInGB.toFixed(2)} GB`;
   }
 }
+
+
+export const delay = (ms: number): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}

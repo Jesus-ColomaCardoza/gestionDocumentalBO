@@ -78,6 +78,7 @@ export interface TramiteEntity {
 }
 
 export interface TramitePendienteEntity {
+  IdMovimiento: number,
   Documento: {
     IdDocumento: number,
     CodigoReferenciaDoc: string,
@@ -100,6 +101,7 @@ export interface TramitePendienteEntity {
   Acciones: string,
   Motivo: string,
   FechaMovimiento: Fecha,
+  NombreResponsable: string,
   Tramite: {
     IdTramite: number,
     CodigoReferenciaTram: string,
@@ -200,9 +202,22 @@ export interface TramitesPendientesOut {
   message: Message;
   registro?: TramitePendienteEntity[];
 }
-export interface GetAllTramitePendienteDto {
+export interface GetAllTramitePendiente {
   IdAreaDestino: number;
-
 }
+
+export interface TramiteRecibir {
+  Movimientos: {
+    IdEstado?: number
+    IdMovimiento: number
+    Observaciones?: string
+    FechaHistorialMxE?: Date
+    Activo?: boolean
+    CreadoPor?: string
+    CreadoEl?: Date
+  }[];
+  Observaciones: string;
+}
+
 
 

@@ -2,6 +2,7 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 
 type ConfirmModalProps = {
+  submitted: boolean;
   typeMessage:
     | "success"
     | "info"
@@ -35,6 +36,7 @@ const ConfirmModal = (props: ConfirmModalProps) => {
         onClick={props.hideDialog}
       />
       <Button
+        loading={props.submitted}
         label="Yes"
         icon="pi pi-check"
         severity={props.typeButton}

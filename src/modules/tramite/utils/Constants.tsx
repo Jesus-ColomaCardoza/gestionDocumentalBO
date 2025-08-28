@@ -129,6 +129,15 @@ export const columnsTramitePendiente: ColumnMeta[] = [
     filterPlaceholder: "Buscar por Origen",
   },
   {
+    field: "Remitente",
+    filterField: "Remitente.NombreCompleto",
+    header: "Remitente",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Remitente",
+  },
+  {
     field: "Motivo_Acciones",
     filterField: "Motivo_Acciones",
     header: "Motivo/Acciones",
@@ -136,6 +145,15 @@ export const columnsTramitePendiente: ColumnMeta[] = [
     width: "15%",
     show: true,
     filterPlaceholder: "Buscar por Motivo/Acciones",
+  },
+  {
+    field: "Tpo",
+    filterField: "Tpo",
+    header: "Tpo",
+    dataType: "text",
+    width: "5%",
+    show: true,
+    filterPlaceholder: "Buscar por tiempo",
   },
   {
     field: "FechaMovimiento",
@@ -161,9 +179,17 @@ export const defaultFiltersTramitePendiente: DataTableFilterMeta = {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
+  "Remitente.NombreCompleto": {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
   Motivo_Acciones: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Tpo: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
   },
   FechaMovimiento: {
     operator: FilterOperator.AND,
@@ -228,6 +254,7 @@ export let emptyTramite: TramiteEntity = {
 };
 
 export let emptyTramitePendiente: TramitePendienteEntity = {
+  IdMovimiento: 0,
   Documento: {
     IdDocumento: 0,
     CodigoReferenciaDoc: "",
@@ -250,6 +277,7 @@ export let emptyTramitePendiente: TramitePendienteEntity = {
   Acciones: "",
   Motivo: "",
   FechaMovimiento: null,
+  NombreResponsable: "",
   Tramite: {
     IdTramite: 0,
     CodigoReferenciaTram: "",
