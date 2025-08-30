@@ -125,6 +125,7 @@ const TramiteEmitidoNuevo = () => {
     if (
       tramiteEmitidoCreate.Asunto.trim() &&
       tramiteEmitidoCreate.IdTipoDocumento != 0 &&
+      tramiteEmitidoCreate.IdAreaEmision != 0 &&
       tramiteEmitidoCreate.CodigoReferenciaDoc.trim() &&
       tramiteEmitidoCreate.IdRemitente != 0 &&
       tramiteEmitidoCreate.Folios != 0
@@ -649,6 +650,18 @@ const TramiteEmitidoNuevo = () => {
     findAllRemitenteCombox();
     findAllAreaCombox();
   }, []);
+
+  useEffect(() => {
+    if (userAuth?.IdUsuario) {
+      setTramiteEmitidoCreate({
+        ...emptyTramiteEmitidoCreate,
+        Area: {
+          IdArea: userAuth.Area.IdArea,
+          Descripcion: userAuth.Area.Descripcion,
+        },
+      });
+    }
+  }, [userAuth?.IdUsuario]);
 
   return (
     <div className="card p-0 m-0">
@@ -1205,7 +1218,7 @@ const TramiteEmitidoNuevo = () => {
                           >
                             {destino.NombreCompleto
                               ? `${destino.NombreCompleto} | Responsable de oficina`
-                              : destino.AreaDestino.Descripcion}
+                              : destino?.AreaDestino?.Descripcion || ""}
                           </span>
                           <span className="flex flex-row gap-2 m-0">
                             {destino.FirmaDigital && (
@@ -1214,7 +1227,7 @@ const TramiteEmitidoNuevo = () => {
 
                             {destino.NombreCompleto && (
                               <span className="text-xs">
-                                {destino.AreaDestino.Descripcion}
+                                {destino?.AreaDestino?.Descripcion || ""}
                               </span>
                             )}
                           </span>

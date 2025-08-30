@@ -2,9 +2,12 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState, useEffect, useRef } from "react";
 import UseTramite from "../hooks/UseTramite";
-import { TramiteEntity } from "../interfaces/TramiteInterface";
+import {
+  TramiteEntity,
+  TramiteExternoRecibir,
+} from "../interfaces/TramiteInterface";
 import { Toast } from "primereact/toast";
-import { emptyTramite } from "../utils/Constants";
+import { emptyTramite, emptyTramiteExternoRecibir } from "../utils/Constants";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useTheme } from "../../../ThemeContext";
@@ -32,6 +35,8 @@ import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
 import { useNavigate } from "react-router-dom";
 import { Toolbar } from "primereact/toolbar";
 import { Menu } from "primereact/menu";
+import UseTipoIdentificacion from "../../tipo-identificacion/hooks/UseTipoIdentificacion";
+import { TipoIdentificacionEntity } from "../../tipo-identificacion/interfaces/TipoIdentificacionInterface";
 
 const TramiteRecibidoExterno = () => {
   // custom hooks
@@ -39,7 +44,7 @@ const TramiteRecibidoExterno = () => {
 
   const { userAuth } = useAuth()!;
 
-  const { createEmitido } = UseTramite();
+  const { createEmitido, recibirExterno } = UseTramite();
 
   const { createDocumento } = UseFileManager();
 
@@ -48,6 +53,8 @@ const TramiteRecibidoExterno = () => {
   const { create: createFile, remove: removeFile } = UseFile();
 
   const { findAll: findAllTipoDocumento } = UseTipoDocumento();
+
+  const { findAll: findAllTipoIdentificacion } = UseTipoIdentificacion();
 
   const { findAll: findAllRemitentes } = UseUsuario();
 
@@ -72,7 +79,11 @@ const TramiteRecibidoExterno = () => {
   const [loadingTramiteCreateOrUpdate, setLoadingTramiteCreateOrUpdate] =
     useState<boolean>(false);
 
-  const [tramite, setTramite] = useState<TramiteEntity>(emptyTramite);
+  const [loadingTramiteRecibidoExterno, setLoadingTramiteRecibidoExterno] =
+    useState<boolean>(false);
+
+  const [TramiteExternoRecibir, setTramiteExternoRecibir] =
+    useState<TramiteExternoRecibir>(emptyTramiteExternoRecibir);
 
   const [movimiento, setMovimiento] =
     useState<MovimientoEntity>(emptyMovimiento);
@@ -85,6 +96,10 @@ const TramiteRecibidoExterno = () => {
 
   const [tiposDocumento, setTiposDocumento] = useState<
     Pick<TipoDocumentoEntity, "IdTipoDocumento" | "Descripcion">[]
+  >([]);
+
+  const [tiposIdentificacion, setTiposIdentificacion] = useState<
+    Pick<TipoIdentificacionEntity, "IdTipoIdentificacion" | "Descripcion">[]
   >([]);
 
   const [remitentes, setRemitentes] = useState<
@@ -116,16 +131,21 @@ const TramiteRecibidoExterno = () => {
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
   //functions
-  const createTramiteEmitido = async () => {
+
+  const recibirTramiteExterno = async () => {
     setSubmitted(true);
     if (
-      tramite.Asunto.trim() &&
-      tramite.IdTipoDocumento != 0 &&
-      tramite.CodigoReferencia.trim() &&
-      tramite.IdRemitente != 0 &&
-      tramite.Folios != 0
+      TramiteExternoRecibir.Asunto.trim() &&
+      TramiteExternoRecibir.IdTipoDocumento != 0 &&
+      TramiteExternoRecibir.CodigoReferenciaDoc.trim() &&
+      TramiteExternoRecibir.Folios != 0 &&
+      TramiteExternoRecibir.IdTipoIdentificacion != 0 &&
+      TramiteExternoRecibir.NroIdentificacion.trim() &&
+      TramiteExternoRecibir.Nombres.trim() &&
+      TramiteExternoRecibir.ApellidoPaterno.trim() &&
+      TramiteExternoRecibir.ApellidoPaterno.trim()
     ) {
-      // setLoadingTramiteCreateOrUpdate(true);
+      setLoadingTramiteRecibidoExterno(true);
       let arrayAnexosUpload: AnexoEntity[] = [];
 
       //1 we create anexos physical files
@@ -179,30 +199,59 @@ const TramiteRecibidoExterno = () => {
         return;
       }
 
-      //2 we create tramite
-      let tramiteCreateEmitido = await createEmitido({
-        CodigoReferencia: tramite.CodigoReferencia,
-        Asunto: tramite.Asunto,
-        // Descripcion: tramite.Descripcion,
-        Observaciones: tramite.Observaciones,
+      //2 we create tramiteEmitidoCreate
+      let tramiteCreateEmitido = await recibirExterno({
+        //data documento
+        CodigoReferenciaDoc: TramiteExternoRecibir.CodigoReferenciaDoc,
+        Asunto: TramiteExternoRecibir.Asunto,
+        Observaciones: TramiteExternoRecibir.Observaciones,
+        Folios: TramiteExternoRecibir.Folios,
+        IdTipoDocumento: TramiteExternoRecibir.IdTipoDocumento,
+
+        //data tramite
         FechaInicio: new Date().toISOString(),
-        // FechaFin:tramite.FechaFin,
-        Folios: tramite.Folios,
+        IdTipoTramite: TramiteExternoRecibir.IdTipoTramite || 2, // IdTipoTramite - Externo - 2
+        IdAreaEmision: TramiteExternoRecibir.IdAreaEmision,
+        IdEstado: TramiteExternoRecibir.IdEstado || 12, // IdTipoTramite - Pendiente - 12
+        IdRemitente: TramiteExternoRecibir.IdRemitente,
+        Activo: TramiteExternoRecibir.Activo,
 
-        IdTipoTramite: tramite.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
-
-        IdTipoDocumento: tramite.IdTipoDocumento,
-        IdAreaEmision: tramite.IdAreaEmision,
-        IdEstado: tramite.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
-        IdRemitente: tramite.IdRemitente,
-        Activo: tramite.Activo,
-
+        //others
         DigitalFiles: selectedDigitalFiles,
-        TramiteDestinos: selectedTramiteDestinos,
+        TramiteDestinos: [
+          {
+            IdAreaDestino: TramiteExternoRecibir.IdAreaEmision,
+            FirmaDigital: true,
+            NombreResponsable: {
+              NombreCompleto:
+                TramiteExternoRecibir.Remitente?.Nombres +
+                " " +
+                TramiteExternoRecibir.Remitente?.ApellidoPaterno +
+                " " +
+                TramiteExternoRecibir.Remitente?.ApellidoMaterno,
+            },
+          },
+        ],
         Anexos: arrayAnexosUpload,
+
+        //data usuario exteno
+        Nombres: TramiteExternoRecibir.Nombres,
+        ApellidoPaterno: TramiteExternoRecibir.ApellidoPaterno,
+        ApellidoMaterno: TramiteExternoRecibir.ApellidoMaterno,
+        Email: TramiteExternoRecibir.Email,
+        Celular: TramiteExternoRecibir.Celular,
+        Direccion: TramiteExternoRecibir.Direccion,
+        RazonSocial: TramiteExternoRecibir.RazonSocial,
+        IdTipoIdentificacion: TramiteExternoRecibir.RazonSocial != "" ? 2 : 1, // IdTipoIdentificacion 1: DNI - 2: RUC
+        NroIdentificacion:
+          TramiteExternoRecibir.RazonSocial != ""
+            ? TramiteExternoRecibir.RUC || ""
+            : TramiteExternoRecibir.NroIdentificacion,
+        IdTipoUsuario: TramiteExternoRecibir.RazonSocial != "" ? 1 : 2, // IdTipoUsuario - 1: juridica - 2: natural
+        IdRol: "USER_EXTERNO", //Usuario Externo o Ciudadano
       });
 
-      // setLoadingTramiteCreateOrUpdate(false);
+      setLoadingTramiteRecibidoExterno(false);
 
       if (
         tramiteCreateEmitido?.message.msgId == 0 &&
@@ -210,7 +259,7 @@ const TramiteRecibidoExterno = () => {
       ) {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
-        navigate("../tramite/emitido");
+        navigate("../tramite/recibido");
 
         toast.current?.show({
           severity: "success",
@@ -227,7 +276,29 @@ const TramiteRecibidoExterno = () => {
 
       // setSelectedAnexos([])
       // setFileManagerDialog(false);
-      // setTramite(emptyTramite);
+      // setTramiteEmitidoCreate(emptyTramite);
+    }
+  };
+  // actions CRUD - Esquema TipoIdentificacion (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllTipoIdentificacionCombox = async () => {
+    setLoading(true);
+    const tiposIdentificacionFindAll = await findAllTipoIdentificacion();
+    setLoading(false);
+
+    if (
+      tiposIdentificacionFindAll?.message.msgId == 0 &&
+      tiposIdentificacionFindAll.registro
+    ) {
+      setTiposIdentificacion(
+        Array.isArray(tiposIdentificacionFindAll.registro)
+          ? tiposIdentificacionFindAll.registro?.map((af) => {
+              return {
+                IdTipoIdentificacion: af.IdTipoIdentificacion,
+                Descripcion: af.Descripcion,
+              };
+            })
+          : []
+      );
     }
   };
 
@@ -504,7 +575,7 @@ const TramiteRecibidoExterno = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    setTramite((prev) => ({
+    setTramiteExternoRecibir((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -515,7 +586,7 @@ const TramiteRecibidoExterno = () => {
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
     const val = e.value ?? null;
 
-    setTramite((prev) => ({
+    setTramiteExternoRecibir((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -528,12 +599,12 @@ const TramiteRecibidoExterno = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _tramite = { ...tramite };
+    let _tramite = { ...TramiteExternoRecibir };
 
     // @ts-ignore
     _tramite[name] = val;
 
-    setTramite(_tramite);
+    setTramiteExternoRecibir(_tramite);
 
     setTramiteErrors((prev: any) => ({ ...prev, [name]: undefined }));
   };
@@ -546,12 +617,12 @@ const TramiteRecibidoExterno = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    let _tramite: any = { ...tramite };
+    let _tramite: any = { ...TramiteExternoRecibir };
 
     _tramite[nameTagFK ? nameTagFK : nameFK] = val[nameFK];
     _tramite[nameObj] = { ...val };
 
-    setTramite(_tramite);
+    setTramiteExternoRecibir(_tramite);
 
     setTramiteErrors((prev: any) => ({
       ...prev,
@@ -609,28 +680,53 @@ const TramiteRecibidoExterno = () => {
   const validateForm = () => {
     let fieldErrors: any = {};
 
-    if (!tramite.Asunto.trim()) {
+    if (!TramiteExternoRecibir.Asunto.trim()) {
       fieldErrors.Asunto = "Asunto es obligatorio.";
     }
 
-    if (tramite.IdTipoDocumento == 0) {
+    if (TramiteExternoRecibir.IdTipoDocumento == 0) {
       fieldErrors.IdTipoDocumento = "Tipo de documento es obligatorio.";
     }
 
-    if (!tramite.CodigoReferencia.trim()) {
-      fieldErrors.CodigoReferencia = "Codigo de referencia es obligatoria.";
+    if (!TramiteExternoRecibir.CodigoReferenciaDoc.trim()) {
+      fieldErrors.CodigoReferenciaDoc = "Codigo de referencia es obligatoria.";
     }
 
-    if (tramite.IdRemitente == 0) {
-      fieldErrors.IdRemitente = "Remitente es obligatorio.";
-    }
+    // if (TramiteExternoRecibir.IdRemitente == 0) {
+    //   fieldErrors.IdRemitente = "Destinatario / Responsable de área es obligatorio.";
+    // }
 
-    if (tramite.Folios == 0) {
+    if (TramiteExternoRecibir.Folios == 0) {
       fieldErrors.Folios = "Folios es obligatorio.";
     }
 
-    if (tramite.IdAreaEmision == 0) {
-      fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
+    // if (TramiteExternoRecibir.IdAreaEmision == 0) {
+    //   fieldErrors.IdAreaEmision = "Área de emición es obligatoria.";
+    // }
+
+    // if (TramiteExternoRecibir.IdAreaEmision == 0) {
+    //   fieldErrors.IdAreaEmision = "Área de destino es obligatoria.";
+    // }
+
+    if (TramiteExternoRecibir.IdTipoIdentificacion == 0) {
+      fieldErrors.IdTipoIdentificacion =
+        "Tipo de identificacion es obligatorio.";
+    }
+
+    if (!TramiteExternoRecibir.NroIdentificacion.trim()) {
+      fieldErrors.NroIdentificacion = "Nro de identificacion es obligatoria.";
+    }
+
+    if (!TramiteExternoRecibir.Nombres.trim()) {
+      fieldErrors.Nombres = "Nombres es obligatorio.";
+    }
+
+    if (!TramiteExternoRecibir.ApellidoPaterno.trim()) {
+      fieldErrors.ApellidoPaterno = "Apellido paterno es obligatorio.";
+    }
+
+    if (!TramiteExternoRecibir.ApellidoMaterno.trim()) {
+      fieldErrors.ApellidoMaterno = "Apellido materno es obligatorio.";
     }
 
     setTramiteErrors(fieldErrors);
@@ -641,9 +737,23 @@ const TramiteRecibidoExterno = () => {
   //useEffects
   useEffect(() => {
     findAllTipoDocumentoCombox();
+    findAllTipoIdentificacionCombox();
     findAllRemitenteCombox();
     findAllAreaCombox();
   }, []);
+
+  useEffect(() => {
+    if (userAuth?.IdUsuario) {
+      setTramiteExternoRecibir({
+        ...emptyTramiteExternoRecibir,
+        IdAreaEmision: userAuth.Area.IdArea,
+        Area: {
+          IdArea: userAuth.Area.IdArea,
+          Descripcion: userAuth.Area.Descripcion,
+        },
+      });
+    }
+  }, [userAuth?.IdUsuario]);
 
   return (
     <div className="card p-0 m-0">
@@ -845,7 +955,7 @@ const TramiteRecibidoExterno = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={tramite.TipoDocumento}
+                    value={TramiteExternoRecibir.TipoDocumento}
                     onChange={(e) => {
                       onDropdownChange(e, "TipoDocumento", "IdTipoDocumento");
                     }}
@@ -877,26 +987,26 @@ const TramiteRecibidoExterno = () => {
               }}
             >
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="CodigoReferenciaDoc"
                 className="block text-900 text-sm font-medium mb-2"
               >
-                Nº de referencia
+                Código de referencia
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
+                    id="CodigoReferenciaDoc"
+                    value={TramiteExternoRecibir.CodigoReferenciaDoc}
                     onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
+                      onInputTextChange(e, "CodigoReferenciaDoc");
                     }}
                     type="text"
                     className="p-inputtext-sm "
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
+                {tramiteErrors.CodigoReferenciaDoc && (
                   <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
+                    {tramiteErrors.CodigoReferenciaDoc}
                   </small>
                 )}
               </div>
@@ -917,7 +1027,7 @@ const TramiteRecibidoExterno = () => {
                 <div className="p-inputgroup">
                   <InputNumber
                     id="Folios"
-                    value={tramite.Folios}
+                    value={TramiteExternoRecibir.Folios}
                     onChange={(e) => {
                       onInputNumberChange(e, "Folios");
                     }}
@@ -949,7 +1059,7 @@ const TramiteRecibidoExterno = () => {
                 <div className="p-inputgroup">
                   <InputTextarea
                     id="Asunto"
-                    value={tramite.Asunto}
+                    value={TramiteExternoRecibir.Asunto}
                     onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                     autoFocus
                     rows={2}
@@ -981,7 +1091,7 @@ const TramiteRecibidoExterno = () => {
                 <div className="p-inputgroup">
                   <InputTextarea
                     id="Observaciones"
-                    value={tramite.Observaciones}
+                    value={TramiteExternoRecibir.Observaciones}
                     onChange={(e) => onInputTextAreaChange(e, "Observaciones")}
                     rows={3}
                   />
@@ -1173,7 +1283,7 @@ const TramiteRecibidoExterno = () => {
                   }}
                 >
                   <label
-                    htmlFor="CodigoReferencia"
+                    htmlFor="RUC"
                     className="block text-900 text-sm font-medium mb-2"
                   >
                     RUC
@@ -1181,10 +1291,10 @@ const TramiteRecibidoExterno = () => {
                   <div className="flex flex-column mb-3 gap-1">
                     <div className="flex align-items-center">
                       <InputText
-                        id="CodigoReferencia"
-                        value={tramite.CodigoReferencia}
+                        id="RUC"
+                        value={TramiteExternoRecibir.RUC}
                         onChange={(e) => {
-                          onInputTextChange(e, "CodigoReferencia");
+                          onInputTextChange(e, "RUC");
                         }}
                         type="text"
                         className="p-inputtext-sm"
@@ -1203,11 +1313,6 @@ const TramiteRecibidoExterno = () => {
                         }}
                       ></Button>
                     </div>
-                    {tramiteErrors.CodigoReferencia && (
-                      <small className="p-error">
-                        {tramiteErrors.CodigoReferencia}
-                      </small>
-                    )}
                   </div>
                 </div>
 
@@ -1217,7 +1322,7 @@ const TramiteRecibidoExterno = () => {
                   }}
                 >
                   <label
-                    htmlFor="CodigoReferencia"
+                    htmlFor="RazonSocial"
                     className="block text-900 text-sm font-medium mb-2"
                   >
                     Razón social
@@ -1225,20 +1330,15 @@ const TramiteRecibidoExterno = () => {
                   <div className="flex flex-column mb-3 gap-1">
                     <div className="p-inputgroup">
                       <InputText
-                        id="CodigoReferencia"
-                        value={tramite.CodigoReferencia}
+                        id="RazonSocial"
+                        value={TramiteExternoRecibir.RazonSocial}
                         onChange={(e) => {
-                          onInputTextChange(e, "CodigoReferencia");
+                          onInputTextChange(e, "RazonSocial");
                         }}
                         type="text"
                         className="p-inputtext-sm "
                       />
                     </div>
-                    {tramiteErrors.CodigoReferencia && (
-                      <small className="p-error">
-                        {tramiteErrors.CodigoReferencia}
-                      </small>
-                    )}
                   </div>
                 </div>
               </div>
@@ -1251,19 +1351,23 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="TipoDocumento"
+                  htmlFor="TipoIdentificacion"
                   className="block text-900 text-sm font-medium mb-2"
                 >
-                  Tipo de documento
+                  Tipo de identificación
                 </label>
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <Dropdown
-                      value={tramite.TipoDocumento}
+                      value={TramiteExternoRecibir.TipoIdentificacion}
                       onChange={(e) => {
-                        onDropdownChange(e, "TipoDocumento", "IdTipoDocumento");
+                        onDropdownChange(
+                          e,
+                          "TipoIdentificacion",
+                          "IdTipoIdentificacion"
+                        );
                       }}
-                      options={tiposDocumento}
+                      options={tiposIdentificacion}
                       optionLabel="Descripcion"
                       filter
                       placeholder="Seleccionar..."
@@ -1277,9 +1381,9 @@ const TramiteRecibidoExterno = () => {
                       }}
                     />
                   </div>
-                  {tramiteErrors.IdTipoDocumento && (
+                  {tramiteErrors.IdTipoIdentificacion && (
                     <small className="p-error">
-                      {tramiteErrors.IdTipoDocumento}
+                      {tramiteErrors.IdTipoIdentificacion}
                     </small>
                   )}
                 </div>
@@ -1291,18 +1395,18 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="NroIdentificacion"
                   className="block text-900 text-sm font-medium mb-2"
                 >
-                  Número de documento
+                  Número de identificación
                 </label>
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="flex align-items-center">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="NroIdentificacion"
+                      value={TramiteExternoRecibir.NroIdentificacion}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "NroIdentificacion");
                       }}
                       type="text"
                       className="p-inputtext-sm"
@@ -1321,9 +1425,9 @@ const TramiteRecibidoExterno = () => {
                       }}
                     ></Button>
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
+                  {tramiteErrors.NroIdentificacion && (
                     <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
+                      {tramiteErrors.NroIdentificacion}
                     </small>
                   )}
                 </div>
@@ -1337,7 +1441,7 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="Nombres"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Nombres
@@ -1345,19 +1449,17 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="Nombres"
+                      value={TramiteExternoRecibir.Nombres}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "Nombres");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
-                    <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
-                    </small>
+                  {tramiteErrors.Nombres && (
+                    <small className="p-error">{tramiteErrors.Nombres}</small>
                   )}
                 </div>
               </div>
@@ -1368,7 +1470,7 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="ApellidoPaterno"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Apellido paterno
@@ -1376,18 +1478,18 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="ApellidoPaterno"
+                      value={TramiteExternoRecibir.ApellidoPaterno}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "ApellidoPaterno");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
+                  {tramiteErrors.ApellidoPaterno && (
                     <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
+                      {tramiteErrors.ApellidoPaterno}
                     </small>
                   )}
                 </div>
@@ -1401,7 +1503,7 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="ApellidoMaterno"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Apellido materno
@@ -1409,18 +1511,18 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="ApellidoMaterno"
+                      value={TramiteExternoRecibir.ApellidoMaterno}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "ApellidoMaterno");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
+                  {tramiteErrors.ApellidoMaterno && (
                     <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
+                      {tramiteErrors.ApellidoMaterno}
                     </small>
                   )}
                 </div>
@@ -1432,7 +1534,7 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="Email"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Correo electrónico
@@ -1440,19 +1542,17 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="Email"
+                      value={TramiteExternoRecibir.Email}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "Email");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
-                    <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
-                    </small>
+                  {tramiteErrors.Email && (
+                    <small className="p-error">{tramiteErrors.Email}</small>
                   )}
                 </div>
               </div>
@@ -1465,7 +1565,7 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="Celular"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Teléfono
@@ -1473,20 +1573,20 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="Celular"
+                      value={TramiteExternoRecibir.Celular}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "Celular");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
+                  {/* {tramiteErrors.Celular && (
                     <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
+                      {tramiteErrors.Celular}
                     </small>
-                  )}
+                  )} */}
                 </div>
               </div>
 
@@ -1496,7 +1596,7 @@ const TramiteRecibidoExterno = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="Direccion"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Dirección
@@ -1504,25 +1604,25 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      id="Direccion"
+                      value={TramiteExternoRecibir.Direccion}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "Direccion");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
+                  {/* {tramiteErrors.Direccion && (
                     <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
+                      {tramiteErrors.Direccion}
                     </small>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
 
-            <div className="flex flex-row  px-4" style={{ gap: "1rem" }}>
+            <div className="flex flex-row justify-content-between align-items-center pt-3 pb-2 px-4 border-top-1 border-gray-500">
               <div
                 style={{
                   width: "100%",
@@ -1537,14 +1637,14 @@ const TramiteRecibidoExterno = () => {
                 <div className="flex flex-column mb-3  gap-1">
                   <div className="p-inputgroup">
                     <Dropdown
-                      value={tramite.Area}
+                      value={TramiteExternoRecibir.Area}
                       onChange={(e) => {
                         onDropdownChange(e, "Area", "IdArea", "IdAreaEmision");
                       }}
                       options={areas}
                       optionLabel="Descripcion"
                       filter
-                      placeholder="Seleccionar Área de Emisión"
+                      placeholder="Seleccionar..."
                       className="w-full flex flex-row align-items-center p-inputtext-sm"
                       showClear
                       style={{
@@ -1574,12 +1674,12 @@ const TramiteRecibidoExterno = () => {
                   htmlFor="Remitente"
                   className="block text-900 text-sm font-medium mb-2"
                 >
-                  Destinatario
+                  Destinatario / Responsable de área
                 </label>
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <Dropdown
-                      value={tramite.Remitente}
+                      value={TramiteExternoRecibir.Remitente}
                       onChange={(e) => {
                         onDropdownChange(
                           e,
@@ -1591,7 +1691,7 @@ const TramiteRecibidoExterno = () => {
                       options={remitentes}
                       optionLabel="NombreCompleto"
                       filter
-                      placeholder="Seleccionar Remitente"
+                      placeholder="Seleccionar..."
                       className="w-full flex flex-row align-items-center p-inputtext-sm"
                       showClear
                       style={{
@@ -1637,9 +1737,11 @@ const TramiteRecibidoExterno = () => {
             <Button
               type="button"
               onClick={() => {
-                if (validateForm()) {
-                  createTramiteEmitido();
-                }
+                        navigate("../tramite/recibido");
+
+                // if (validateForm()) {
+                //   recibirTramiteExterno();
+                // }
               }}
               size="small"
               style={{

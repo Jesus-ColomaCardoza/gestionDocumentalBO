@@ -184,6 +184,62 @@ export interface TramiteEmitidoCreate {
   TramiteDestinos?: MovimientoEntity[];
   Anexos?: AnexoEntity[]
 }
+export interface TramiteExternoRecibir {
+  //data tramite
+  IdTramite?: number;
+  FechaInicio: Fecha;
+  IdTipoTramite: number;
+  IdEstado: number;
+  IdRemitente: number;
+  Remitente?: {
+    IdUsuario: number,
+    Nombres: string,
+    ApellidoPaterno: string,
+    ApellidoMaterno: string,
+  },
+  IdAreaEmision: number;
+  Area?: {
+    IdArea: number;
+    Descripcion: string;
+  };
+  Activo: boolean;
+  CreadoEl?: Date;
+  CreadoPor?: string;
+
+  //data documento
+  CodigoReferenciaDoc: string;
+  Asunto: string;
+  Observaciones: string;
+  Folios: number;
+  IdTipoDocumento: number;
+  TipoDocumento?: {
+    IdTipoDocumento: number;
+    Descripcion: string;
+  };
+
+  //data others
+  DigitalFiles?: FileManagerEntity[];
+  TramiteDestinos?: MovimientoEntity[];
+  Anexos?: AnexoEntity[]
+
+  //data usuario externo
+  Nombres: string;
+  ApellidoPaterno: string;
+  ApellidoMaterno: string;
+  Email: string;
+  Celular: string;
+  Direccion: string;
+  NroIdentificacion: string;
+  RUC?: string;
+  RazonSocial?: string;
+  IdTipoUsuario: number;
+  IdRol: string;
+  IdTipoIdentificacion: number;
+  TipoIdentificacion?: {
+    IdTipoIdentificacion: number;
+    Descripcion: string;
+  };
+}
 export interface TramiteUpdate {
   Activo?: boolean;
   ModificadoEl?: Date | string;

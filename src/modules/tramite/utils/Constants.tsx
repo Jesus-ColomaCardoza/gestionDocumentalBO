@@ -4,6 +4,7 @@ import { DataTableFilterMeta } from "primereact/datatable";
 import {
   TramiteEmitidoCreate,
   TramiteEntity,
+  TramiteExternoRecibir,
   TramitePendienteEntity,
 } from "../interfaces/TramiteInterface";
 
@@ -346,6 +347,58 @@ export let emptyTramiteEmitidoCreate: TramiteEmitidoCreate = {
   IdTipoDocumento: 0,
   TipoDocumento: {
     IdTipoDocumento: 0,
+    Descripcion: "",
+  },
+};
+
+export let emptyTramiteExternoRecibir: TramiteExternoRecibir = {
+  //data tramite
+  IdTramite: 0,
+  FechaInicio: null,
+  IdTipoTramite: 0,
+  IdAreaEmision: 0,
+  Area: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  IdRemitente: 0,
+  Remitente: {
+    IdUsuario: 0,
+    Nombres: "",
+    ApellidoPaterno: "",
+    ApellidoMaterno: "",
+  },
+  IdEstado: 0,
+  Activo: true,
+  CreadoEl: new Date(),
+  CreadoPor: "",
+
+  //data documento
+  CodigoReferenciaDoc: "",
+  Asunto: "",
+  Observaciones: "",
+  Folios: 0,
+  IdTipoDocumento: 0,
+  TipoDocumento: {
+    IdTipoDocumento: 0,
+    Descripcion: "",
+  },
+
+  //data usuario externo
+  Nombres: "",
+  ApellidoPaterno: "",
+  ApellidoMaterno: "",
+  Email: "",
+  Celular: "",
+  Direccion: "",
+  NroIdentificacion: "",
+  RUC: "",
+  RazonSocial: "",
+  IdTipoUsuario: 0,
+  IdRol: "",
+  IdTipoIdentificacion: 0,
+  TipoIdentificacion: {
+    IdTipoIdentificacion: 0,
     Descripcion: "",
   },
 };

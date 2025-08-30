@@ -948,6 +948,7 @@ const TramiteRecibido = () => {
       />
 
       <ConfirmModal
+        submitted={submitted}
         titleModal="Atención!!!"
         typeMessage="info"
         message="¿Estás seguro que desea anular el estado atendido?"

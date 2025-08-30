@@ -2,26 +2,26 @@ import { Message } from "../../utils/Interfaces";
 
 type Fecha = Date | string | null;
 export interface MovimientoEntity {
-  IdMovimiento: number;
+  IdMovimiento?: number;
   IdTramite?: number;
-  IdAreaOrigen: number;
+  IdAreaOrigen?: number;
   IdAreaDestino: number;
-  FechaMovimiento: string;
-  Copia: boolean;
-  FirmaDigital: boolean;
-  IdMovimientoPadre: number | null;
+  FechaMovimiento?: string;
+  Copia?: boolean;
+  FirmaDigital?: boolean;
+  IdMovimientoPadre?: number | null;
   NombreCompleto?: string ;
-  NombreResponsable: object ;
+  NombreResponsable?: object ;
   Activo?: boolean;
   CreadoEl?: Fecha;
   CreadoPor?: string;
   ModificadoEl?: Fecha;
   ModificadoPor?: string;
-  AreaOrigen: {
+  AreaOrigen?: {
     IdArea: number;
     Descripcion: string;
   };
-  AreaDestino: {
+  AreaDestino?: {
     IdArea: number;
     Descripcion: string;
   };
