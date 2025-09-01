@@ -140,6 +140,79 @@ export interface TramitePendienteEntity {
     // },
   }
 }
+export interface TramiteRecibidoEntity {
+  IdMovimiento: number,
+  HistorialMovimientoxEstado: {
+    IdHistorialMxE: number,
+    FechaHistorialMxE: string,
+    Estado: {
+      IdEstado: number,
+      Descripcion: string,
+    }
+    // Observaciones:string,
+    // Detalle:string,
+  }[],
+  Documento: {
+    IdDocumento: number,
+    CodigoReferenciaDoc: string,
+    Asunto: string,
+    Observaciones: string,
+    Folios: number,
+    TipoDocumento: {
+      IdTipoDocumento: number,
+      Descripcion: string,
+    },
+  },
+  AreaOrigen: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  AreaDestino: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  Acciones: string,
+  Motivo: string,
+  FechaMovimiento: Fecha,
+  NombreResponsable: string,
+  Tramite: {
+    IdTramite: number,
+    CodigoReferenciaTram: string,
+    Descripcion: string,
+    FechaInicio: Fecha,
+    FechaFin: Fecha,
+    IdTipoTramite: number,
+    IdRemitente: number,
+    IdEstado: number,
+    IdDocumento: number,
+    TipoTramite: {
+      IdTipoTramite: number,
+      Descripcion: string,
+    },
+    Remitente: {
+      IdUsuario: number,
+      Nombres: string,
+      ApellidoPaterno: string,
+      ApellidoMaterno: string,
+      NroIdentificacion: string,
+    },
+    Estado: {
+      IdEstado: number,
+      Descripcion: string,
+    };
+    // Documento: {
+    //   IdDocumento: number,
+    //   CodigoReferenciaDoc: string,
+    //   Asunto: string,
+    //   Observaciones: string,
+    //   Folios: number,
+    //   TipoDocumento: {
+    //     IdTipoDocumento: number,
+    //     Descripcion: string,
+    //   },
+    // },
+  }
+}
 
 export interface TramiteCreate {
   Activo: boolean;
@@ -253,15 +326,20 @@ export interface TramitesOut {
   message: Message;
   registro?: TramiteEntity[];
 }
-
 export interface TramitesPendientesOut {
   message: Message;
   registro?: TramitePendienteEntity[];
 }
+export interface TramitesRecibidosOut {
+  message: Message;
+  registro?: TramiteRecibidoEntity[];
+}
 export interface GetAllTramitePendiente {
   IdAreaDestino: number;
 }
-
+export interface GetAllTramiteRecibido {
+  IdAreaDestino: number;
+}
 export interface TramiteRecibir {
   Movimientos: {
     IdEstado?: number

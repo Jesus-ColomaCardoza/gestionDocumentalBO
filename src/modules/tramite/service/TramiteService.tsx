@@ -5,6 +5,7 @@ export const TRAMITE = {
   RECIBIR: "/tramite/recibir/",
   FIND_ALL: "/tramite/find_all/",
   FIND_ALL_PENDIENTES: "/tramite/find_all_pendientes/",
+  FIND_ALL_RECIBIDOS: "/tramite/find_all_recibidos/",
   FIND_ONE: "/tramite/find_one/",
   UPDATE: "/tramite/update/",
   REMOVE: "/tramite/remove/",

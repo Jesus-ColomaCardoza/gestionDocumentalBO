@@ -17,7 +17,12 @@ import {
 
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters } from "../utils/Constants";
+import {
+  columns,
+  columnsTramiteRecibido,
+  defaultFilters,
+  defaultFiltersTramiteRecibido,
+} from "../utils/Constants";
 import EstadoCreateOrUpdate from "./TramiteDestinosModal";
 import EstadoRemove from "./EstadoRemove";
 import EstadosRemove from "./EstadosRemove";
@@ -35,14 +40,26 @@ import TramiteRecibidoAtendidoModal from "./TramiteRecibidoAtendidoModal";
 import ConfirmModal from "../../utils/shared/ConfirmModal";
 import { useNavigate } from "react-router-dom";
 import TramiteArchivarModal from "./TramiteArchivarModal";
+import { useAuth } from "../../auth/context/AuthContext";
+import UseTramite from "../hooks/UseTramite";
+import { differenceInHours } from "date-fns";
+import { TramiteRecibidoEntity } from "../interfaces/TramiteInterface";
+import { useTheme } from "../../../ThemeContext";
+import { Tag } from "primereact/tag";
 
 const TramiteRecibido = () => {
   // custom hooks
+  const { userAuth } = useAuth()!;
+
+  const { findAllRecibidos } = UseTramite();
+
   const { create, findAll, findOne, update, remove } = UseEstado();
 
   const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
 
   const navigate = useNavigate();
+
+  const { themePrimeFlex, switchTheme } = useTheme();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -52,12 +69,14 @@ const TramiteRecibido = () => {
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
 
-  const [filters, setFilters] = useState<DataTableFilterMeta>(defaultFilters);
+  const [filters, setFilters] = useState<DataTableFilterMeta>(
+    defaultFiltersTramiteRecibido
+  );
 
   const [globalFilterValue, setGlobalFilterValue] = useState<string>("");
 
   const [visibleColumns, setVisibleColumns] = useState<ColumnMeta[]>(
-    columns.filter((col: ColumnMeta) => col.show)
+    columnsTramiteRecibido.filter((col: ColumnMeta) => col.show)
   );
 
   const [loading, setLoading] = useState<boolean>(true);
@@ -67,7 +86,15 @@ const TramiteRecibido = () => {
 
   const [estado, setEstado] = useState<EstadoEntity>(emptyEstado);
 
+  const [tramitesRecibidos, setTramitesRecibidos] = useState<
+    TramiteRecibidoEntity[]
+  >([]);
+
   const [estados, setEstados] = useState<EstadoEntity[]>([]);
+
+  const [selectedTramitesRecibidos, setSelectedTramitesRecibidos] = useState<
+    TramiteRecibidoEntity[]
+  >([]);
 
   const [selectedEstados, setSelectedEstados] = useState<EstadoEntity[]>([]);
 
@@ -94,9 +121,95 @@ const TramiteRecibido = () => {
     }>({ type: "simple", state: false }); //close
 
   const [tramiteArchivarDialog, setTramiteArchivarDialog] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
-  const [confirmModal, setConfirmModal] = useState<boolean>(false);//close
+  const [confirmModal, setConfirmModal] = useState<boolean>(false); //close
+
+  const findAllTramiteRecibido = async () => {
+    setLoading(true);
+    const tramitesFindAllRecibidos = await findAllRecibidos({
+      IdAreaDestino: userAuth?.Area.IdArea!,
+    });
+    console.log(tramitesFindAllRecibidos);
+
+    setLoading(false);
+
+    if (
+      tramitesFindAllRecibidos?.message.msgId == 0 &&
+      tramitesFindAllRecibidos.registro
+    ) {
+      const currentDate = new Date();
+      console.log(currentDate.toLocaleString());
+
+      setTramitesRecibidos(
+        Array.isArray(tramitesFindAllRecibidos.registro)
+          ? tramitesFindAllRecibidos.registro?.map((af) => {
+              // TipoTramite: 1 - Interno
+              // TipoTramite: 2 - Externo
+              const idTipoTramite = af.Tramite.TipoTramite.IdTipoTramite == 1;
+
+              const tpo = af.FechaMovimiento
+                ? differenceInHours(currentDate, new Date(af.FechaMovimiento))
+                : 0;
+
+              let tpoColor = "";
+
+              if (tpo >= 0 && tpo <= 12) {
+                //a tiempo
+                tpoColor = "green";
+              } else if (tpo >= 13 && tpo <= 24) {
+                // accion urgente
+                tpoColor = "orage";
+              } else {
+                // retraso
+                tpoColor = "red";
+              }
+
+              return {
+                ...af,
+                Detalle:
+                  (af.Documento?.TipoDocumento?.Descripcion || "") +
+                  " " +
+                  (af.Documento?.CodigoReferenciaDoc || "") +
+                  " " +
+                  (af.Documento?.Folios || "") +
+                  " " +
+                  (af.Documento?.Asunto || ""),
+                Remitente: {
+                  NombreCompleto:
+                    (af.Tramite.Remitente.Nombres || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoPaterno || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoMaterno || ""),
+                },
+                Origen: idTipoTramite
+                  ? af.AreaOrigen.Descripcion || ""
+                  : (af.Tramite.TipoTramite.Descripcion || "") +
+                    " " +
+                    (af.Tramite.Remitente.NroIdentificacion || "") +
+                    " " +
+                    (af.Tramite.Remitente.Nombres || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoPaterno || "") +
+                    " " +
+                    (af.Tramite.Remitente.ApellidoMaterno || ""),
+                Motivo_Acciones: af.Motivo + " " + af.Acciones,
+                Tpo: tpoColor,
+                FechaMovimiento: af.FechaMovimiento
+                  ? new Date(af.FechaMovimiento)
+                  : null,
+                Estado:
+                  af.HistorialMovimientoxEstado[0]?.Estado?.Descripcion || "",
+              };
+            })
+          : []
+      );
+    }
+
+    setLoading(false);
+    onGlobalFilterChange();
+  };
 
   // actions CRUD - TramiteRecibido (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEstado = async () => {
@@ -316,6 +429,11 @@ const TramiteRecibido = () => {
     setTramiteRecibidoAtendidoDialog({ type: type, state: true });
   };
 
+  const showTramiteArchivarDialog = () => {
+    // setMovimiento(emptyMovimiento);
+    setTramiteArchivarDialog(true);
+  };
+
   const confirmRemoveEstado = (estado: EstadoEntity) => {
     setEstado(estado);
     setRemoveEstadoDialog(true);
@@ -467,7 +585,7 @@ const TramiteRecibido = () => {
           type="button"
           icon="pi pi-refresh"
           severity="info"
-          onClick={findAllEstado}
+          onClick={findAllTramiteRecibido}
           style={{
             width: "2rem",
             height: "2rem",
@@ -475,81 +593,85 @@ const TramiteRecibido = () => {
             color: "#fff",
           }}
         />
-        <Button
-          type="button"
-          onClick={() => {
-            navigate("./derivado");
-          }}
-          size="small"
-          style={{
-            padding: "0",
-            width: "10rem",
-            height: "2rem",
-            margin: "auto 0",
-            color: "#fff",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-            <i className="pi pi-reply text-sm"></i>
-            <span>Derivar selección</span>
-          </span>
-        </Button>
-        <Button
-          type="button"
-          onClick={() => showTramiteRecibidoAtendidoDialog("multiple")}
-          size="small"
-          style={{
-            padding: "0",
-            width: "10rem",
-            height: "2rem",
-            margin: "auto 0",
-            background: "#293",
-            border: "none",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-            <i className="pi pi-verified text-sm"></i>
-            <span>Atender selección</span>
-          </span>
-        </Button>
-        <Button
-          type="button"
-          severity="danger"
-          onClick={findAllEstado}
-          size="small"
-          style={{
-            padding: "0",
-            width: "10rem",
-            height: "2rem",
-            margin: "auto 0",
-            color: "#fff",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-            <i className="pi pi-exclamation-circle text-sm"></i>
-            <span>Observar selección</span>
-          </span>
-        </Button>
-        <Button
-          type="button"
-          severity="contrast"
-          onClick={findAllEstado}
-          size="small"
-          style={{
-            padding: "0",
-            width: "10rem",
-            height: "2rem",
-            margin: "auto 0",
-            color: "#000",
-            background: "#eee",
-            border: "none",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto">
-            <i className="pi pi-trash text-sm"></i>
-            <span>Archivar selección</span>
-          </span>
-        </Button>
+        {selectedTramitesRecibidos.length > 1 && (
+          <>
+            <Button
+              type="button"
+              onClick={() => {
+                navigate("./derivado");
+              }}
+              size="small"
+              style={{
+                padding: "0",
+                width: "10rem",
+                height: "2rem",
+                margin: "auto 0",
+                color: "#fff",
+              }}
+            >
+              <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+                <i className="pi pi-reply text-sm"></i>
+                <span>Derivar selección</span>
+              </span>
+            </Button>
+            <Button
+              type="button"
+              onClick={() => showTramiteRecibidoAtendidoDialog("multiple")}
+              size="small"
+              style={{
+                padding: "0",
+                width: "10rem",
+                height: "2rem",
+                margin: "auto 0",
+                background: "#293",
+                border: "none",
+              }}
+            >
+              <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+                <i className="pi pi-verified text-sm"></i>
+                <span>Atender selección</span>
+              </span>
+            </Button>
+            <Button
+              type="button"
+              severity="danger"
+              onClick={findAllEstado}
+              size="small"
+              style={{
+                padding: "0",
+                width: "10rem",
+                height: "2rem",
+                margin: "auto 0",
+                color: "#fff",
+              }}
+            >
+              <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+                <i className="pi pi-exclamation-circle text-sm"></i>
+                <span>Observar selección</span>
+              </span>
+            </Button>
+            <Button
+              type="button"
+              severity="contrast"
+              onClick={() => showTramiteArchivarDialog()}
+              size="small"
+              style={{
+                padding: "0",
+                width: "10rem",
+                height: "2rem",
+                margin: "auto 0",
+                color: "#000",
+                background: "#eee",
+                border: "none",
+              }}
+            >
+              <span className="flex justify-content-between gap-2 align-items-center m-auto">
+                <i className="pi pi-trash text-sm"></i>
+                <span>Archivar selección</span>
+              </span>
+            </Button>
+          </>
+        )}
       </div>
 
       <div className="flex justify-content-between gap-2 ">
@@ -615,7 +737,9 @@ const TramiteRecibido = () => {
     <>
       <Button
         type="button"
-        // onClick={findAllEstado}
+        onClick={() => {
+          navigate("../tramite/emitido/nuevo");
+        }}
         size="small"
         style={{
           padding: "0",
@@ -633,112 +757,201 @@ const TramiteRecibido = () => {
     </>
   );
 
-  // templates to column EsquemaEstado
-  const esquemaEstadoBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column detalle
+  const detalleBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
-      <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.EsquemaEstado.Descripcion}</p>
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">
+          {rowData.Documento
+            ? `${
+                rowData.Documento.TipoDocumento?.Descripcion?.substring(0, 3) ??
+                "Doc"
+              }. ${rowData.Documento.CodigoReferenciaDoc ?? ""} [${
+                rowData.Documento.Folios ?? 0
+              } Folio(s)]`
+            : ""}
+        </p>
+        <span className="text-xs text-color-secondary m-0">
+          {rowData.Documento?.Asunto || ""}
+        </span>
       </div>
     );
   };
 
-  const esquemaEstadoFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
+  // templates to column IdTramite
+  const idTramiteBodyTemplate = (rowData: TramiteRecibidoEntity) => {
+    return (
+      <span
+        className="hover:underline hover:text-blue-500"
+        onClick={() => {
+          //call endpoint findone
+          //navigate tramite/seguimiento
+          navigate("../tramite/seguimiento");
+        }}
+      >
+        {rowData.Tramite?.IdTramite.toString().padStart(8, "0")}
+      </span>
+    );
+  };
+
+  // templates to column Origen
+  const origenBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
       <>
-        <div className="mb-3 text-sm w-12rem">Esquema Picker</div>
-        <MultiSelect
-          value={options.value}
-          options={esquemaEstados}
-          itemTemplate={(option: EsquemaEstadoEntity) => {
-            return (
-              <div className="flex align-items-center gap-2">
-                <span>{option.Descripcion}</span>
-              </div>
-            );
-          }}
-          onChange={(e: MultiSelectChangeEvent) =>
-            options.filterCallback(e.value)
-          }
-          optionLabel="Descripcion"
-          optionValue="Descripcion"
-          placeholder="Seleccionar"
-          className="p-column-filter"
-        />
+        {rowData.Tramite?.TipoTramite.IdTipoTramite == 1 ? (
+          <p className="text-sm m-0">
+            {`${rowData.AreaOrigen.Descripcion ?? ""}`}
+          </p>
+        ) : (
+          <div className="flex flex-row align-items-center gap-2">
+            <div
+              className="flex align-items-center justify-content-center text-center border-round-md"
+              style={{
+                background: themePrimeFlex === "light" ? "#eee" : "#333",
+              }}
+            >
+              <i
+                className="pi pi-globe px-2 py-2 "
+                style={{
+                  color: themePrimeFlex === "light" ? "#ee0a3cff" : "#db3458ff",
+                  fontSize: "1.3rem",
+                }}
+              ></i>
+            </div>
+            <div className="flex flex-column ">
+              <p className="text-sm m-0">
+                {rowData.Tramite?.TipoTramite.Descripcion ?? ""}
+              </p>
+              <span className="text-xs text-color-secondary m-0">
+                {rowData.Tramite?.Remitente.NroIdentificacion ?? ""}
+                {" | "}
+                {rowData.Tramite?.Remitente.Nombres ?? ""}{" "}
+                {rowData.Tramite?.Remitente.ApellidoPaterno ?? ""}{" "}
+                {rowData.Tramite?.Remitente.ApellidoMaterno ?? ""}
+              </span>
+            </div>
+          </div>
+        )}
       </>
     );
   };
 
-  // templates to column Activo
-  const activoBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column Remitente
+  const remitenteBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
-      <i
-        className={classNames("pi", {
-          "text-green-500 pl-5 pi-check-circle": rowData.Activo,
-          "text-red-500 pl-5 pi-times-circle": !rowData.Activo,
-        })}
-      ></i>
-    );
-  };
-
-  const activoFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <div className="flex align-items-center justify-content-center gap-2 w-12rem">
-        <label htmlFor="verified-filter" className="font-bold">
-          Activo
-        </label>
-        <TriStateCheckbox
-          id="verified-filter"
-          value={options.value}
-          onChange={(e: TriStateCheckboxChangeEvent) =>
-            options.filterCallback(e.value)
-          }
-        />
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">
+          {rowData.Tramite?.Remitente
+            ? `${rowData.Tramite?.Remitente.Nombres ?? ""} ${
+                rowData.Tramite?.Remitente.ApellidoPaterno ?? ""
+              } ${rowData.Tramite?.Remitente.ApellidoMaterno ?? ""}`
+            : ""}
+        </p>
       </div>
     );
   };
 
-  // templates to column ModificadoEl
-  const modifiadoElBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column Motivo_Acciones
+  const motivoAccionesBodyTemplate = (rowData: TramiteRecibidoEntity) => {
+    return (
+      <div className="flex flex-column gap-2">
+        <p className="text-sm m-0">{"SOLO DEPENDENCIA"}</p>
+        <span className="text-xs text-color-secondary m-0">
+          {rowData.Motivo ?? ""} {rowData.Acciones ?? ""}{" "}
+        </span>
+      </div>
+    );
+  };
+
+  // templates to column  Tpo
+  const tpoBodyTemplate = (rowData: any) => {
     return (
       <p className="text-sm m-0">
-        {!rowData.ModificadoEl
-          ? "00/00/0000, 00:00 TM"
-          : formatDate(new Date(rowData.ModificadoEl))}
+        {rowData.Tpo == "green" && (
+          <i
+            className="pi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#0aee97ff" : "#85db34ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
+        {rowData.Tpo == "orange" && (
+          <i
+            className="ppi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#ee9e0aff" : "#dba134ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
+        {rowData.Tpo == "red" && (
+          <i
+            className="pi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#ee0a3cff" : "#db3458ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
       </p>
     );
   };
 
-  const modifiadoElFilterTemplate = (
-    options: ColumnFilterElementTemplateOptions
-  ) => {
-    return (
-      <Calendar
-        value={options.value ? new Date(options.value) : null}
-        onChange={(e) => {
-          options.filterCallback(e.value, options.index);
-        }}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-        showIcon
-      />
-    );
+  // templates to column  Tpo
+  const EstadoBodyTemplate = (rowData: TramiteRecibidoEntity) => {
+    switch (rowData?.HistorialMovimientoxEstado[0]?.Estado.IdEstado) {
+      case 15: // Pendiente
+        return (
+          <Tag className="text-sm m-0" style={{background:"#3c3", width:"6rem"}}>
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          </Tag>
+        );
+      case 16: // Recibido
+        return (
+          <Tag className="text-sm m-0" severity="warning" style={{ width:"6rem"}}>
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          </Tag>
+        );
+      case 17: // Derivado
+        return (
+          <Tag className="text-sm m-0" severity="info" style={{ width:"6rem"}}>
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          </Tag>
+        );
+      case 18: // Atendido
+        return (
+          <Tag className="text-sm m-0" style={{background:"#3c3", width:"6rem"}}>
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          </Tag>
+        );
+      case 19: // Archivado
+        return (
+          <Tag className="text-sm m-0" severity="secondary" style={{ width:"6rem"}}>
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          </Tag>
+        );
+      case 20: // Observado
+        return (
+          <Tag className="text-sm m-0" severity="danger" style={{ width:"6rem"}}>
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          </Tag>
+        );
+    }
   };
 
-  // templates to column CreadoEl
-  const creadoElBodyTemplate = (rowData: EstadoEntity) => {
+  // templates to column  FechaMovimiento
+  const fechaMocimientoBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
       <p className="text-sm m-0">
-        {!rowData.CreadoEl ? "__" : formatDate(new Date(rowData.CreadoEl))}
+        {!rowData.FechaMovimiento
+          ? "__"
+          : formatDate(new Date(rowData.FechaMovimiento))}
       </p>
     );
   };
 
-  const creadoElFilterTemplate = (
+  const fechaMocimientoFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
@@ -756,34 +969,56 @@ const TramiteRecibido = () => {
   };
 
   // templates to actions update and remove on dataTable
-  const actionsBodyTemplate = (rowData: EstadoEntity) => {
+  const actionsBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
       <div style={{ display: "flex", flexWrap: "nowrap" }}>
         <Button
-          icon="pi pi-pencil"
-          className="mr-2"
-          style={{
-            width: "2rem",
-            height: "1rem",
-            color: "#fff",
+          type="button"
+          onClick={() => {
+            if (
+              selectedTramitesRecibidos?.length == 0 ||
+              (selectedTramitesRecibidos?.length == 1 &&
+                selectedTramitesRecibidos[0].IdMovimiento ==
+                  rowData.IdMovimiento)
+            ) {
+              if (
+                selectedTramitesRecibidos.find(
+                  (stp) => stp.IdMovimiento == rowData.IdMovimiento
+                ) == undefined
+              ) {
+                setSelectedTramitesRecibidos((prev) => [...prev, rowData]);
+              }
+
+              // showTramiteDetailsDialog(rowData);
+            }
           }}
-          onClick={() => showUpdateEstadoDialog(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          severity="danger"
+          size="small"
           style={{
-            width: "2rem",
-            height: "1rem",
+            padding: "0",
+            width: "6rem",
+            height: "2rem",
+            margin: "auto 0",
             color: "#fff",
+            background: "rgba(24, 61, 161, 1)",
+            border: "none",
           }}
-          onClick={() => confirmRemoveEstado(rowData)}
-        />
+        >
+          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+            <i className="pi pi-download text-sm"></i>
+            <span>Recibir</span>
+          </span>
+        </Button>
       </div>
     );
   };
 
   //useEffects
+  useEffect(() => {
+    if (userAuth?.IdUsuario) {
+      findAllTramiteRecibido();
+    }
+  }, [userAuth?.IdUsuario]);
+
   useEffect(() => {
     findAllEstado();
     findAllEsquemaEstadoCombox();
@@ -804,7 +1039,7 @@ const TramiteRecibido = () => {
       />
 
       <DataTable
-        value={estados}
+        value={tramitesRecibidos}
         sortMode="multiple"
         removableSort
         paginator
@@ -818,24 +1053,23 @@ const TramiteRecibido = () => {
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
-          "IdEstado",
-          "Descripcion",
-          "EsquemaEstado.Descripcion",
-          "Activo",
-          "CreadoEl",
-          "CreadoPor",
-          "ModificadoEl",
-          "ModificadoPor",
+          "Tramite.IdTramite",
+          "Detalle",
+          "Origen",
+          "Remitente.NombreCompleto",
+          "Motivo_Acciones",
+          "FechaMovimiento",
+          "Estado",
         ]}
         emptyMessage={<EmptyMessageData loading={loading} />}
         selectionMode="multiple"
-        selection={selectedEstados}
+        selection={selectedTramitesRecibidos}
         onSelectionChange={(e) => {
           if (Array.isArray(e.value)) {
-            setSelectedEstados(e.value);
+            setSelectedTramitesRecibidos(e.value);
           }
         }}
-        dataKey="IdEstado"
+        dataKey="Tramite.IdTramite"
         selectionPageOnly
         // loading={loading}
       >
@@ -845,13 +1079,12 @@ const TramiteRecibido = () => {
           headerStyle={{ width: "0%" }}
         />
         {visibleColumns.map((col) => {
-          if (col.field == "EsquemaEstado") {
+          if (col.field == "Detalle") {
             return (
               <Column
                 key={col.field}
                 field={col.filterField}
                 filterField={col.filterField}
-                showFilterMatchModes={false}
                 sortField={col.filterField}
                 header={col.header}
                 dataType={col.dataType}
@@ -859,26 +1092,74 @@ const TramiteRecibido = () => {
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={esquemaEstadoBodyTemplate}
-                filterElement={esquemaEstadoFilterTemplate}
+                body={detalleBodyTemplate}
               />
             );
-          } else if (col.field == "Activo") {
+          } else if (col.field == "IdTramite") {
             return (
               <Column
                 key={col.field}
                 field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
                 header={col.header}
                 dataType={col.dataType}
                 sortable
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={activoBodyTemplate}
-                filterElement={activoFilterTemplate}
+                body={idTramiteBodyTemplate}
               />
             );
-          } else if (col.field == "CreadoEl") {
+          } else if (col.field == "Origen") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={origenBodyTemplate}
+              />
+            );
+          } else if (col.field == "Remitente") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={remitenteBodyTemplate}
+              />
+            );
+          } else if (col.field == "Motivo_Acciones") {
+            return (
+              <Column
+                key={col.field}
+                field={col.field}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={motivoAccionesBodyTemplate}
+              />
+            );
+          } else if (col.field == "FechaMovimiento") {
             return (
               <Column
                 key={col.field}
@@ -890,11 +1171,11 @@ const TramiteRecibido = () => {
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={creadoElBodyTemplate}
-                filterElement={creadoElFilterTemplate}
+                body={fechaMocimientoBodyTemplate}
+                filterElement={fechaMocimientoFilterTemplate}
               />
             );
-          } else if (col.field == "ModificadoEl") {
+          } else if (col.field == "Tpo") {
             return (
               <Column
                 key={col.field}
@@ -906,8 +1187,23 @@ const TramiteRecibido = () => {
                 style={{ width: col.width, padding: 5 }}
                 filter
                 filterPlaceholder={col.filterPlaceholder}
-                body={modifiadoElBodyTemplate}
-                filterElement={modifiadoElFilterTemplate}
+                body={tpoBodyTemplate}
+              />
+            );
+          } else if (col.field == "Estado") {
+            return (
+              <Column
+                key={col.field}
+                field={col.filterField}
+                filterField={col.filterField}
+                sortField={col.filterField}
+                header={col.header}
+                dataType={col.dataType}
+                sortable
+                style={{ width: col.width, padding: 5 }}
+                filter
+                filterPlaceholder={col.filterPlaceholder}
+                body={EstadoBodyTemplate}
               />
             );
           } else {

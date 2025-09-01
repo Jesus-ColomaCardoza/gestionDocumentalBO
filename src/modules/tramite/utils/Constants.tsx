@@ -6,6 +6,7 @@ import {
   TramiteEntity,
   TramiteExternoRecibir,
   TramitePendienteEntity,
+  TramiteRecibidoEntity,
 } from "../interfaces/TramiteInterface";
 
 export const columns: ColumnMeta[] = [
@@ -166,6 +167,80 @@ export const columnsTramitePendiente: ColumnMeta[] = [
   },
 ];
 
+export const columnsTramiteRecibido: ColumnMeta[] = [
+  {
+    field: "IdTramite",
+    filterField: "Tramite.IdTramite",
+    header: "Id",
+    dataType: "numeric",
+    width: "5%",
+    show: true,
+    filterPlaceholder: "Buscar por IdTramite",
+  },
+  {
+    field: "Detalle",
+    filterField: "Detalle",
+    header: "Detalle",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Detalle",
+  },
+  {
+    field: "Origen",
+    filterField: "Origen",
+    header: "Origen",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Origen",
+  },
+  {
+    field: "Remitente",
+    filterField: "Remitente.NombreCompleto",
+    header: "Remitente",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Remitente",
+  },
+  {
+    field: "Motivo_Acciones",
+    filterField: "Motivo_Acciones",
+    header: "Motivo/Acciones",
+    dataType: "text",
+    width: "15%",
+    show: true,
+    filterPlaceholder: "Buscar por Motivo/Acciones",
+  },
+  {
+    field: "Tpo",
+    filterField: "Tpo",
+    header: "Tpo",
+    dataType: "text",
+    width: "5%",
+    show: true,
+    filterPlaceholder: "Buscar por tiempo",
+  },
+  {
+    field: "FechaMovimiento",
+    header: "Fecha",
+    dataType: "date",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Fecha",
+  },
+  {
+    field: "Estado",
+    filterField: "Estado",
+    header: "Estado",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Estado",
+  },
+];
+
 export const defaultFiltersTramitePendiente: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   "Tramite.IdTramite": {
@@ -190,11 +265,47 @@ export const defaultFiltersTramitePendiente: DataTableFilterMeta = {
   },
   Tpo: {
     operator: FilterOperator.AND,
-    constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
   FechaMovimiento: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+  },
+};
+
+export const defaultFiltersTramiteRecibido: DataTableFilterMeta = {
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  "Tramite.IdTramite": {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Detalle: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Origen: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  "Remitente.NombreCompleto": {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Motivo_Acciones: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  Tpo: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  FechaMovimiento: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.DATE_IS }],
+  },
+  Estado: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
 };
 
@@ -256,6 +367,82 @@ export let emptyTramite: TramiteEntity = {
 
 export let emptyTramitePendiente: TramitePendienteEntity = {
   IdMovimiento: 0,
+  Documento: {
+    IdDocumento: 0,
+    CodigoReferenciaDoc: "",
+    Asunto: "",
+    Observaciones: "",
+    Folios: 0,
+    TipoDocumento: {
+      IdTipoDocumento: 0,
+      Descripcion: "",
+    },
+  },
+  AreaOrigen: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  AreaDestino: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  Acciones: "",
+  Motivo: "",
+  FechaMovimiento: null,
+  NombreResponsable: "",
+  Tramite: {
+    IdTramite: 0,
+    CodigoReferenciaTram: "",
+    Descripcion: "",
+    FechaInicio: null,
+    FechaFin: null,
+    IdTipoTramite: 0,
+    IdRemitente: 0,
+    IdEstado: 0,
+    IdDocumento: 0,
+    TipoTramite: {
+      IdTipoTramite: 0,
+      Descripcion: "",
+    },
+    Remitente: {
+      IdUsuario: 0,
+      Nombres: "",
+      ApellidoPaterno: "",
+      ApellidoMaterno: "",
+      NroIdentificacion: "",
+    },
+    Estado: {
+      IdEstado: 0,
+      Descripcion: "",
+    },
+    // Documento: {
+    //   IdDocumento: 0,
+    //   CodigoReferenciaDoc: "",
+    //   Asunto: "",
+    //   Observaciones: "",
+    //   Folios: 0,
+    //   TipoDocumento: {
+    //     IdTipoDocumento: 0,
+    //     Descripcion: "",
+    //   },
+    // },
+  },
+};
+
+export let emptyTramiteRecibido: TramiteRecibidoEntity = {
+  IdMovimiento: 0,
+  HistorialMovimientoxEstado: [
+    {
+      IdHistorialMxE: 0,
+      FechaHistorialMxE: "",
+      Estado: {
+        IdEstado: 0,
+        Descripcion: "",
+      },
+      // Observaciones:string,
+      // Detalle:string,
+    },
+  ],
   Documento: {
     IdDocumento: 0,
     CodigoReferenciaDoc: "",

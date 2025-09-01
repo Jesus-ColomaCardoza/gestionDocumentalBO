@@ -7,6 +7,8 @@ import {
   TramitesPendientesOut,
   GetAllTramitePendiente,
   TramiteRecibir,
+  TramitesRecibidosOut,
+  GetAllTramiteRecibido,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -107,6 +109,20 @@ const UseTramite = () => {
     }
   };
 
+  const findAllRecibidos= async (
+    getAllTramiteRecibido: GetAllTramiteRecibido
+  ): Promise<TramitesRecibidosOut | undefined> => {
+    try {
+      const tramites = await axios.post<TramitesRecibidosOut>(
+        `${VITE_API_URL_GDS + TRAMITE.FIND_ALL_RECIBIDOS}`,
+        getAllTramiteRecibido
+      );
+      return tramites.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const findOne = async (id: string): Promise<TramiteOut | undefined> => {
     try {
       const tramite = await axios.get<TramiteOut>(
@@ -151,6 +167,7 @@ const UseTramite = () => {
     recibir,
     findAll,
     findAllPendientes,
+    findAllRecibidos,
     findOne,
     update,
     remove,
