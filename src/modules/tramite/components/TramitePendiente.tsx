@@ -902,9 +902,15 @@ const TramitePendiente = () => {
   const fechaMocimientoBodyTemplate = (rowData: TramitePendienteEntity) => {
     return (
       <p className="text-sm m-0">
-        {!rowData.FechaMovimiento
-          ? "__"
-          : formatDate(new Date(rowData.FechaMovimiento))}
+        {!rowData.FechaMovimiento ? (
+          "__"
+        ) : (
+          <>
+            {formatDate(new Date(rowData.FechaMovimiento)).split(",")[0]}
+            <br />
+            {formatDate(new Date(rowData.FechaMovimiento)).split(",")[1]}
+          </>
+        )}
       </p>
     );
   };

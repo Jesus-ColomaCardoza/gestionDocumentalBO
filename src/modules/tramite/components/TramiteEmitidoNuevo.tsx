@@ -655,6 +655,8 @@ const TramiteEmitidoNuevo = () => {
     if (userAuth?.IdUsuario) {
       setTramiteEmitidoCreate({
         ...emptyTramiteEmitidoCreate,
+        IdAreaEmision: userAuth.Area.IdArea,
+
         Area: {
           IdArea: userAuth.Area.IdArea,
           Descripcion: userAuth.Area.Descripcion,

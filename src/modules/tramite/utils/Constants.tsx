@@ -223,6 +223,15 @@ export const columnsTramiteRecibido: ColumnMeta[] = [
     filterPlaceholder: "Buscar por tiempo",
   },
   {
+    field: "NombreResponsable",
+    filterField: "NombreResponsable",
+    header: "Responsable",
+    dataType: "text",
+    width: "5%",
+    show: true,
+    filterPlaceholder: "Buscar por Responsable",
+  },
+  {
     field: "FechaMovimiento",
     header: "Fecha",
     dataType: "date",
@@ -296,6 +305,10 @@ export const defaultFiltersTramiteRecibido: DataTableFilterMeta = {
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },
   Tpo: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
+  NombreResponsable: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
   },

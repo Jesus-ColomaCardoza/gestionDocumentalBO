@@ -505,7 +505,7 @@ const TramiteRecibidoExterno = () => {
         return;
       }
 
-      // console.log(Array.from(files));
+      console.log(Array.from(files));
 
       setSelectedAnexos((prev) => [...prev, ...Array.from(files)]);
       // const formData = new FormData();
@@ -1737,11 +1737,11 @@ const TramiteRecibidoExterno = () => {
             <Button
               type="button"
               onClick={() => {
-                        navigate("../tramite/recibido");
+                        // navigate("../tramite/recibido");
 
-                // if (validateForm()) {
-                //   recibirTramiteExterno();
-                // }
+                if (validateForm()) {
+                  recibirTramiteExterno();
+                }
               }}
               size="small"
               style={{

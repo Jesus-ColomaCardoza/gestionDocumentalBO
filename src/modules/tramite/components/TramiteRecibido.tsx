@@ -46,6 +46,8 @@ import { differenceInHours } from "date-fns";
 import { TramiteRecibidoEntity } from "../interfaces/TramiteInterface";
 import { useTheme } from "../../../ThemeContext";
 import { Tag } from "primereact/tag";
+import { Menu } from "primereact/menu";
+import { de } from "date-fns/locale";
 
 const TramiteRecibido = () => {
   // custom hooks
@@ -559,7 +561,7 @@ const TramiteRecibido = () => {
   const onColumnToggle = (event: MultiSelectChangeEvent) => {
     let selectedColumns = event.value;
 
-    let orderedSelectedColumns = columns.filter((col) =>
+    let orderedSelectedColumns = columnsTramiteRecibido.filter((col) =>
       selectedColumns.some((sCol: ColumnMeta) => sCol.field === col.field)
     );
     setVisibleColumns(orderedSelectedColumns);
@@ -692,7 +694,7 @@ const TramiteRecibido = () => {
         </IconField>
         <MultiSelect
           value={visibleColumns}
-          options={columns}
+          options={columnsTramiteRecibido}
           optionLabel="header"
           onChange={onColumnToggle}
           display="comma"
@@ -903,38 +905,65 @@ const TramiteRecibido = () => {
     switch (rowData?.HistorialMovimientoxEstado[0]?.Estado.IdEstado) {
       case 15: // Pendiente
         return (
-          <Tag className="text-sm m-0" style={{background:"#3c3", width:"6rem"}}>
-            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          <Tag
+            className="text-sm m-0"
+            style={{ background: "#3c3", width: "7rem" }}
+          >
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion.toUpperCase() ??
+              ""}
           </Tag>
         );
       case 16: // Recibido
         return (
-          <Tag className="text-sm m-0" severity="warning" style={{ width:"6rem"}}>
-            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          <Tag
+            className="text-sm m-0"
+            severity="warning"
+            style={{ width: "7rem" }}
+          >
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion.toUpperCase() ??
+              ""}
           </Tag>
         );
       case 17: // Derivado
         return (
-          <Tag className="text-sm m-0" severity="info" style={{ width:"6rem"}}>
-            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          <Tag
+            className="text-sm m-0"
+            severity="info"
+            style={{ width: "7rem" }}
+          >
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion.toUpperCase() ??
+              ""}
           </Tag>
         );
       case 18: // Atendido
         return (
-          <Tag className="text-sm m-0" style={{background:"#3c3", width:"6rem"}}>
-            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          <Tag
+            className="text-sm m-0"
+            style={{ background: "#3c3", width: "7rem" }}
+          >
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion.toUpperCase() ??
+              ""}
           </Tag>
         );
       case 19: // Archivado
         return (
-          <Tag className="text-sm m-0" severity="secondary" style={{ width:"6rem"}}>
-            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          <Tag
+            className="text-sm m-0"
+            style={{ background: "rgba(153, 146, 158, 1)", width: "7rem" }}
+          >
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion.toUpperCase() ??
+              ""}
           </Tag>
         );
       case 20: // Observado
         return (
-          <Tag className="text-sm m-0" severity="danger" style={{ width:"6rem"}}>
-            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+          <Tag
+            className="text-sm m-0"
+            severity="danger"
+            style={{ width: "7rem" }}
+          >
+            {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion.toUpperCase() ??
+              ""}
           </Tag>
         );
     }
@@ -944,9 +973,15 @@ const TramiteRecibido = () => {
   const fechaMocimientoBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
       <p className="text-sm m-0">
-        {!rowData.FechaMovimiento
-          ? "__"
-          : formatDate(new Date(rowData.FechaMovimiento))}
+        {!rowData.FechaMovimiento ? (
+          "__"
+        ) : (
+          <>
+            {formatDate(new Date(rowData.FechaMovimiento)).split(",")[0]}
+            <br />
+            {formatDate(new Date(rowData.FechaMovimiento)).split(",")[1]}
+          </>
+        )}
       </p>
     );
   };
@@ -969,46 +1004,225 @@ const TramiteRecibido = () => {
   };
 
   // templates to actions update and remove on dataTable
+  const getItemsMenuActionsTR = (
+    rowData: TramiteRecibidoEntity
+  ): MenuItem[] => {
+    switch (rowData?.HistorialMovimientoxEstado[0]?.Estado.IdEstado) {
+      case 15: // Pendiente
+        // <Tag
+        //   className="text-sm m-0"
+        //   style={{ background: "#3c3", width: "6rem" }}
+        // >
+        //   {rowData?.HistorialMovimientoxEstado[0]?.Estado.Descripcion ?? ""}
+        // </Tag>
+        return [];
+      case 16: // Recibido
+        return [
+          {
+            label: "Derivar",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-file-plus",
+            command: () => {
+              navigate("./derivado");
+            },
+          },
+          {
+            label: "Atender",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            // icon: "pi pi-file-export",
+            icon: "pi pi-check-circle",
+            command: () => {
+              //here
+              showTramiteRecibidoAtendidoDialog("simple");
+            },
+          },
+          {
+            label: "Observar",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-info-circle",
+            command: () => {},
+          },
+          {
+            label: "Archivar",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-minus-circle",
+            command: () => {
+              showTramiteArchivarDialog();
+            },
+          },
+          {
+            label: "Adjunatr PDF",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-paperclip",
+            command: () => {
+              // confirmRemoveCarpeta({
+              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+              //   Descripcion: rowData.Descripcion,
+              //   CreadoEl: rowData.FechaEmision,
+              //   Categoria: rowData.Categoria,
+              //   IdUsuario: rowData.Usuario.IdUsuario,
+              //   Activo: rowData.Activo,
+              // });
+            },
+          },
+          {
+            label: "Anular recepción",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-eraser",
+            command: () => {
+              // confirmRemoveCarpeta({
+              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+              //   Descripcion: rowData.Descripcion,
+              //   CreadoEl: rowData.FechaEmision,
+              //   Categoria: rowData.Categoria,
+              //   IdUsuario: rowData.Usuario.IdUsuario,
+              //   Activo: rowData.Activo,
+              // });
+            },
+          },
+          // { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
+        ];
+      case 17: // Derivado
+        return [
+          {
+            label: "Desmarcar derivación",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-eraser",
+            command: () => {
+              // showUpdateCarpetaDialog({
+              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+              //   Descripcion: rowData.Descripcion,
+              //   CreadoEl: rowData.FechaEmision,
+              //   Categoria: rowData.Categoria,
+              //   IdUsuario: rowData.Usuario.IdUsuario,
+              //   Activo: rowData.Activo,
+              // });
+            },
+          },
+        ];
+      case 18: // Atendido
+        return [
+          {
+            label: "Desmarcar atendido",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-eraser",
+            command: () => {
+              // showUpdateCarpetaDialog({
+              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+              //   Descripcion: rowData.Descripcion,
+              //   CreadoEl: rowData.FechaEmision,
+              //   Categoria: rowData.Categoria,
+              //   IdUsuario: rowData.Usuario.IdUsuario,
+              //   Activo: rowData.Activo,
+              // });
+            },
+          },
+        ];
+      case 19: // Archivado
+        return [
+          {
+            label: "Desarchivar",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-eraser",
+            command: () => {
+              // showUpdateCarpetaDialog({
+              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+              //   Descripcion: rowData.Descripcion,
+              //   CreadoEl: rowData.FechaEmision,
+              //   Categoria: rowData.Categoria,
+              //   IdUsuario: rowData.Usuario.IdUsuario,
+              //   Activo: rowData.Activo,
+              // });
+            },
+          },
+        ];
+      case 20: // Observado
+        return [
+          {
+            label: "Levantar Observación",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-eraser",
+            command: () => {
+              // showUpdateCarpetaDialog({
+              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
+              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
+              //   Descripcion: rowData.Descripcion,
+              //   CreadoEl: rowData.FechaEmision,
+              //   Categoria: rowData.Categoria,
+              //   IdUsuario: rowData.Usuario.IdUsuario,
+              //   Activo: rowData.Activo,
+              // });
+            },
+          },
+        ];
+
+      default:
+        return [];
+    }
+  };
+
+  const menuActionsTR = useRef<Menu>(null);
+  const [itemsMenuActionsTR, setItemsMenuActionsTR] = useState<MenuItem[]>([]);
+
   const actionsBodyTemplate = (rowData: TramiteRecibidoEntity) => {
     return (
-      <div style={{ display: "flex", flexWrap: "nowrap" }}>
+      <>
+        <Menu
+          model={itemsMenuActionsTR}
+          popup
+          ref={menuActionsTR}
+          id="popup_menu_right"
+          popupAlignment="right"
+        />
         <Button
-          type="button"
-          onClick={() => {
-            if (
-              selectedTramitesRecibidos?.length == 0 ||
-              (selectedTramitesRecibidos?.length == 1 &&
-                selectedTramitesRecibidos[0].IdMovimiento ==
-                  rowData.IdMovimiento)
-            ) {
-              if (
-                selectedTramitesRecibidos.find(
-                  (stp) => stp.IdMovimiento == rowData.IdMovimiento
-                ) == undefined
-              ) {
-                setSelectedTramitesRecibidos((prev) => [...prev, rowData]);
-              }
-
-              // showTramiteDetailsDialog(rowData);
-            }
+          icon="pi pi-bars"
+          className="mr-2"
+          onClick={(event) => {
+            setItemsMenuActionsTR(getItemsMenuActionsTR(rowData));
+            menuActionsTR.current?.toggle(event);
           }}
+          aria-controls="popup_menu_right"
+          aria-haspopup
+          text
           size="small"
-          style={{
-            padding: "0",
-            width: "6rem",
-            height: "2rem",
-            margin: "auto 0",
-            color: "#fff",
-            background: "rgba(24, 61, 161, 1)",
-            border: "none",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-            <i className="pi pi-download text-sm"></i>
-            <span>Recibir</span>
-          </span>
-        </Button>
-      </div>
+          severity="secondary"
+        />
+      </>
     );
   };
 
@@ -1049,6 +1263,46 @@ const TramiteRecibido = () => {
         scrollable
         scrollHeight="60vh"
         header={headerDataTable}
+        footer={
+          <div className="flex flex-row flex-wrap justify-content-start gap-3">
+            <span className="flex gap-1 align-items-center text-xs">
+              <i
+                className="pi pi-circle-fill text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#0aee97ff" : "#85db34ff",
+                }}
+              ></i>
+              <span>A tiempo</span>
+            </span>
+            <span className="flex gap-1 align-items-center  text-xs">
+              <i
+                className="pi pi-circle-fill text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#ee9e0aff" : "#dba134ff",
+                }}
+              ></i>
+              <span>Acción urgente</span>
+            </span>
+            <span className="flex gap-1 align-items-center text-xs">
+              <i
+                className="pi pi-circle-fill text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#ee0a3cff" : "#db3458ff",
+                }}
+              ></i>
+              <span>Atender ahora</span>
+            </span>
+            <span className="flex gap-1 align-items-center text-xs">
+              <i
+                className="pi pi-circle-fill text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#3653d4ff" : "#3653d4ff",
+                }}
+              ></i>
+              <span>Atendido / Derivado</span>
+            </span>
+          </div>
+        }
         paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}

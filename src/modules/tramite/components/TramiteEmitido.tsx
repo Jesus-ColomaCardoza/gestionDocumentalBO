@@ -420,9 +420,15 @@ const TramiteEmitido = () => {
   const fechaInicioBodyTemplate = (rowData: TramiteEntity) => {
     return (
       <p className="text-sm m-0">
-        {!rowData.FechaInicio
-          ? "__"
-          : formatDate(new Date(rowData.FechaInicio))}
+        {!rowData.FechaInicio ? (
+          "__"
+        ) : (
+          <>
+            {formatDate(new Date(rowData.FechaInicio)).split(",")[0]}
+            <br />
+            {formatDate(new Date(rowData.FechaInicio)).split(",")[1]}
+          </>
+        )}
       </p>
     );
   };
