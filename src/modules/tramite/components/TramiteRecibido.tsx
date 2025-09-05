@@ -161,7 +161,7 @@ const TramiteRecibido = () => {
                 tpoColor = "green";
               } else if (tpo >= 13 && tpo <= 24) {
                 // accion urgente
-                tpoColor = "orage";
+                tpoColor = "orange";
               } else {
                 // retraso
                 tpoColor = "red";
@@ -880,7 +880,7 @@ const TramiteRecibido = () => {
         )}
         {rowData.Tpo == "orange" && (
           <i
-            className="ppi pi-circle-fill"
+            className="pi pi-circle-fill"
             style={{
               color: themePrimeFlex === "light" ? "#ee9e0aff" : "#dba134ff",
               fontSize: ".6rem",

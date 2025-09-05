@@ -215,6 +215,8 @@ const TramiteEmitidoNuevo = () => {
       ) {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
+        setSelectedAnexos([])
+
         navigate("../tramite/emitido");
 
         toast.current?.show({
@@ -230,7 +232,6 @@ const TramiteEmitidoNuevo = () => {
         });
       }
 
-      // setSelectedAnexos([])
       // setFileManagerDialog(false);
       // setTramiteEmitidoCreate(emptyTramite);
     }

@@ -18,6 +18,7 @@ const SideBar = (props: SideBarProps) => {
   const btnRef2 = useRef<any>(null);
   const btnRef3 = useRef<any>(null);
   const btnRef4 = useRef<any>(null);
+  const btnRef5 = useRef<any>(null);
 
   const navigate = useNavigate();
 
@@ -521,7 +522,7 @@ const SideBar = (props: SideBarProps) => {
         <ul className="list-none px-2">
           <li>
             <StyleClass
-              nodeRef={btnRef1}
+              nodeRef={btnRef5}
               selector="@next"
               enterFromClassName="hidden"
               enterActiveClassName="slidedown"
@@ -529,7 +530,7 @@ const SideBar = (props: SideBarProps) => {
               leaveActiveClassName="slideup"
             >
               <div
-                ref={btnRef1}
+                ref={btnRef5}
                 className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
               >
                 <span className="font-medium">Otros</span>

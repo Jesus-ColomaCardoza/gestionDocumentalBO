@@ -259,6 +259,8 @@ const TramiteRecibidoExterno = () => {
       ) {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
+        setSelectedAnexos([]);
+        
         navigate("../tramite/recibido");
 
         toast.current?.show({
@@ -274,7 +276,6 @@ const TramiteRecibidoExterno = () => {
         });
       }
 
-      // setSelectedAnexos([])
       // setFileManagerDialog(false);
       // setTramiteEmitidoCreate(emptyTramite);
     }
@@ -1737,7 +1738,7 @@ const TramiteRecibidoExterno = () => {
             <Button
               type="button"
               onClick={() => {
-                        // navigate("../tramite/recibido");
+                // navigate("../tramite/recibido");
 
                 if (validateForm()) {
                   recibirTramiteExterno();
