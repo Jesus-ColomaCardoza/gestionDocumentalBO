@@ -15,17 +15,11 @@ import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useNavigate } from "react-router-dom";
 
-type TramiteRecibidoAtendidoModalProps = {
+type TramiteRecibidoObservadoModalProps = {
   submitted: boolean;
-  hideTramiteRecibidoAtendidoDialog: (type: "multiple" | "simple") => void;
-  showTramiteRecibidoAtendidoDialog: (
-    type: "multiple" | "simple",
-    tramiteRecibido: TramiteRecibidoEntity
-  ) => void;
-  tramiteRecibidoAtendidoDialog: {
-    type: "multiple" | "simple";
-    state: boolean;
-  };
+  hideTramiteRecibidoObservadoDialog: () => void;
+  showTramiteRecibidoObservadoDialog: () => void;
+  tramiteRecibidoObservadoDialog: boolean;
   selectedTramitesRecibidos: TramiteRecibidoEntity[];
   tramiteRecibido: TramiteRecibidoEntity;
   observaciones: string;
@@ -35,30 +29,11 @@ type TramiteRecibidoAtendidoModalProps = {
   // setSelectedTramiteDestinos: Dispatch<SetStateAction<MovimientoEntity[]>>;
 };
 
-const TramiteRecibidoAtendidoModal = (
-  props: TramiteRecibidoAtendidoModalProps
+const TramiteRecibidoObservadoModal = (
+  props: TramiteRecibidoObservadoModalProps
 ) => {
-  const navigate = useNavigate();
-
   const estadoDialogFooter = (
-    <div className="flex flex-row justify-content-between">
-      <div>
-        {props.tramiteRecibidoAtendidoDialog.type == "multiple" && (
-          <Button
-            label="Atender con documento"
-            icon="pi pi-file-arrow-up"
-            outlined
-            severity="success"
-            size="small"
-            onClick={() => {
-              props.hideTramiteRecibidoAtendidoDialog("simple");
-              navigate(
-                `../tramite/recibido/atendido/${props.tramiteRecibido.IdMovimiento}`
-              );
-            }}
-          />
-        )}
-      </div>
+    <div className="flex flex-row justify-content-end">
       <div>
         <Button
           label="Cancel"
@@ -66,7 +41,7 @@ const TramiteRecibidoAtendidoModal = (
           outlined
           size="small"
           onClick={() => {
-            props.hideTramiteRecibidoAtendidoDialog("simple");
+            props.hideTramiteRecibidoObservadoDialog();
           }}
         />
         <Button
@@ -82,15 +57,15 @@ const TramiteRecibidoAtendidoModal = (
 
   return (
     <Dialog
-      visible={props.tramiteRecibidoAtendidoDialog.state}
+      visible={props.tramiteRecibidoObservadoDialog}
       style={{ width: "40rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Detalle de trámite a atander"
+      header="Detalle de trámite a observar"
       modal
       className="p-fluid"
       footer={estadoDialogFooter}
       onHide={() => {
-        props.hideTramiteRecibidoAtendidoDialog("simple");
+        props.hideTramiteRecibidoObservadoDialog();
       }}
     >
       <div className="flex flex-row" style={{ gap: "1rem" }}>
@@ -110,7 +85,7 @@ const TramiteRecibidoAtendidoModal = (
               <InputTextarea
                 id="IdTramite"
                 value={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos
                         .map(
                           (str, index) =>
@@ -122,7 +97,7 @@ const TramiteRecibidoAtendidoModal = (
                             )}`
                         )
                         .join("\n")
-                    : props.tramiteRecibido.Tramite?.IdTramite.toString().padStart(
+                    : props.tramiteRecibido?.Tramite?.IdTramite.toString().padStart(
                         8,
                         "0"
                       )
@@ -130,7 +105,7 @@ const TramiteRecibidoAtendidoModal = (
                 // onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                 autoFocus
                 rows={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos.length
                     : 1
                 }
@@ -163,7 +138,7 @@ const TramiteRecibidoAtendidoModal = (
               <InputTextarea
                 id="Documento"
                 value={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos
                         .map(
                           (str, index) =>
@@ -175,15 +150,15 @@ const TramiteRecibidoAtendidoModal = (
                             }`
                         )
                         .join("\n")
-                    : props.tramiteRecibido.Documento?.TipoDocumento
+                    : props.tramiteRecibido?.Documento?.TipoDocumento
                         ?.Descripcion +
                       " " +
-                      props.tramiteRecibido.Documento?.CodigoReferenciaDoc
+                      props.tramiteRecibido?.Documento?.CodigoReferenciaDoc
                 }
                 // onChange={(e) => onInputTextAreaChange(e, "Documento")}
                 autoFocus
                 rows={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos.length
                     : 1
                 }
@@ -266,7 +241,6 @@ const TramiteRecibidoAtendidoModal = (
                 value={props.observaciones || ""}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                   const value = (e.target && e.target.value) || "";
-
                   props.setObservaciones(value);
                 }}
                 autoFocus
@@ -286,4 +260,4 @@ const TramiteRecibidoAtendidoModal = (
   );
 };
 
-export default TramiteRecibidoAtendidoModal;
+export default TramiteRecibidoObservadoModal;

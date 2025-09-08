@@ -2,6 +2,7 @@ import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
 import { FileManagerEntity } from "../../file-manager/interfaces/FileMangerInterface";
 import { MovimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
 import { Message } from "../../utils/Interfaces";
+import Usuario from '../../usuario/components/Usuario';
 
 type Fecha = Date | string | null;
 export interface TramiteEntity {
@@ -213,6 +214,79 @@ export interface TramiteRecibidoEntity {
     // },
   }
 }
+export interface TramiteAtendidoEntity {
+  IdMovimiento: number,
+  HistorialMovimientoxEstado: {
+    IdHistorialMxE: number,
+    FechaHistorialMxE: string,
+    Estado: {
+      IdEstado: number,
+      Descripcion: string,
+    }
+    // Observaciones:string,
+    // Detalle:string,
+  }[],
+  Documento: {
+    IdDocumento: number,
+    CodigoReferenciaDoc: string,
+    Asunto: string,
+    Observaciones: string,
+    Folios: number,
+    TipoDocumento: {
+      IdTipoDocumento: number,
+      Descripcion: string,
+    },
+  },
+  AreaOrigen: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  AreaDestino: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  Acciones: string,
+  Motivo: string,
+  FechaMovimiento: Fecha,
+  NombreResponsable: string,
+  Tramite: {
+    IdTramite: number,
+    CodigoReferenciaTram: string,
+    Descripcion: string,
+    FechaInicio: Fecha,
+    FechaFin: Fecha,
+    IdTipoTramite: number,
+    IdRemitente: number,
+    IdEstado: number,
+    IdDocumento: number,
+    TipoTramite: {
+      IdTipoTramite: number,
+      Descripcion: string,
+    },
+    Remitente: {
+      IdUsuario: number,
+      Nombres: string,
+      ApellidoPaterno: string,
+      ApellidoMaterno: string,
+      NroIdentificacion: string,
+    },
+    Estado: {
+      IdEstado: number,
+      Descripcion: string,
+    };
+    // Documento: {
+    //   IdDocumento: number,
+    //   CodigoReferenciaDoc: string,
+    //   Asunto: string,
+    //   Observaciones: string,
+    //   Folios: number,
+    //   TipoDocumento: {
+    //     IdTipoDocumento: number,
+    //     Descripcion: string,
+    //   },
+    // },
+  }
+}
 
 export interface TramiteCreate {
   Activo: boolean;
@@ -255,6 +329,35 @@ export interface TramiteEmitidoCreate {
   //data others
   DigitalFiles?: FileManagerEntity[];
   TramiteDestinos?: MovimientoEntity[];
+  Anexos?: AnexoEntity[]
+}
+export interface TramiteRecibidoAtendidoCreate {
+  //NOTA EL REMITENTE AQUI ES EL IDUSUARIO EN LA TABLA DOCUMENTO
+  //data Movimiento
+  IdMovimiento?: number;
+
+  IdRemitente: number;
+  Remitente?: {
+    IdUsuario: number,
+    Nombres: string,
+    ApellidoPaterno: string,
+    ApellidoMaterno: string,
+  },
+
+  //data documento
+  Visible: boolean;
+  CodigoReferenciaDoc: string;
+  Asunto: string;
+  Observaciones: string;
+  Folios: number;
+  IdTipoDocumento: number;
+  TipoDocumento?: {
+    IdTipoDocumento: number;
+    Descripcion: string;
+  };
+
+  //data others
+  DigitalFiles?: FileManagerEntity[];
   Anexos?: AnexoEntity[]
 }
 export interface TramiteExternoRecibir {
@@ -322,6 +425,19 @@ export interface TramiteOut {
   message: Message;
   registro?: TramiteEntity;
 }
+export interface TramitePendienteOut {
+  message: Message;
+  registro?: TramitePendienteEntity;
+}
+export interface TramiteRecibidoOut {
+  message: Message;
+  registro?: TramiteRecibidoEntity[];
+}
+export interface TramiteAtendidoOut {
+  message: Message;
+  // registro?: TramiteAtendidoEntity[];
+  registro?: { Movimientos: any[] };
+}
 export interface TramitesOut {
   message: Message;
   registro?: TramiteEntity[];
@@ -351,6 +467,22 @@ export interface TramiteRecibir {
     CreadoEl?: Date
   }[];
   Observaciones: string;
+}
+export interface TramiteAtender {
+  Movimientos: {
+    IdEstado?: number
+    IdMovimiento: number
+    Observaciones?: string
+    FechaHistorialMxE?: Date
+    Activo?: boolean
+    CreadoPor?: string
+    CreadoEl?: Date
+  }[];
+  Observaciones: string;
+}
+export interface TramiteAtenderWithDocumento {
+
+
 }
 
 

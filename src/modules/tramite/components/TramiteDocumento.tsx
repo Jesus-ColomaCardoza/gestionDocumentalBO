@@ -140,7 +140,10 @@ const TramiteDocumento = () => {
     <div className="card p-0 m-0">
       <Toast ref={toast} position={"bottom-right"} />
 
-      <div className="flex flex-row flex-wrap justify-content-between">
+      <div
+        className="flex flex-row flex-wrap justify-content-between"
+        style={{ minHeight: "70vh" }}
+      >
         <div
           className="flex flex-column justify-content-between border-solid border-1 border-gray-500 border-round-md"
           style={{ width: "24%" }}

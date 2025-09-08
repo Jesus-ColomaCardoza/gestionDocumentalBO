@@ -22,6 +22,7 @@ import {
   columnsTramiteRecibido,
   defaultFilters,
   defaultFiltersTramiteRecibido,
+  emptyTramiteRecibido,
 } from "../utils/Constants";
 import EstadoCreateOrUpdate from "./TramiteDestinosModal";
 import EstadoRemove from "./EstadoRemove";
@@ -39,7 +40,6 @@ import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
 import TramiteRecibidoAtendidoModal from "./TramiteRecibidoAtendidoModal";
 import ConfirmModal from "../../utils/shared/ConfirmModal";
 import { useNavigate } from "react-router-dom";
-import TramiteArchivarModal from "./TramiteArchivarModal";
 import { useAuth } from "../../auth/context/AuthContext";
 import UseTramite from "../hooks/UseTramite";
 import { differenceInHours } from "date-fns";
@@ -48,12 +48,18 @@ import { useTheme } from "../../../ThemeContext";
 import { Tag } from "primereact/tag";
 import { Menu } from "primereact/menu";
 import { de } from "date-fns/locale";
+import TramiteRecibidoObservadoModal from "./TramiteRecibidoObservadoModal";
+import TramiteArchivadoModal from "./TramiteArchivadoModal";
+import UseArchivador from "../../archivador/hooks/UseArchivador";
+import { ArchivadorEntity } from "../../archivador/interfaces/ArchivadorInterface";
 
 const TramiteRecibido = () => {
   // custom hooks
   const { userAuth } = useAuth()!;
 
-  const { findAllRecibidos } = UseTramite();
+  const { findAllRecibidos, atender } = UseTramite();
+
+  const { findAll: findAllArchivador } = UseArchivador();
 
   const { create, findAll, findOne, update, remove } = UseEstado();
 
@@ -88,6 +94,9 @@ const TramiteRecibido = () => {
 
   const [estado, setEstado] = useState<EstadoEntity>(emptyEstado);
 
+  const [tramiteRecibido, setTramiteRecibido] =
+    useState<TramiteRecibidoEntity>(emptyTramiteRecibido);
+
   const [tramitesRecibidos, setTramitesRecibidos] = useState<
     TramiteRecibidoEntity[]
   >([]);
@@ -103,6 +112,13 @@ const TramiteRecibido = () => {
   const [esquemaEstados, setEsquemaEstados] = useState<
     Pick<EsquemaEstadoEntity, "IdEsquemaEstado" | "Descripcion">[]
   >([]);
+
+  const [archivadores, setArchivadores] = useState<
+    Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">[]
+  >([]);
+
+  const [archivador, setArchivador] =
+    useState<Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">>();
 
   const [estadoDialog, setEstadoDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -122,10 +138,88 @@ const TramiteRecibido = () => {
       state: boolean;
     }>({ type: "simple", state: false }); //close
 
-  const [tramiteArchivarDialog, setTramiteArchivarDialog] =
+  const [tramiteRecibidoObservadoDialog, setTramiteRecibidoObservadoDialog] =
+    useState<boolean>(false);
+
+  const [tramiteArchivarDialog, setTramiteArchivadoDialog] =
     useState<boolean>(false);
 
   const [confirmModal, setConfirmModal] = useState<boolean>(false); //close
+
+  const [observaciones, setObservaciones] = useState<string>(" ");
+
+  const [detalle, setDetalle] = useState<string>(" ");
+
+  const atenderTramitesRecibidos = async () => {
+    setSubmitted(true);
+
+    let idMovimientos: {
+      IdMovimiento: number;
+    }[] = [];
+
+    if (
+      selectedTramitesRecibidos.length == 0 &&
+      tramiteRecibido.IdMovimiento != null
+    ) {
+      idMovimientos = [{ IdMovimiento: tramiteRecibido.IdMovimiento }];
+    } else {
+      idMovimientos = selectedTramitesRecibidos.map((stp) => {
+        return { IdMovimiento: stp.IdMovimiento };
+      });
+    }
+
+    const recibirTramitePendintes = await atender({
+      Movimientos: idMovimientos,
+      Observaciones: observaciones,
+    });
+
+    if (
+      recibirTramitePendintes?.message.msgId == 0 &&
+      recibirTramitePendintes.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.map((tr: any) => {
+          const index =
+            recibirTramitePendintes.registro?.Movimientos.findIndex(
+              (mov) => mov.data.IdMovimiento == tr.IdMovimiento
+            ) ?? -1;
+
+          if (typeof index === "number" && index > -1) {
+            console.log("index", index);
+            console.log(tr.IdMovimiento);
+            return {
+              ...tr,
+              Estado:
+                recibirTramitePendintes.registro?.Movimientos[index].data.Estado
+                  .Descripcion,
+            };
+          } else {
+            return {
+              ...tr,
+            };
+          }
+        });
+      });
+      // setTramitesRecibidos(recibirTramitePendintes.registro);
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${recibirTramitePendintes.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (recibirTramitePendintes?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${recibirTramitePendintes.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setTramiteRecibidoAtendidoDialog({ type: "simple", state: false });
+    setObservaciones("");
+    setSelectedTramitesRecibidos([]);
+    setSubmitted(false);
+  };
 
   const findAllTramiteRecibido = async () => {
     setLoading(true);
@@ -362,6 +456,29 @@ const TramiteRecibido = () => {
     });
   };
 
+  // actions CRUD - Archivdor (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllArchivadorCombox = async () => {
+    setLoading(true);
+    const archivadoresFindAll = await findAllArchivador();
+    setLoading(false);
+
+    if (
+      archivadoresFindAll?.message.msgId == 0 &&
+      archivadoresFindAll.registro
+    ) {
+      setArchivadores(
+        Array.isArray(archivadoresFindAll.registro)
+          ? archivadoresFindAll.registro?.map((af) => {
+              return {
+                IdArchivador: af.IdArchivador,
+                Descripcion: af.Descripcion,
+              };
+            })
+          : []
+      );
+    }
+  };
+
   // actions CRUD - Esquema TramiteRecibido (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEsquemaEstadoCombox = async () => {
     setLoading(true);
@@ -410,12 +527,6 @@ const TramiteRecibido = () => {
     setRemoveEstadosDialog(false);
   };
 
-  const hideTramiteArchivarDialog = () => {
-    setSubmitted(false);
-    // setMovimiento(emptyMovimiento);
-    setTramiteArchivarDialog(false);
-  };
-
   const hideConfirmModal = () => {
     setConfirmModal(false);
   };
@@ -424,16 +535,49 @@ const TramiteRecibido = () => {
     setSubmitted(false);
     // setMovimiento(emptyMovimiento);
     setTramiteRecibidoAtendidoDialog({ type: type, state: false });
+    setObservaciones("");
   };
 
-  const showTramiteRecibidoAtendidoDialog = (type: "multiple" | "simple") => {
-    // setMovimiento(emptyMovimiento);
+  const showTramiteRecibidoAtendidoDialog = (
+    type: "multiple" | "simple",
+    tramiteRecibido?: TramiteRecibidoEntity
+  ) => {
+    if (tramiteRecibido) {
+      setTramiteRecibido(tramiteRecibido);
+    }
     setTramiteRecibidoAtendidoDialog({ type: type, state: true });
   };
 
-  const showTramiteArchivarDialog = () => {
+  const hideTramiteRecibidoObservadoDialog = () => {
+    setSubmitted(false);
     // setMovimiento(emptyMovimiento);
-    setTramiteArchivarDialog(true);
+    setTramiteRecibidoObservadoDialog(false);
+    setObservaciones("");
+  };
+
+  const showTramiteRecibidoObservadoDialog = (
+    tramiteRecibido?: TramiteRecibidoEntity
+  ) => {
+    if (tramiteRecibido) {
+      setTramiteRecibido(tramiteRecibido);
+    }
+    setTramiteRecibidoObservadoDialog(true);
+  };
+
+  const hideTramiteArchivadoDialog = () => {
+    setSubmitted(false);
+    // setMovimiento(emptyMovimiento);
+    setTramiteArchivadoDialog(false);
+    setDetalle("");
+  };
+
+  const showTramiteArchivadoDialog = (
+    tramiteRecibido?: TramiteRecibidoEntity
+  ) => {
+    if (tramiteRecibido) {
+      setTramiteRecibido(tramiteRecibido);
+    }
+    setTramiteArchivadoDialog(true);
   };
 
   const confirmRemoveEstado = (estado: EstadoEntity) => {
@@ -492,21 +636,6 @@ const TramiteRecibido = () => {
     let _estado: any = { ...estado };
 
     _estado[name] = val;
-
-    setEstado(_estado);
-  };
-
-  const onDropdownChange = (
-    e: DropdownChangeEvent,
-    nameFK: string,
-    nameObj: string
-  ) => {
-    const val = (e.target && e.target.value) || "";
-
-    let _estado: any = { ...estado };
-
-    _estado[nameFK] = val[nameFK];
-    _estado[nameObj] = { ...val };
 
     setEstado(_estado);
   };
@@ -618,7 +747,7 @@ const TramiteRecibido = () => {
             </Button>
             <Button
               type="button"
-              onClick={() => showTramiteRecibidoAtendidoDialog("multiple")}
+              onClick={() => showTramiteRecibidoAtendidoDialog("simple")}
               size="small"
               style={{
                 padding: "0",
@@ -637,7 +766,7 @@ const TramiteRecibido = () => {
             <Button
               type="button"
               severity="danger"
-              onClick={findAllEstado}
+              onClick={() => showTramiteRecibidoObservadoDialog()}
               size="small"
               style={{
                 padding: "0",
@@ -655,7 +784,7 @@ const TramiteRecibido = () => {
             <Button
               type="button"
               severity="contrast"
-              onClick={() => showTramiteArchivarDialog()}
+              onClick={() => showTramiteArchivadoDialog()}
               size="small"
               style={{
                 padding: "0",
@@ -1035,11 +1164,11 @@ const TramiteRecibido = () => {
             style: {
               whiteSpace: "nowrap",
             },
-            // icon: "pi pi-file-export",
             icon: "pi pi-check-circle",
             command: () => {
               //here
-              showTramiteRecibidoAtendidoDialog("simple");
+              setSelectedTramitesRecibidos([]);
+              showTramiteRecibidoAtendidoDialog("multiple", rowData);
             },
           },
           {
@@ -1049,7 +1178,10 @@ const TramiteRecibido = () => {
               whiteSpace: "nowrap",
             },
             icon: "pi pi-info-circle",
-            command: () => {},
+            command: () => {
+              setSelectedTramitesRecibidos([]);
+              showTramiteRecibidoObservadoDialog(rowData);
+            },
           },
           {
             label: "Archivar",
@@ -1059,7 +1191,8 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-minus-circle",
             command: () => {
-              showTramiteArchivarDialog();
+              setSelectedTramitesRecibidos([]);
+              showTramiteArchivadoDialog(rowData);
             },
           },
           {
@@ -1107,6 +1240,7 @@ const TramiteRecibido = () => {
           {
             label: "Desmarcar derivación",
             className: "text-sm",
+            autoFocus: true,
             style: {
               whiteSpace: "nowrap",
             },
@@ -1236,6 +1370,7 @@ const TramiteRecibido = () => {
   useEffect(() => {
     findAllEstado();
     findAllEsquemaEstadoCombox();
+    findAllArchivadorCombox();
   }, []);
 
   return (
@@ -1487,14 +1622,40 @@ const TramiteRecibido = () => {
         hideTramiteRecibidoAtendidoDialog={hideTramiteRecibidoAtendidoDialog}
         showTramiteRecibidoAtendidoDialog={showTramiteRecibidoAtendidoDialog}
         tramiteRecibidoAtendidoDialog={tramiteRecibidoAtendidoDialog}
+        selectedTramitesRecibidos={selectedTramitesRecibidos}
+        tramiteRecibido={tramiteRecibido}
+        observaciones={observaciones}
+        setObservaciones={setObservaciones}
+        atenderTramitesRecibidos={atenderTramitesRecibidos}
         // selectedTramiteDestinos={selectedTramiteDestinos}
         // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
       />
 
-      <TramiteArchivarModal
+      <TramiteRecibidoObservadoModal
         submitted={submitted}
-        hideTramiteArchivarDialog={hideTramiteArchivarDialog}
+        hideTramiteRecibidoObservadoDialog={hideTramiteRecibidoObservadoDialog}
+        showTramiteRecibidoObservadoDialog={showTramiteRecibidoObservadoDialog}
+        tramiteRecibidoObservadoDialog={tramiteRecibidoObservadoDialog}
+        selectedTramitesRecibidos={selectedTramitesRecibidos}
+        tramiteRecibido={tramiteRecibido}
+        observaciones={observaciones}
+        setObservaciones={setObservaciones}
+        atenderTramitesRecibidos={atenderTramitesRecibidos}
+        // selectedTramiteDestinos={selectedTramiteDestinos}
+        // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
+      />
+
+      <TramiteArchivadoModal
+        submitted={submitted}
+        hideTramiteArchivadoDialog={hideTramiteArchivadoDialog}
         tramiteArchivarDialog={tramiteArchivarDialog}
+        selectedTramitesRecibidos={selectedTramitesRecibidos}
+        tramiteRecibido={tramiteRecibido}
+        archivadores={archivadores}
+        setArchivador={setArchivador}
+        archivador={archivador}
+        detalle={detalle}
+        setDetalle={setDetalle}
       />
 
       <ConfirmModal

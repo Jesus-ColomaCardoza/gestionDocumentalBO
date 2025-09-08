@@ -9,6 +9,9 @@ import {
   TramiteRecibir,
   TramitesRecibidosOut,
   GetAllTramiteRecibido,
+  TramiteAtender,
+  TramiteRecibidoOut,
+  TramiteAtendidoOut,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -69,11 +72,27 @@ const UseTramite = () => {
 
   const recibir = async (
     tramiteRecibir: TramiteRecibir
-  ): Promise<TramiteOut | undefined> => {
+  ): Promise<TramiteRecibidoOut | undefined> => {
     try {
-      const tramite = await axios.post<TramiteOut>(
+      const tramite = await axios.post<TramiteRecibidoOut>(
         `${VITE_API_URL_GDS + TRAMITE.RECIBIR}`,
         tramiteRecibir
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const atender = async (
+    tramiteAtender: TramiteAtender
+  ): Promise<TramiteAtendidoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteAtendidoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.ATENDER}`,
+        tramiteAtender
       );
       return tramite.data;
     } catch (error: any) {
@@ -165,6 +184,7 @@ const UseTramite = () => {
     createEmitido,
     recibirExterno,
     recibir,
+    atender,
     findAll,
     findAllPendientes,
     findAllRecibidos,

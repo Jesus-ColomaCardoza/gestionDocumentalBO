@@ -2,9 +2,15 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState, useEffect, useRef } from "react";
 import UseTramite from "../hooks/UseTramite";
-import { TramiteEntity } from "../interfaces/TramiteInterface";
+import {
+  TramiteEntity,
+  TramiteRecibidoAtendidoCreate,
+} from "../interfaces/TramiteInterface";
 import { Toast } from "primereact/toast";
-import { emptyTramite } from "../utils/Constants";
+import {
+  emptyTramite,
+  emptyTramiteRecibidoAtendidoCreate,
+} from "../utils/Constants";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useTheme } from "../../../ThemeContext";
@@ -22,18 +28,22 @@ import { useAuth } from "../../auth/context/AuthContext";
 import { MAX_FILE_SIZE } from "../../utils/Constants";
 import { formatFileSize } from "../../utils/Methods";
 import TramiteDestinosModal from "./TramiteDestinosModal";
-import { MovimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
+import {
+  MovimientoDetailsEntity,
+  MovimientoEntity,
+} from "../../movimiento/interfaces/MovimientoInterface";
 import { emptyMovimiento } from "../../movimiento/utils/Constants";
 import { InputSwitch, InputSwitchChangeEvent } from "primereact/inputswitch";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import UseFile from "../../file/hooks/UseFile";
 import UseAnexo from "../../anexo/hooks/UseAnexo";
 import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { RadioButton } from "primereact/radiobutton";
 import { Toolbar } from "primereact/toolbar";
 import { TabPanel, TabView, TabViewTabChangeEvent } from "primereact/tabview";
 import TramiteRecibidoAtendidoModal from "./TramiteRecibidoAtendidoModal";
+import UseMovimiento from "../../movimiento/hooks/UseMovimiento";
 
 const TramiteRecibidoAtendido = () => {
   // custom hooks
@@ -42,6 +52,8 @@ const TramiteRecibidoAtendido = () => {
   const { userAuth } = useAuth()!;
 
   const { createEmitido } = UseTramite();
+
+  const { findOneDetails } = UseMovimiento();
 
   const { createDocumento } = UseFileManager();
 
@@ -75,6 +87,9 @@ const TramiteRecibidoAtendido = () => {
     useState<boolean>(false);
 
   const [tramite, setTramite] = useState<TramiteEntity>(emptyTramite);
+
+  const [tramiteRecibidoAtendidoCreate, setTramiteRecibidoAtendidoCreate] =
+    useState<TramiteRecibidoAtendidoCreate>(emptyTramiteRecibidoAtendidoCreate);
 
   const [movimiento, setMovimiento] =
     useState<MovimientoEntity>(emptyMovimiento);
@@ -113,19 +128,39 @@ const TramiteRecibidoAtendido = () => {
     MovimientoEntity[]
   >([]);
 
+  const [moviminetoDetails, setMoviminetoDetails] =
+    useState<MovimientoDetailsEntity>();
+
   const [selectedLoadFiles, setSelectedLoadFiles] = useState<File[]>([]);
 
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
+
+  const params = useParams();
+  const findOneDetailsMovimiento = async () => {
+    setLoading(true);
+    const movimiento = await findOneDetails(params.id ?? "0");
+    console.log(movimiento);
+
+    setLoading(false);
+
+    if (movimiento?.message.msgId == 0 && movimiento.registro) {
+      setMoviminetoDetails(movimiento.registro);
+      // setTramiteRecibidoAtendidoCreate({
+      //   ...tramiteRecibidoAtendidoCreate,
+      //   IdMovimiento: parseInt(params.id??"0"),
+      // });
+    }
+  };
 
   //functions
   const createTramiteEmitido = async () => {
     setSubmitted(true);
     if (
-      tramite.Asunto.trim() &&
-      tramite.IdTipoDocumento != 0 &&
-      tramite.CodigoReferencia.trim() &&
-      tramite.IdRemitente != 0 &&
-      tramite.Folios != 0
+      tramiteRecibidoAtendidoCreate.Asunto.trim() &&
+      tramiteRecibidoAtendidoCreate.IdTipoDocumento != 0 &&
+      tramiteRecibidoAtendidoCreate.CodigoReferenciaDoc.trim() &&
+      tramiteRecibidoAtendidoCreate.IdRemitente != 0 &&
+      tramiteRecibidoAtendidoCreate.Folios != 0
     ) {
       // setLoadingTramiteCreateOrUpdate(true);
       let arrayAnexosUpload: AnexoEntity[] = [];
@@ -181,23 +216,23 @@ const TramiteRecibidoAtendido = () => {
         return;
       }
 
-      //2 we create tramite
+      //2 we create tramiteRecibidoAtendidoCreate
       let tramiteCreateEmitido = await createEmitido({
-        CodigoReferencia: tramite.CodigoReferencia,
-        Asunto: tramite.Asunto,
-        // Descripcion: tramite.Descripcion,
-        Observaciones: tramite.Observaciones,
+        CodigoReferencia: tramiteRecibidoAtendidoCreate.CodigoReferencia,
+        Asunto: tramiteRecibidoAtendidoCreate.Asunto,
+        // Descripcion: tramiteRecibidoAtendidoCreate.Descripcion,
+        Observaciones: tramiteRecibidoAtendidoCreate.Observaciones,
         FechaInicio: new Date().toISOString(),
-        // FechaFin:tramite.FechaFin,
-        Folios: tramite.Folios,
+        // FechaFin:tramiteRecibidoAtendidoCreate.FechaFin,
+        Folios: tramiteRecibidoAtendidoCreate.Folios,
 
-        IdTipoTramite: tramite.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
+        IdTipoTramite: tramiteRecibidoAtendidoCreate.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
 
-        IdTipoDocumento: tramite.IdTipoDocumento,
-        IdAreaEmision: tramite.IdAreaEmision,
-        IdEstado: tramite.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
-        IdRemitente: tramite.IdRemitente,
-        Activo: tramite.Activo,
+        IdTipoDocumento: tramiteRecibidoAtendidoCreate.IdTipoDocumento,
+        IdAreaEmision: tramiteRecibidoAtendidoCreate.IdAreaEmision,
+        IdEstado: tramiteRecibidoAtendidoCreate.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
+        IdRemitente: tramiteRecibidoAtendidoCreate.IdRemitente,
+        Activo: tramiteRecibidoAtendidoCreate.Activo,
 
         DigitalFiles: selectedDigitalFiles,
         TramiteDestinos: selectedTramiteDestinos,
@@ -212,7 +247,7 @@ const TramiteRecibidoAtendido = () => {
       ) {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
-        navigate("../tramite/emitido");
+        navigate("../tramiteRecibidoAtendidoCreate/emitido");
 
         toast.current?.show({
           severity: "success",
@@ -229,7 +264,7 @@ const TramiteRecibidoAtendido = () => {
 
       // setSelectedAnexos([])
       // setFileManagerDialog(false);
-      // setTramite(emptyTramite);
+      // setTramiteRecibidoAtendidoCreate(emptyTramite);
     }
   };
 
@@ -506,7 +541,7 @@ const TramiteRecibidoAtendido = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    setTramite((prev) => ({
+    setTramiteRecibidoAtendidoCreate((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -517,7 +552,7 @@ const TramiteRecibidoAtendido = () => {
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
     const val = e.value ?? null;
 
-    setTramite((prev) => ({
+    setTramiteRecibidoAtendidoCreate((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -530,12 +565,12 @@ const TramiteRecibidoAtendido = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _tramite = { ...tramite };
+    let _tramite = { ...tramiteRecibidoAtendidoCreate };
 
     // @ts-ignore
     _tramite[name] = val;
 
-    setTramite(_tramite);
+    setTramiteRecibidoAtendidoCreate(_tramite);
 
     setTramiteErrors((prev: any) => ({ ...prev, [name]: undefined }));
   };
@@ -548,12 +583,12 @@ const TramiteRecibidoAtendido = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    let _tramite: any = { ...tramite };
+    let _tramite: any = { ...tramiteRecibidoAtendidoCreate };
 
     _tramite[nameTagFK ? nameTagFK : nameFK] = val[nameFK];
     _tramite[nameObj] = { ...val };
 
-    setTramite(_tramite);
+    setTramiteRecibidoAtendidoCreate(_tramite);
 
     setTramiteErrors((prev: any) => ({
       ...prev,
@@ -603,37 +638,37 @@ const TramiteRecibidoAtendido = () => {
   };
 
   const onSwitchChange = (e: InputSwitchChangeEvent, name: string) => {
-    let _movimiento: any = { ...movimiento };
-    _movimiento[name] = e.value;
-    setMovimiento(_movimiento);
+    let _trac: any = { ...tramiteRecibidoAtendidoCreate };
+    _trac[name] = e.value;
+    setTramiteRecibidoAtendidoCreate(_trac);
   };
 
   const validateForm = () => {
     let fieldErrors: any = {};
 
-    if (!tramite.Asunto.trim()) {
+    if (!tramiteRecibidoAtendidoCreate.Asunto.trim()) {
       fieldErrors.Asunto = "Asunto es obligatorio.";
     }
 
-    if (tramite.IdTipoDocumento == 0) {
+    if (tramiteRecibidoAtendidoCreate.IdTipoDocumento == 0) {
       fieldErrors.IdTipoDocumento = "Tipo de documento es obligatorio.";
     }
 
-    if (!tramite.CodigoReferencia.trim()) {
-      fieldErrors.CodigoReferencia = "Codigo de referencia es obligatoria.";
+    if (!tramiteRecibidoAtendidoCreate.CodigoReferenciaDoc.trim()) {
+      fieldErrors.CodigoReferenciaDoc = "Codigo de referencia es obligatoria.";
     }
 
-    if (tramite.IdRemitente == 0) {
+    if (tramiteRecibidoAtendidoCreate.IdRemitente == 0) {
       fieldErrors.IdRemitente = "Remitente es obligatorio.";
     }
 
-    if (tramite.Folios == 0) {
+    if (tramiteRecibidoAtendidoCreate.Folios <= 0) {
       fieldErrors.Folios = "Folios es obligatorio.";
     }
 
-    if (tramite.IdAreaEmision == 0) {
-      fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
-    }
+    // if (tramiteRecibidoAtendidoCreate.IdAreaEmision == 0) {
+    //   fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
+    // }
 
     setTramiteErrors(fieldErrors);
 
@@ -645,7 +680,24 @@ const TramiteRecibidoAtendido = () => {
     findAllTipoDocumentoCombox();
     findAllRemitenteCombox();
     findAllAreaCombox();
+    findOneDetailsMovimiento();
   }, []);
+
+  useEffect(() => {
+    if (userAuth?.IdUsuario && params.id) {
+      setTramiteRecibidoAtendidoCreate({
+        ...tramiteRecibidoAtendidoCreate,
+        IdRemitente: userAuth?.IdUsuario ?? 0,
+        IdMovimiento:parseInt(params.id ?? "0"),
+        Remitente: {
+          IdUsuario: userAuth?.IdUsuario ?? 0,
+          Nombres: userAuth?.Nombres ?? "",
+          ApellidoPaterno: userAuth?.ApellidoPaterno ?? "",
+          ApellidoMaterno: userAuth?.ApellidoMaterno ?? "",
+        },
+      });
+    }
+  }, [userAuth?.IdUsuario,params.id ]);
 
   return (
     <div className="card p-0 m-0">
@@ -688,7 +740,17 @@ const TramiteRecibidoAtendido = () => {
             >
               <Button
                 type="button"
-                onClick={showFileManagerDialog}
+                onClick={() => {
+                  if (selectedDigitalFiles.length < 1) {
+                    showFileManagerDialog();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Ya tiene un archivo digital seleccionado`,
+                      life: 3000,
+                    });
+                  }
+                }}
                 size="small"
                 severity="secondary"
                 style={{
@@ -708,7 +770,15 @@ const TramiteRecibidoAtendido = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  loadFilesRef.current?.click();
+                  if (selectedDigitalFiles.length < 1) {
+                    loadFilesRef.current?.click();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Ya tiene un archivo digital seleccionado`,
+                      life: 3000,
+                    });
+                  }
                 }}
                 size="small"
                 style={{
@@ -734,7 +804,7 @@ const TramiteRecibidoAtendido = () => {
             </div>
           </div>
 
-          <div className="flex flex-row px-4" style={{ gap: "1rem" }}>
+          <div className="flex flex-row px-4 mb-2" style={{ gap: "1rem" }}>
             <div
               style={{
                 width: "100%",
@@ -824,18 +894,19 @@ const TramiteRecibidoAtendido = () => {
                 })}
               </div>
 
-              <div className="flex justify-content-start align-items-center mb-2">
-                <InputSwitch
-                  id="Copia"
-                  // checked={props.movimiento.Copia ?? false}
-                  checked={false}
-                  // onChange={(e) => props.onSwitchChange(e, "Copia")}
-                  className="small-switch"
-                />
-                <label htmlFor="Copia" className="text-sm m-0">
-                  visible
-                </label>
-              </div>
+              {selectedDigitalFiles.length > 0 && (
+                <div className="flex justify-content-start align-items-center">
+                  <InputSwitch
+                    id="Visible"
+                    checked={tramiteRecibidoAtendidoCreate.Visible ?? false}
+                    onChange={(e) => onSwitchChange(e, "Visible")}
+                    className="small-switch"
+                  />
+                  <label htmlFor="Visible" className="text-sm m-0">
+                    visible
+                  </label>
+                </div>
+              )}
             </div>
           </div>
 
@@ -854,7 +925,7 @@ const TramiteRecibidoAtendido = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={tramite.TipoDocumento}
+                    value={tramiteRecibidoAtendidoCreate.TipoDocumento}
                     onChange={(e) => {
                       onDropdownChange(e, "TipoDocumento", "IdTipoDocumento");
                     }}
@@ -886,27 +957,27 @@ const TramiteRecibidoAtendido = () => {
               }}
             >
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="CodigoReferenciaDoc"
                 className="block text-900 text-sm font-medium mb-2"
               >
-                Nº de referencia
+                Código de referencia
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
+                    id="CodigoReferenciaDoc"
+                    value={tramiteRecibidoAtendidoCreate.CodigoReferenciaDoc}
                     onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
+                      onInputTextChange(e, "CodigoReferenciaDoc");
                     }}
                     type="text"
-                    placeholder="Nº de referencia"
+                    placeholder="Código de referencia"
                     className="p-inputtext-sm "
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
+                {tramiteErrors.CodigoReferenciaDoc && (
                   <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
+                    {tramiteErrors.CodigoReferenciaDoc}
                   </small>
                 )}
               </div>
@@ -928,7 +999,13 @@ const TramiteRecibidoAtendido = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <Dropdown
-                    value={tramite.Remitente}
+                    value={{
+                      IdUsuario: userAuth?.IdUsuario ?? 0,
+                      Nombres: userAuth?.Nombres ?? "",
+                      ApellidoPaterno: userAuth?.ApellidoPaterno ?? "",
+                      ApellidoMaterno: userAuth?.ApellidoMaterno ?? "",
+                      NombreCompleto: `${userAuth?.Nombres} ${userAuth?.ApellidoPaterno} ${userAuth?.ApellidoMaterno}`,
+                    }}
                     onChange={(e) => {
                       onDropdownChange(
                         e,
@@ -972,7 +1049,7 @@ const TramiteRecibidoAtendido = () => {
                 <div className="p-inputgroup">
                   <InputNumber
                     id="Folios"
-                    value={tramite.Folios}
+                    value={tramiteRecibidoAtendidoCreate.Folios}
                     onChange={(e) => {
                       onInputNumberChange(e, "Folios");
                     }}
@@ -1004,7 +1081,7 @@ const TramiteRecibidoAtendido = () => {
                 <div className="p-inputgroup">
                   <InputTextarea
                     id="Asunto"
-                    value={tramite.Asunto}
+                    value={tramiteRecibidoAtendidoCreate.Asunto}
                     onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                     autoFocus
                     rows={2}
@@ -1036,7 +1113,7 @@ const TramiteRecibidoAtendido = () => {
                 <div className="p-inputgroup">
                   <InputTextarea
                     id="Observaciones"
-                    value={tramite.Observaciones}
+                    value={tramiteRecibidoAtendidoCreate.Observaciones}
                     onChange={(e) => onInputTextAreaChange(e, "Observaciones")}
                     rows={3}
                   />
@@ -1074,7 +1151,7 @@ const TramiteRecibidoAtendido = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="IdTramite"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Trámite
@@ -1082,20 +1159,19 @@ const TramiteRecibidoAtendido = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      disabled
+                      id="IdTramite"
+                      value={"" + moviminetoDetails?.Tramite?.IdTramite}
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "IdTramite");
                       }}
                       type="text"
                       className="p-inputtext-sm "
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
-                    <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
-                    </small>
-                  )}
+                  {/* {tramiteErrors.IdTramite && (
+                    <small className="p-error">{tramiteErrors.IdTramite}</small>
+                  )} */}
                 </div>
               </div>
 
@@ -1113,27 +1189,33 @@ const TramiteRecibidoAtendido = () => {
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
                     <InputText
+                      disabled
                       id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
+                      value={
+                        moviminetoDetails?.Documento?.TipoDocumento
+                          ?.Descripcion +
+                        " " +
+                        moviminetoDetails?.Documento?.CodigoReferenciaDoc
+                      }
                       onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
+                        onInputTextChange(e, "CodigoReferenciaDoc");
                       }}
                       type="text"
-                      className="p-inputtext-sm "
+                      className="p-inputtext-sm"
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
+                  {/* {tramiteErrors.CodigoReferencia && (
                     <small className="p-error">
                       {tramiteErrors.CodigoReferencia}
                     </small>
-                  )}
+                  )} */}
                 </div>
               </div>
             </div>
 
             <div className="flex flex-column px-4">
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="Asunto"
                 className="block text-900 text-sm font-medium mb-2"
               >
                 Asunto
@@ -1141,26 +1223,25 @@ const TramiteRecibidoAtendido = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
+                    disabled
+                    id="Asunto"
+                    value={moviminetoDetails?.Documento?.Asunto}
                     onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
+                      onInputTextChange(e, "Asunto");
                     }}
                     type="text"
                     className="p-inputtext-sm "
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
-                  <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
-                  </small>
-                )}
+                {/* {tramiteErrors.Asunto && (
+                  <small className="p-error">{tramiteErrors.Asunto}</small>
+                )} */}
               </div>
             </div>
 
             <div className="flex flex-column px-4">
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="Ubicacion"
                 className="block text-900 text-sm font-medium mb-2"
               >
                 Ubicación
@@ -1168,47 +1249,45 @@ const TramiteRecibidoAtendido = () => {
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
+                    disabled
+                    id="Ubicacion"
+                    value={moviminetoDetails?.AreaDestino?.Descripcion}
                     onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
+                      onInputTextChange(e, "Ubicacion");
                     }}
                     type="text"
                     className="p-inputtext-sm "
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
-                  <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
-                  </small>
-                )}
+                {/* {tramiteErrors.Ubicacion && (
+                  <small className="p-error">{tramiteErrors.Ubicacion}</small>
+                )} */}
               </div>
             </div>
 
             <div className="flex flex-column px-4">
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="Responsable"
                 className="block text-900 text-sm font-medium mb-2"
               >
-                Personal
+                Responsable
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
                   <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
+                    disabled
+                    id="Responsable"
+                    value={moviminetoDetails?.NombreResponsable}
                     onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
+                      onInputTextChange(e, "Responsable");
                     }}
                     type="text"
                     className="p-inputtext-sm "
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
-                  <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
-                  </small>
-                )}
+                {/* {tramiteErrors.Responsable && (
+                  <small className="p-error">{tramiteErrors.Responsable}</small>
+                )} */}
               </div>
             </div>
 
@@ -1365,7 +1444,7 @@ const TramiteRecibidoAtendido = () => {
               type="button"
               onClick={() => {
                 if (validateForm()) {
-                  createTramiteEmitido();
+                  // createTramiteEmitido();
                 }
               }}
               size="small"

@@ -808,7 +808,7 @@ const Usuario = () => {
   const cargoBodyTemplate = (rowData: UsuarioEntity) => {
     return (
       <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.Cargo.Descripcion}</p>
+        <p className="text-sm m-0">{rowData?.Cargo?.Descripcion}</p>
       </div>
     );
   };
@@ -843,7 +843,7 @@ const Usuario = () => {
   const areaBodyTemplate = (rowData: UsuarioEntity) => {
     return (
       <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.Area.Descripcion}</p>
+        <p className="text-sm m-0">{rowData?.Area?.Descripcion}</p>
       </div>
     );
   };

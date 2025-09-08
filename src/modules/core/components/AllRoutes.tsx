@@ -57,7 +57,7 @@ const AllRoutes = () => {
               <Route path="tramite/pendiente" element={<TramitePendiente />}></Route>
               <Route path="tramite/recibido" element={<TramiteRecibido />}></Route>
               <Route path="tramite/recibido/externo" element={<TramiteRecibidoExterno />}></Route>
-              <Route path="tramite/recibido/atendido" element={<TramiteRecibidoAtendido />}></Route>
+              <Route path="tramite/recibido/atendido/:id" element={<TramiteRecibidoAtendido />}></Route>
               <Route path="tramite/recibido/derivado" element={<TramiteRecibidoDerivado />}></Route>
               <Route path="tramite/recibido/derivados" element={<TramiteRecibidoDerivados />}></Route>
               <Route path="tramite/emitido" element={<TramiteEmitido />}></Route>

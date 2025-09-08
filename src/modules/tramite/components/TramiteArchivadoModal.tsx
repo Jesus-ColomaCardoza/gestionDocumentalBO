@@ -13,85 +13,59 @@ import {
 import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
-import { useNavigate } from "react-router-dom";
+import { ArchivadorEntity } from "../../archivador/interfaces/ArchivadorInterface";
 
-type TramiteRecibidoAtendidoModalProps = {
+type TramiteArchivadoModalProps = {
   submitted: boolean;
-  hideTramiteRecibidoAtendidoDialog: (type: "multiple" | "simple") => void;
-  showTramiteRecibidoAtendidoDialog: (
-    type: "multiple" | "simple",
-    tramiteRecibido: TramiteRecibidoEntity
-  ) => void;
-  tramiteRecibidoAtendidoDialog: {
-    type: "multiple" | "simple";
-    state: boolean;
-  };
+  hideTramiteArchivadoDialog: () => void;
+  tramiteArchivarDialog: boolean;
   selectedTramitesRecibidos: TramiteRecibidoEntity[];
   tramiteRecibido: TramiteRecibidoEntity;
-  observaciones: string;
-  setObservaciones: Dispatch<SetStateAction<string>>;
-  atenderTramitesRecibidos: () => Promise<void>;
+  archivadores: Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">[];
+  setArchivador: Dispatch<
+    SetStateAction<
+      Pick<ArchivadorEntity, "IdArchivador" | "Descripcion"> | undefined
+    >
+  >;
+  archivador:
+    | Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">
+    | undefined;
+  detalle: string;
+  setDetalle: Dispatch<SetStateAction<string>>;
   // selectedTramiteDestinos: TramiteEntity[];
   // setSelectedTramiteDestinos: Dispatch<SetStateAction<MovimientoEntity[]>>;
 };
 
-const TramiteRecibidoAtendidoModal = (
-  props: TramiteRecibidoAtendidoModalProps
-) => {
-  const navigate = useNavigate();
-
+const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
   const estadoDialogFooter = (
-    <div className="flex flex-row justify-content-between">
-      <div>
-        {props.tramiteRecibidoAtendidoDialog.type == "multiple" && (
-          <Button
-            label="Atender con documento"
-            icon="pi pi-file-arrow-up"
-            outlined
-            severity="success"
-            size="small"
-            onClick={() => {
-              props.hideTramiteRecibidoAtendidoDialog("simple");
-              navigate(
-                `../tramite/recibido/atendido/${props.tramiteRecibido.IdMovimiento}`
-              );
-            }}
-          />
-        )}
-      </div>
-      <div>
-        <Button
-          label="Cancel"
-          icon="pi pi-times"
-          outlined
-          size="small"
-          onClick={() => {
-            props.hideTramiteRecibidoAtendidoDialog("simple");
-          }}
-        />
-        <Button
-          loading={props.submitted}
-          label="Guardar"
-          icon="pi pi-check"
-          size="small"
-          onClick={props.atenderTramitesRecibidos}
-        />
-      </div>
-    </div>
+    <>
+      <Button
+        label="Cancel"
+        icon="pi pi-times"
+        outlined
+        onClick={() => {
+          props.hideTramiteArchivadoDialog();
+        }}
+      />
+      <Button
+        // loading={props.loadingEstadoCreateOrUpdate}
+        label="Archivar"
+        icon="pi pi-check"
+        onClick={() => {}}
+      />
+    </>
   );
 
   return (
     <Dialog
-      visible={props.tramiteRecibidoAtendidoDialog.state}
+      visible={props.tramiteArchivarDialog}
       style={{ width: "40rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-      header="Detalle de trámite a atander"
+      header="Archivar trámite"
       modal
       className="p-fluid"
       footer={estadoDialogFooter}
-      onHide={() => {
-        props.hideTramiteRecibidoAtendidoDialog("simple");
-      }}
+      onHide={props.hideTramiteArchivadoDialog}
     >
       <div className="flex flex-row" style={{ gap: "1rem" }}>
         <div
@@ -110,7 +84,7 @@ const TramiteRecibidoAtendidoModal = (
               <InputTextarea
                 id="IdTramite"
                 value={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos
                         .map(
                           (str, index) =>
@@ -122,7 +96,7 @@ const TramiteRecibidoAtendidoModal = (
                             )}`
                         )
                         .join("\n")
-                    : props.tramiteRecibido.Tramite?.IdTramite.toString().padStart(
+                    : props.tramiteRecibido?.Tramite?.IdTramite.toString().padStart(
                         8,
                         "0"
                       )
@@ -130,7 +104,7 @@ const TramiteRecibidoAtendidoModal = (
                 // onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                 autoFocus
                 rows={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos.length
                     : 1
                 }
@@ -163,7 +137,7 @@ const TramiteRecibidoAtendidoModal = (
               <InputTextarea
                 id="Documento"
                 value={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos
                         .map(
                           (str, index) =>
@@ -175,15 +149,15 @@ const TramiteRecibidoAtendidoModal = (
                             }`
                         )
                         .join("\n")
-                    : props.tramiteRecibido.Documento?.TipoDocumento
+                    : props.tramiteRecibido?.Documento?.TipoDocumento
                         ?.Descripcion +
                       " " +
-                      props.tramiteRecibido.Documento?.CodigoReferenciaDoc
+                      props.tramiteRecibido?.Documento?.CodigoReferenciaDoc
                 }
                 // onChange={(e) => onInputTextAreaChange(e, "Documento")}
                 autoFocus
                 rows={
-                  props.selectedTramitesRecibidos.length > 0
+                  props.selectedTramitesRecibidos?.length > 0
                     ? props.selectedTramitesRecibidos.length
                     : 1
                 }
@@ -208,40 +182,35 @@ const TramiteRecibidoAtendidoModal = (
           }}
         >
           <label
-            htmlFor="Asunto"
+            htmlFor="AreaEmision"
             className="block text-900 text-sm font-medium mb-2"
           >
-            Asunto
+            Archivador
           </label>
-          <div className="flex flex-column mb-3 gap-1">
+          <div className="flex flex-column  mb-3 gap-1">
             <div className="p-inputgroup">
-              <InputTextarea
-                id="Asunto"
-                value={
-                  props.selectedTramitesRecibidos.length > 0
-                    ? props.selectedTramitesRecibidos
-                        .map(
-                          (str, index) =>
-                            `${index + 1}. ${str.Documento?.Asunto || ""}`
-                        )
-                        .join("\n")
-                    : props.tramiteRecibido.Documento?.Asunto
-                } // onChange={(e) => onInputTextAreaChange(e, "Asunto")}
-                autoFocus
-                rows={
-                  props.selectedTramitesRecibidos.length > 0
-                    ? props.selectedTramitesRecibidos.length
-                    : 1
-                }
-                // className={classNames({
-                //   "p-invalid": props.submitted && !props.documento.Asunto,
-                // })}
+              <Dropdown
+                value={props.archivador}
+                onChange={(e: DropdownChangeEvent) => {
+                  const value = e.value || "";
+                  props.setArchivador(value);
+                }}
+                options={props.archivadores}
+                optionLabel="Descripcion"
+                filter
+                // placeholder="Seleccionar Área de Emisión"
+                className="w-full flex flex-row align-items-center p-inputtext-sm"
+                showClear
+                style={{
+                  paddingTop: "1.2rem",
+                  paddingBottom: "1.2rem",
+                  width: "16rem",
+                  height: "2rem",
+                }}
               />
             </div>
-            {/* {tramiteErrors.Asunto && (
-              <small className="p-error">
-                {tramiteErrors.Asunto}
-              </small>
+            {/* {tramiteErrors.IdAreaEmision && (
+              <small className="p-error">{tramiteErrors.IdAreaEmision}</small>
             )} */}
           </div>
         </div>
@@ -254,30 +223,28 @@ const TramiteRecibidoAtendidoModal = (
           }}
         >
           <label
-            htmlFor="Observaciones"
+            htmlFor="Detalle"
             className="block text-900 text-sm font-medium mb-2"
           >
-            Observaciones
+            Detalle
           </label>
           <div className="flex flex-column mb-3 gap-1">
             <div className="p-inputgroup">
-              <InputTextarea
-                id="Observaciones"
-                value={props.observaciones || ""}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+              <InputText
+                id="Detalle"
+                value={props.detalle || ""}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const value = (e.target && e.target.value) || "";
-
-                  props.setObservaciones(value);
+                  props.setDetalle(value);
                 }}
-                autoFocus
-                rows={2}
-                // className={classNames({
-                //   "p-invalid": props.submitted && !props.documento.Observaciones,
-                // })}
+                type="text"
+                className="p-inputtext-sm "
               />
             </div>
-            {/* {tramiteErrors.Observaciones && (
-              <small className="p-error">{tramiteErrors.Observaciones}</small>
+            {/* {tramiteErrors.Detalle && (
+              <small className="p-error">
+                {tramiteErrors.Detalle}
+              </small>
             )} */}
           </div>
         </div>
@@ -286,4 +253,4 @@ const TramiteRecibidoAtendidoModal = (
   );
 };
 
-export default TramiteRecibidoAtendidoModal;
+export default TramiteArchivadoModal;

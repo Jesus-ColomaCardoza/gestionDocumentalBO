@@ -32,7 +32,7 @@ import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import UseFile from "../../file/hooks/UseFile";
 import UseAnexo from "../../anexo/hooks/UseAnexo";
 import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Toolbar } from "primereact/toolbar";
 import { Menu } from "primereact/menu";
 import UseTipoIdentificacion from "../../tipo-identificacion/hooks/UseTipoIdentificacion";
@@ -260,7 +260,7 @@ const TramiteRecibidoExterno = () => {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
         setSelectedAnexos([]);
-        
+
         navigate("../tramite/recibido");
 
         toast.current?.show({
@@ -483,7 +483,7 @@ const TramiteRecibidoExterno = () => {
   const onChangeAnexos = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
 
-    if (files && files.length > 0) {
+    if (files) {
       // setLoadingDocumentoCreateOrUpdate(true);
 
       // we validate if there is some file exceeds the limit size
@@ -734,6 +734,12 @@ const TramiteRecibidoExterno = () => {
 
     return Object.keys(fieldErrors).length === 0;
   };
+
+  // const location = useLocation();
+
+  // useEffect(() => {
+  //   setSelectedAnexos([]);
+  // }, [location.pathname]);
 
   //useEffects
   useEffect(() => {
@@ -1736,7 +1742,9 @@ const TramiteRecibidoExterno = () => {
             </Button>
 
             <Button
+              className="px-2"
               type="button"
+              loading={loadingTramiteRecibidoExterno}
               onClick={() => {
                 // navigate("../tramite/recibido");
 

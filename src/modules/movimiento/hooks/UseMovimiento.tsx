@@ -1,5 +1,6 @@
 import {
   MovimientoCreate,
+  MovimientoDetailsOut,
   MovimientoOut,
   MovimientosOut,
   MovimientoUpdate,
@@ -51,6 +52,17 @@ const UseMovimiento = () => {
     }
   };
 
+  const findOneDetails = async (id: string): Promise<MovimientoDetailsOut | undefined> => {
+    try {
+      const movimiento = await axios.get<MovimientoDetailsOut>(
+        `${VITE_API_URL_GDS + MOVIMIENTO.FIND_ONE_DETAILS + id}`
+      );
+      return movimiento.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const update = async (
     id: string,
     movimientoUpdate: MovimientoUpdate
@@ -81,6 +93,7 @@ const UseMovimiento = () => {
     create,
     findAll,
     findOne,
+    findOneDetails,
     update,
     remove,
   };
