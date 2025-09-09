@@ -136,6 +136,7 @@ const TramiteRecibidoAtendido = () => {
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
   const params = useParams();
+  
   const findOneDetailsMovimiento = async () => {
     setLoading(true);
     const movimiento = await findOneDetails(params.id ?? "0");
@@ -1181,7 +1182,7 @@ const TramiteRecibidoAtendido = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="Documento"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Documento
@@ -1190,23 +1191,23 @@ const TramiteRecibidoAtendido = () => {
                   <div className="p-inputgroup">
                     <InputText
                       disabled
-                      id="CodigoReferencia"
+                      id="Documento"
                       value={
                         moviminetoDetails?.Documento?.TipoDocumento
                           ?.Descripcion +
                         " " +
                         moviminetoDetails?.Documento?.CodigoReferenciaDoc
                       }
-                      onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferenciaDoc");
-                      }}
+                      // onChange={(e) => {
+                      //   onInputTextChange(e, "Documento");
+                      // }}
                       type="text"
                       className="p-inputtext-sm"
                     />
                   </div>
-                  {/* {tramiteErrors.CodigoReferencia && (
+                  {/* {tramiteErrors.Documento && (
                     <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
+                      {tramiteErrors.Documento}
                     </small>
                   )} */}
                 </div>

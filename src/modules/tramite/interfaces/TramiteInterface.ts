@@ -360,6 +360,35 @@ export interface TramiteRecibidoAtendidoCreate {
   DigitalFiles?: FileManagerEntity[];
   Anexos?: AnexoEntity[]
 }
+export interface TramiteRecibidoDerivadoCreate {
+  //NOTA EL REMITENTE AQUI ES EL IDUSUARIO EN LA TABLA DOCUMENTO
+  //data Movimiento
+  IdMovimiento?: number;
+
+  IdRemitente: number;
+  Remitente?: {
+    IdUsuario: number,
+    Nombres: string,
+    ApellidoPaterno: string,
+    ApellidoMaterno: string,
+  },
+
+  //data documento
+  Visible: boolean;
+  CodigoReferenciaDoc: string;
+  Asunto: string;
+  Observaciones: string;
+  Folios: number;
+  IdTipoDocumento: number;
+  TipoDocumento?: {
+    IdTipoDocumento: number;
+    Descripcion: string;
+  };
+
+  //data others
+  DigitalFiles?: FileManagerEntity[];
+  Anexos?: AnexoEntity[]
+}
 export interface TramiteExternoRecibir {
   //data tramite
   IdTramite?: number;

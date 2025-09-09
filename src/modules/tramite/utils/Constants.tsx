@@ -7,6 +7,7 @@ import {
   TramiteExternoRecibir,
   TramitePendienteEntity,
   TramiteRecibidoAtendidoCreate,
+  TramiteRecibidoDerivadoCreate,
   TramiteRecibidoEntity,
 } from "../interfaces/TramiteInterface";
 
@@ -553,6 +554,29 @@ export let emptyTramiteEmitidoCreate: TramiteEmitidoCreate = {
 };
 
 export let emptyTramiteRecibidoAtendidoCreate: TramiteRecibidoAtendidoCreate = {
+  IdMovimiento: 0,
+  
+  IdRemitente: 0,
+  Remitente: {
+    IdUsuario: 0,
+    Nombres: "",
+    ApellidoPaterno: "",
+    ApellidoMaterno: "",
+  },
+
+  //data documento
+  Visible: false,
+  CodigoReferenciaDoc: "",
+  Asunto: "",
+  Observaciones: "",
+  Folios: 0,
+  IdTipoDocumento: 0,
+  TipoDocumento: {
+    IdTipoDocumento: 0,
+    Descripcion: "",
+  },
+};
+export let emptyTramiteRecibidoDerivadoCreate: TramiteRecibidoDerivadoCreate = {
   IdMovimiento: 0,
   
   IdRemitente: 0,

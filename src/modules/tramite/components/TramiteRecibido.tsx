@@ -729,7 +729,12 @@ const TramiteRecibido = () => {
             <Button
               type="button"
               onClick={() => {
-                navigate("./derivado");
+                navigate(`../tramite/recibido/derivado`, {
+                  state: {
+                    selectedTramitesRecibidos: selectedTramitesRecibidos,
+                    tramiteRecibido: tramiteRecibido,
+                  },
+                });
               }}
               size="small"
               style={{
@@ -1155,7 +1160,18 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-file-plus",
             command: () => {
-              navigate("./derivado");
+              setSelectedTramitesRecibidos([]);
+
+              if (rowData) {
+                setTramiteRecibido(rowData);
+              }
+
+              navigate(`../tramite/recibido/derivado`, {
+                state: {
+                  selectedTramites: [],
+                  tramiteRecibido: rowData,
+                },
+              });
             },
           },
           {
@@ -1240,7 +1256,6 @@ const TramiteRecibido = () => {
           {
             label: "Desmarcar derivación",
             className: "text-sm",
-            autoFocus: true,
             style: {
               whiteSpace: "nowrap",
             },

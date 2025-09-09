@@ -226,7 +226,8 @@ const TramiteRecibidoAtendidoModal = (
                         )
                         .join("\n")
                     : props.tramiteRecibido.Documento?.Asunto
-                } // onChange={(e) => onInputTextAreaChange(e, "Asunto")}
+                }
+                 // onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                 autoFocus
                 rows={
                   props.selectedTramitesRecibidos.length > 0

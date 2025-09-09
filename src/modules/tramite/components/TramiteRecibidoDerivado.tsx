@@ -2,9 +2,15 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { useState, useEffect, useRef } from "react";
 import UseTramite from "../hooks/UseTramite";
-import { TramiteEntity } from "../interfaces/TramiteInterface";
+import {
+  TramiteEntity,
+  TramiteRecibidoDerivadoCreate,
+} from "../interfaces/TramiteInterface";
 import { Toast } from "primereact/toast";
-import { emptyTramite } from "../utils/Constants";
+import {
+  emptyTramite,
+  emptyTramiteRecibidoDerivadoCreate,
+} from "../utils/Constants";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import { useTheme } from "../../../ThemeContext";
@@ -22,17 +28,21 @@ import { useAuth } from "../../auth/context/AuthContext";
 import { MAX_FILE_SIZE } from "../../utils/Constants";
 import { formatFileSize } from "../../utils/Methods";
 import TramiteDestinosModal from "./TramiteDestinosModal";
-import { MovimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
+import {
+  MovimientoDetailsEntity,
+  MovimientoEntity,
+} from "../../movimiento/interfaces/MovimientoInterface";
 import { emptyMovimiento } from "../../movimiento/utils/Constants";
 import { InputSwitch, InputSwitchChangeEvent } from "primereact/inputswitch";
 import { InputNumber, InputNumberChangeEvent } from "primereact/inputnumber";
 import UseFile from "../../file/hooks/UseFile";
 import UseAnexo from "../../anexo/hooks/UseAnexo";
 import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { RadioButton } from "primereact/radiobutton";
 import { Toolbar } from "primereact/toolbar";
 import { TabPanel, TabView, TabViewTabChangeEvent } from "primereact/tabview";
+import UseMovimiento from "../../movimiento/hooks/UseMovimiento";
 
 const TramiteRecibidoDerivado = () => {
   // custom hooks
@@ -41,6 +51,8 @@ const TramiteRecibidoDerivado = () => {
   const { userAuth } = useAuth()!;
 
   const { createEmitido } = UseTramite();
+
+  const { findOneDetails } = UseMovimiento();
 
   const { createDocumento } = UseFileManager();
 
@@ -55,6 +67,11 @@ const TramiteRecibidoDerivado = () => {
   const { findAll: findAllAreas } = UseArea();
 
   const navigate = useNavigate();
+
+  const location = useLocation();
+
+  // Obtener los trámites seleccionados del estado de navegación
+  const { selectedTramitesRecibidos, tramiteRecibido } = location.state || {};
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -74,6 +91,9 @@ const TramiteRecibidoDerivado = () => {
     useState<boolean>(false);
 
   const [tramite, setTramite] = useState<TramiteEntity>(emptyTramite);
+
+  const [tramiteRecibidoDerivadoCreate, setTramiteRecibidoDerivadoCreate] =
+    useState<TramiteRecibidoDerivadoCreate>(emptyTramiteRecibidoDerivadoCreate);
 
   const [movimiento, setMovimiento] =
     useState<MovimientoEntity>(emptyMovimiento);
@@ -112,19 +132,39 @@ const TramiteRecibidoDerivado = () => {
     MovimientoEntity[]
   >([]);
 
+  const [moviminetoDetails, setMoviminetoDetails] =
+    useState<MovimientoDetailsEntity>();
+
   const [selectedLoadFiles, setSelectedLoadFiles] = useState<File[]>([]);
 
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
+  // const params = useParams();
+
+  // const findOneDetailsMovimiento = async () => {
+  //   setLoading(true);
+  //   const movimiento = await findOneDetails(params.id ?? "0");
+  //   console.log(movimiento);
+
+  //   setLoading(false);
+
+  //   if (movimiento?.message.msgId == 0 && movimiento.registro) {
+  //     setMoviminetoDetails(movimiento.registro);
+  //     // setTramiteRecibidoAtendidoCreate({
+  //     //   ...tramiteRecibidoAtendidoCreate,
+  //     //   IdMovimiento: parseInt(params.id??"0"),
+  //     // });
+  //   }
+  // };
   //functions
   const createTramiteEmitido = async () => {
     setSubmitted(true);
     if (
-      tramite.Asunto.trim() &&
-      tramite.IdTipoDocumento != 0 &&
-      tramite.CodigoReferencia.trim() &&
-      tramite.IdRemitente != 0 &&
-      tramite.Folios != 0
+      tramiteRecibidoDerivadoCreate.Asunto.trim() &&
+      tramiteRecibidoDerivadoCreate.IdTipoDocumento != 0 &&
+      tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc.trim() &&
+      tramiteRecibidoDerivadoCreate.IdRemitente != 0 &&
+      tramiteRecibidoDerivadoCreate.Folios != 0
     ) {
       // setLoadingTramiteCreateOrUpdate(true);
       let arrayAnexosUpload: AnexoEntity[] = [];
@@ -180,23 +220,23 @@ const TramiteRecibidoDerivado = () => {
         return;
       }
 
-      //2 we create tramite
+      //2 we create tramiteRecibidoDerivadoCreate
       let tramiteCreateEmitido = await createEmitido({
-        CodigoReferencia: tramite.CodigoReferencia,
-        Asunto: tramite.Asunto,
-        // Descripcion: tramite.Descripcion,
-        Observaciones: tramite.Observaciones,
+        CodigoReferenciaDoc: tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc,
+        Asunto: tramiteRecibidoDerivadoCreate.Asunto,
+        // Descripcion: tramiteRecibidoDerivadoCreate.Descripcion,
+        Observaciones: tramiteRecibidoDerivadoCreate.Observaciones,
         FechaInicio: new Date().toISOString(),
-        // FechaFin:tramite.FechaFin,
-        Folios: tramite.Folios,
+        // FechaFin:tramiteRecibidoDerivadoCreate.FechaFin,
+        Folios: tramiteRecibidoDerivadoCreate.Folios,
 
-        IdTipoTramite: tramite.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
+        IdTipoTramite: tramiteRecibidoDerivadoCreate.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
 
-        IdTipoDocumento: tramite.IdTipoDocumento,
-        IdAreaEmision: tramite.IdAreaEmision,
-        IdEstado: tramite.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
-        IdRemitente: tramite.IdRemitente,
-        Activo: tramite.Activo,
+        IdTipoDocumento: tramiteRecibidoDerivadoCreate.IdTipoDocumento,
+        IdAreaEmision: tramiteRecibidoDerivadoCreate.IdAreaEmision,
+        IdEstado: tramiteRecibidoDerivadoCreate.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
+        IdRemitente: tramiteRecibidoDerivadoCreate.IdRemitente,
+        Activo: tramiteRecibidoDerivadoCreate.Activo,
 
         DigitalFiles: selectedDigitalFiles,
         TramiteDestinos: selectedTramiteDestinos,
@@ -211,7 +251,7 @@ const TramiteRecibidoDerivado = () => {
       ) {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
-        navigate("../tramite/emitido");
+        navigate("../tramiteRecibidoDerivadoCreate/emitido");
 
         toast.current?.show({
           severity: "success",
@@ -228,7 +268,7 @@ const TramiteRecibidoDerivado = () => {
 
       // setSelectedAnexos([])
       // setFileManagerDialog(false);
-      // setTramite(emptyTramite);
+      // setTramiteRecibidoDerivadoCreate(emptyTramite);
     }
   };
 
@@ -505,7 +545,7 @@ const TramiteRecibidoDerivado = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    setTramite((prev) => ({
+    setTramiteRecibidoDerivadoCreate((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -516,7 +556,7 @@ const TramiteRecibidoDerivado = () => {
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
     const val = e.value ?? null;
 
-    setTramite((prev) => ({
+    setTramiteRecibidoDerivadoCreate((prev) => ({
       ...prev,
       [name]: val,
     }));
@@ -529,12 +569,12 @@ const TramiteRecibidoDerivado = () => {
     name: string
   ) => {
     const val = (e.target && e.target.value) || "";
-    let _tramite = { ...tramite };
+    let _tramite = { ...tramiteRecibidoDerivadoCreate };
 
     // @ts-ignore
     _tramite[name] = val;
 
-    setTramite(_tramite);
+    setTramiteRecibidoDerivadoCreate(_tramite);
 
     setTramiteErrors((prev: any) => ({ ...prev, [name]: undefined }));
   };
@@ -547,12 +587,12 @@ const TramiteRecibidoDerivado = () => {
   ) => {
     const val = (e.target && e.target.value) || "";
 
-    let _tramite: any = { ...tramite };
+    let _tramite: any = { ...tramiteRecibidoDerivadoCreate };
 
     _tramite[nameTagFK ? nameTagFK : nameFK] = val[nameFK];
     _tramite[nameObj] = { ...val };
 
-    setTramite(_tramite);
+    setTramiteRecibidoDerivadoCreate(_tramite);
 
     setTramiteErrors((prev: any) => ({
       ...prev,
@@ -602,37 +642,66 @@ const TramiteRecibidoDerivado = () => {
   };
 
   const onSwitchChange = (e: InputSwitchChangeEvent, name: string) => {
-    let _movimiento: any = { ...movimiento };
-    _movimiento[name] = e.value;
-    setMovimiento(_movimiento);
+    let _trac: any = { ...tramiteRecibidoDerivadoCreate };
+    _trac[name] = e.value;
+    setTramiteRecibidoDerivadoCreate(_trac);
+  };
+
+  const [selectedAccion, setSelectedAccion] = useState<string>("");
+
+  const opcionesAcciones = [
+    { id: 1, label: "1. Acciones necesarias", value: "acciones_necesarias" },
+    { id: 2, label: "2. Conocimiento", value: "conocimiento" },
+    { id: 3, label: "3. Coordinar", value: "coordinar" },
+    { id: 4, label: "4. Informar", value: "informar" },
+    { id: 5, label: "5. Opinión", value: "opinion" },
+    {
+      id: 6,
+      label: "6. Atención según lo solicitado",
+      value: "atencion_solicitada",
+    },
+    { id: 7, label: "7. Difusión", value: "difusion" },
+    { id: 8, label: "8. Archivo", value: "archivo" },
+    { id: 9, label: "9. Publicación", value: "publicacion" },
+    { id: 10, label: "10. Devolución", value: "devolucion" },
+    { id: 11, label: "11. Asistir", value: "asistir" },
+    { id: 12, label: "12. Seguimiento", value: "seguimiento" },
+    { id: 13, label: "13. Revisión", value: "revision" },
+    { id: 14, label: "14. Aprobación", value: "aprobacion" },
+    { id: 15, label: "15. Reunión", value: "reunion" },
+    { id: 16, label: "16. Otros", value: "otros" },
+  ];
+
+  const handleAccionChange = (e: any) => {
+    setSelectedAccion(e.value);
   };
 
   const validateForm = () => {
     let fieldErrors: any = {};
 
-    if (!tramite.Asunto.trim()) {
+    if (!tramiteRecibidoDerivadoCreate.Asunto.trim()) {
       fieldErrors.Asunto = "Asunto es obligatorio.";
     }
 
-    if (tramite.IdTipoDocumento == 0) {
+    if (tramiteRecibidoDerivadoCreate.IdTipoDocumento == 0) {
       fieldErrors.IdTipoDocumento = "Tipo de documento es obligatorio.";
     }
 
-    if (!tramite.CodigoReferencia.trim()) {
-      fieldErrors.CodigoReferencia = "Codigo de referencia es obligatoria.";
+    if (!tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc.trim()) {
+      fieldErrors.CodigoReferenciaDoc = "Codigo de referencia es obligatoria.";
     }
 
-    if (tramite.IdRemitente == 0) {
+    if (tramiteRecibidoDerivadoCreate.IdRemitente == 0) {
       fieldErrors.IdRemitente = "Remitente es obligatorio.";
     }
 
-    if (tramite.Folios == 0) {
+    if (tramiteRecibidoDerivadoCreate.Folios <= 0) {
       fieldErrors.Folios = "Folios es obligatorio.";
     }
 
-    if (tramite.IdAreaEmision == 0) {
-      fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
-    }
+    // if (tramiteRecibidoDerivadoCreate.IdAreaEmision == 0) {
+    //   fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
+    // }
 
     setTramiteErrors(fieldErrors);
 
@@ -644,7 +713,30 @@ const TramiteRecibidoDerivado = () => {
     findAllTipoDocumentoCombox();
     findAllRemitenteCombox();
     findAllAreaCombox();
+    // findOneDetailsMovimiento();
   }, []);
+
+  useEffect(() => {
+    if (
+      userAuth?.IdUsuario
+      //  && params.id
+    ) {
+      setTramiteRecibidoDerivadoCreate({
+        ...tramiteRecibidoDerivadoCreate,
+        IdRemitente: userAuth?.IdUsuario ?? 0,
+        // IdMovimiento: parseInt(params.id ?? "0"),
+        Remitente: {
+          IdUsuario: userAuth?.IdUsuario ?? 0,
+          Nombres: userAuth?.Nombres ?? "",
+          ApellidoPaterno: userAuth?.ApellidoPaterno ?? "",
+          ApellidoMaterno: userAuth?.ApellidoMaterno ?? "",
+        },
+      });
+    }
+  }, [
+    userAuth?.IdUsuario,
+    // params.id
+  ]);
 
   return (
     <div className="card p-0 m-0">
@@ -700,168 +792,20 @@ const TramiteRecibidoDerivado = () => {
                   </label>
 
                   <div className="formgrid grid px-3">
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">1. Acciones necesarias</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">2. Conocimiento</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">3. Coordinar</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">4. Informar</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">5. Opinión</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">
-                        6. Atención según lo solicitado
-                      </label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">7. Difusión</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">8. Archivo</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">9. Publicación</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">10.Devol ución</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">11. Asistir</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">12. Seguimiento</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">13. Revisión</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">14. Aprobación</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activot"
-                        name="Activot"
-                        value={true}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === true}
-                      />
-                      <label htmlFor="Activot">15. Reunión</label>
-                    </div>
-                    <div className="field-radiobutton col-6">
-                      <RadioButton
-                        inputId="Activof"
-                        name="Activof"
-                        value={false}
-                        // onChange={props.onActivoChange}
-                        // checked={props.estado.Activo === false}
-                      />
-                      <label htmlFor="Activof">16. Otros</label>
-                    </div>
+                    {opcionesAcciones.map((opcion) => (
+                      <div key={opcion.id} className="field-radiobutton col-6">
+                        <RadioButton
+                          inputId={`accion_${opcion.id}`}
+                          name="acciones"
+                          value={opcion.value}
+                          onChange={handleAccionChange}
+                          checked={selectedAccion === opcion.value}
+                        />
+                        <label htmlFor={`accion_${opcion.id}`}>
+                          {opcion.label}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -882,7 +826,7 @@ const TramiteRecibidoDerivado = () => {
                     <div className="p-inputgroup">
                       <InputTextarea
                         id="Observaciones"
-                        value={tramite.Observaciones}
+                        value={tramiteRecibidoDerivadoCreate.Observaciones}
                         onChange={(e) =>
                           onInputTextAreaChange(e, "Observaciones")
                         }
@@ -922,7 +866,17 @@ const TramiteRecibidoDerivado = () => {
                     >
                       <Button
                         type="button"
-                        onClick={showFileManagerDialog}
+                        onClick={() => {
+                          if (selectedDigitalFiles.length < 1) {
+                            showFileManagerDialog();
+                          } else {
+                            toast.current?.show({
+                              severity: "info",
+                              detail: `Ya tiene un archivo digital seleccionado`,
+                              life: 3000,
+                            });
+                          }
+                        }}
                         size="small"
                         severity="secondary"
                         style={{
@@ -942,7 +896,15 @@ const TramiteRecibidoDerivado = () => {
                       <Button
                         type="button"
                         onClick={() => {
-                          loadFilesRef.current?.click();
+                          if (selectedDigitalFiles.length < 1) {
+                            loadFilesRef.current?.click();
+                          } else {
+                            toast.current?.show({
+                              severity: "info",
+                              detail: `Ya tiene un archivo digital seleccionado`,
+                              life: 3000,
+                            });
+                          }
                         }}
                         size="small"
                         style={{
@@ -1048,22 +1010,23 @@ const TramiteRecibidoDerivado = () => {
                     })}
                   </div>
 
-                  <div className="flex justify-content-start align-items-center mb-2">
-                    <InputSwitch
-                      id="Copia"
-                      // checked={props.movimiento.Copia ?? false}
-                      checked={false}
-                      // onChange={(e) => props.onSwitchChange(e, "Copia")}
-                      className="small-switch"
-                    />
-                    <label htmlFor="Copia" className="text-sm m-0">
-                      visible
-                    </label>
-                  </div>
+                  {selectedDigitalFiles.length > 0 && (
+                    <div className="flex justify-content-start align-items-center">
+                      <InputSwitch
+                        id="Visible"
+                        checked={tramiteRecibidoDerivadoCreate.Visible ?? false}
+                        onChange={(e) => onSwitchChange(e, "Visible")}
+                        className="small-switch"
+                      />
+                      <label htmlFor="Visible" className="text-sm m-0">
+                        visible
+                      </label>
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="flex flex-row" style={{ gap: "1rem" }}>
+              <div className="flex flex-row mt-3" style={{ gap: "1rem" }}>
                 <div
                   style={{
                     width: "50%",
@@ -1078,7 +1041,7 @@ const TramiteRecibidoDerivado = () => {
                   <div className="flex flex-column mb-3 gap-1">
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={tramite.TipoDocumento}
+                        value={tramiteRecibidoDerivadoCreate.TipoDocumento}
                         onChange={(e) => {
                           onDropdownChange(
                             e,
@@ -1114,27 +1077,29 @@ const TramiteRecibidoDerivado = () => {
                   }}
                 >
                   <label
-                    htmlFor="CodigoReferencia"
+                    htmlFor="CodigoReferenciaDoc"
                     className="block text-900 text-sm font-medium mb-2"
                   >
-                    Nº de referencia
+                    Código de referencia
                   </label>
                   <div className="flex flex-column mb-3 gap-1">
                     <div className="p-inputgroup">
                       <InputText
-                        id="CodigoReferencia"
-                        value={tramite.CodigoReferencia}
+                        id="CodigoReferenciaDoc"
+                        value={
+                          tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc
+                        }
                         onChange={(e) => {
-                          onInputTextChange(e, "CodigoReferencia");
+                          onInputTextChange(e, "CodigoReferenciaDoc");
                         }}
                         type="text"
-                        placeholder="Nº de referencia"
+                        placeholder="Código de referencia"
                         className="p-inputtext-sm "
                       />
                     </div>
-                    {tramiteErrors.CodigoReferencia && (
+                    {tramiteErrors.CodigoReferenciaDoc && (
                       <small className="p-error">
-                        {tramiteErrors.CodigoReferencia}
+                        {tramiteErrors.CodigoReferenciaDoc}
                       </small>
                     )}
                   </div>
@@ -1156,7 +1121,13 @@ const TramiteRecibidoDerivado = () => {
                   <div className="flex flex-column mb-3 gap-1">
                     <div className="p-inputgroup">
                       <Dropdown
-                        value={tramite.Remitente}
+                        value={{
+                          IdUsuario: userAuth?.IdUsuario ?? 0,
+                          Nombres: userAuth?.Nombres ?? "",
+                          ApellidoPaterno: userAuth?.ApellidoPaterno ?? "",
+                          ApellidoMaterno: userAuth?.ApellidoMaterno ?? "",
+                          NombreCompleto: `${userAuth?.Nombres} ${userAuth?.ApellidoPaterno} ${userAuth?.ApellidoMaterno}`,
+                        }}
                         onChange={(e) => {
                           onDropdownChange(
                             e,
@@ -1202,7 +1173,7 @@ const TramiteRecibidoDerivado = () => {
                     <div className="p-inputgroup">
                       <InputNumber
                         id="Folios"
-                        value={tramite.Folios}
+                        value={tramiteRecibidoDerivadoCreate.Folios}
                         onChange={(e) => {
                           onInputNumberChange(e, "Folios");
                         }}
@@ -1234,7 +1205,7 @@ const TramiteRecibidoDerivado = () => {
                     <div className="p-inputgroup">
                       <InputTextarea
                         id="Asunto"
-                        value={tramite.Asunto}
+                        value={tramiteRecibidoDerivadoCreate.Asunto}
                         onChange={(e) => onInputTextAreaChange(e, "Asunto")}
                         autoFocus
                         rows={2}
@@ -1266,7 +1237,7 @@ const TramiteRecibidoDerivado = () => {
                     <div className="p-inputgroup">
                       <InputTextarea
                         id="Observaciones"
-                        value={tramite.Observaciones}
+                        value={tramiteRecibidoDerivadoCreate.Observaciones}
                         onChange={(e) =>
                           onInputTextAreaChange(e, "Observaciones")
                         }
@@ -1301,48 +1272,6 @@ const TramiteRecibidoDerivado = () => {
               </label>
             </div>
 
-            {/* <div className="flex flex-row  px-4" style={{ gap: "1rem" }}>
-              <div
-                style={{
-                  width: "100%",
-                }}
-              >
-                <label
-                  htmlFor="AreaEmision"
-                  className="block text-900 text-sm font-medium mb-2"
-                >
-                  Área Emisión
-                </label>
-                <div className="flex flex-column  gap-1">
-                  <div className="p-inputgroup">
-                    <Dropdown
-                      value={tramite.Area}
-                      onChange={(e) => {
-                        onDropdownChange(e, "Area", "IdArea", "IdAreaEmision");
-                      }}
-                      options={areas}
-                      optionLabel="Descripcion"
-                      filter
-                      placeholder="Seleccionar Área de Emisión"
-                      className="w-full flex flex-row align-items-center p-inputtext-sm"
-                      showClear
-                      style={{
-                        paddingTop: "1.2rem",
-                        paddingBottom: "1.2rem",
-                        width: "16rem",
-                        height: "2rem",
-                      }}
-                    />
-                  </div>
-                  {tramiteErrors.IdAreaEmision && (
-                    <small className="p-error">
-                      {tramiteErrors.IdAreaEmision}
-                    </small>
-                  )}
-                </div>
-              </div>
-            </div> */}
-
             <div className="flex flex-row px-4" style={{ gap: "1rem" }}>
               <div
                 style={{
@@ -1350,28 +1279,47 @@ const TramiteRecibidoDerivado = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="IdTramite"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Trámite
                 </label>
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
-                    <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
-                      onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
-                      }}
-                      type="text"
+                    <InputTextarea
+                      id="IdTramite"
+                      value={
+                        selectedTramitesRecibidos?.length > 0
+                          ? selectedTramitesRecibidos
+                              .map(
+                                (str: any, index: number) =>
+                                  `${
+                                    index + 1
+                                  }. ${str.Tramite?.IdTramite.toString().padStart(
+                                    8,
+                                    "0"
+                                  )}`
+                              )
+                              .join("\n")
+                          : tramiteRecibido?.Tramite?.IdTramite.toString().padStart(
+                              8,
+                              "0"
+                            )
+                      }
+                      // onChange={(e) => {
+                      //   onInputTextChange(e, "IdTramite");
+                      // }}
                       className="p-inputtext-sm "
+                      rows={
+                        selectedTramitesRecibidos?.length > 0
+                          ? selectedTramitesRecibidos?.length
+                          : 1
+                      }
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
-                    <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
-                    </small>
-                  )}
+                  {/* {tramiteErrors.IdTramite && (
+                          <small className="p-error">{tramiteErrors.IdTramite}</small>
+                        )} */}
                 </div>
               </div>
 
@@ -1381,110 +1329,166 @@ const TramiteRecibidoDerivado = () => {
                 }}
               >
                 <label
-                  htmlFor="CodigoReferencia"
+                  htmlFor="Documento"
                   className="block text-900 text-sm font-medium mb-2"
                 >
                   Documento
                 </label>
                 <div className="flex flex-column mb-3 gap-1">
                   <div className="p-inputgroup">
-                    <InputText
-                      id="CodigoReferencia"
-                      value={tramite.CodigoReferencia}
-                      onChange={(e) => {
-                        onInputTextChange(e, "CodigoReferencia");
-                      }}
-                      type="text"
-                      className="p-inputtext-sm "
+                    <InputTextarea
+                      id="Documento"
+                      value={
+                        selectedTramitesRecibidos?.length > 0
+                          ? selectedTramitesRecibidos
+                              .map(
+                                (str: any, index: number) =>
+                                  `${index + 1}. ${
+                                    (str.Documento?.TipoDocumento
+                                      ?.Descripcion || "") +
+                                    " " +
+                                    (str.Documento?.CodigoReferenciaDoc || "")
+                                  }`
+                              )
+                              .join("\n")
+                          : tramiteRecibido?.Documento?.TipoDocumento
+                              ?.Descripcion +
+                            " " +
+                            tramiteRecibido?.Documento?.CodigoReferenciaDoc
+                      }
+                      // onChange={(e) => {
+                      //   onInputTextChange(e, "Documento");
+                      // }}
+                      className="p-inputtext-sm"
+                      rows={
+                        selectedTramitesRecibidos?.length > 0
+                          ? selectedTramitesRecibidos?.length
+                          : 1
+                      }
                     />
                   </div>
-                  {tramiteErrors.CodigoReferencia && (
-                    <small className="p-error">
-                      {tramiteErrors.CodigoReferencia}
-                    </small>
-                  )}
+                  {/* {tramiteErrors.Documento && (
+                          <small className="p-error">
+                            {tramiteErrors.Documento}
+                          </small>
+                        )} */}
                 </div>
               </div>
             </div>
 
             <div className="flex flex-column px-4">
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="Asunto"
                 className="block text-900 text-sm font-medium mb-2"
               >
                 Asunto
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
-                  <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
-                    onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
-                    }}
-                    type="text"
+                  <InputTextarea
+                    id="Asunto"
+                    value={
+                      selectedTramitesRecibidos?.length > 0
+                        ? selectedTramitesRecibidos
+                            .map(
+                              (str: any, index: number) =>
+                                `${index + 1}. ${str.Documento?.Asunto || ""}`
+                            )
+                            .join("\n")
+                        : tramiteRecibido?.Documento?.Asunto
+                    }
+                    // onChange={(e) => {
+                    //   onInputTextChange(e, "Asunto");
+                    // }}
                     className="p-inputtext-sm "
+                    rows={
+                      selectedTramitesRecibidos?.length > 0
+                        ? selectedTramitesRecibidos?.length
+                        : 1
+                    }
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
-                  <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
-                  </small>
-                )}
+                {/* {tramiteErrors.Asunto && (
+                        <small className="p-error">{tramiteErrors.Asunto}</small>
+                      )} */}
               </div>
             </div>
 
             <div className="flex flex-column px-4">
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="Ubicacion"
                 className="block text-900 text-sm font-medium mb-2"
               >
                 Ubicación
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
-                  <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
-                    onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
-                    }}
-                    type="text"
+                  <InputTextarea
+                    id="Ubicacion"
+                    value={
+                      selectedTramitesRecibidos?.length > 0
+                        ? selectedTramitesRecibidos
+                            .map(
+                              (str: any, index: number) =>
+                                `${index + 1}. ${
+                                  str?.AreaDestino?.Descripcion || ""
+                                }`
+                            )
+                            .join("\n")
+                        : tramiteRecibido?.AreaDestino?.Descripcion
+                    }
+                    // onChange={(e) => {
+                    //   onInputTextChange(e, "Ubicacion");
+                    // }}
                     className="p-inputtext-sm "
+                    rows={
+                      selectedTramitesRecibidos?.length > 0
+                        ? selectedTramitesRecibidos?.length
+                        : 1
+                    }
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
-                  <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
-                  </small>
-                )}
+                {/* {tramiteErrors.Ubicacion && (
+                        <small className="p-error">{tramiteErrors.Ubicacion}</small>
+                      )} */}
               </div>
             </div>
 
             <div className="flex flex-column px-4">
               <label
-                htmlFor="CodigoReferencia"
+                htmlFor="Responsable"
                 className="block text-900 text-sm font-medium mb-2"
               >
-                Personal
+                Responsable
               </label>
               <div className="flex flex-column mb-3 gap-1">
                 <div className="p-inputgroup">
-                  <InputText
-                    id="CodigoReferencia"
-                    value={tramite.CodigoReferencia}
-                    onChange={(e) => {
-                      onInputTextChange(e, "CodigoReferencia");
-                    }}
-                    type="text"
+                  <InputTextarea
+                    id="Responsable"
+                    value={
+                      selectedTramitesRecibidos?.length > 0
+                        ? selectedTramitesRecibidos
+                            .map(
+                              (str: any, index: number) =>
+                                `${index + 1}. ${str?.NombreResponsable || ""}`
+                            )
+                            .join("\n")
+                        : tramiteRecibido?.NombreResponsable
+                    }
+                    // onChange={(e) => {
+                    //   onInputTextChange(e, "Responsable");
+                    // }}
                     className="p-inputtext-sm "
+                    rows={
+                      selectedTramitesRecibidos?.length > 0
+                        ? selectedTramitesRecibidos?.length
+                        : 1
+                    }
                   />
                 </div>
-                {tramiteErrors.CodigoReferencia && (
-                  <small className="p-error">
-                    {tramiteErrors.CodigoReferencia}
-                  </small>
-                )}
+                {/* {tramiteErrors.Responsable && (
+                        <small className="p-error">{tramiteErrors.Responsable}</small>
+                      )} */}
               </div>
             </div>
 
@@ -1761,7 +1765,7 @@ const TramiteRecibidoDerivado = () => {
               type="button"
               onClick={() => {
                 if (validateForm()) {
-                  createTramiteEmitido();
+                  // createTramiteEmitido();
                 }
               }}
               size="small"
