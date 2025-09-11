@@ -12,12 +12,18 @@ import {
   TramiteAtender,
   TramiteRecibidoOut,
   TramiteAtendidoOut,
+  TramiteObservar,
+  TramiteObservadoOut,
+  TramiteDesmarcarAtendidoOut,
+  TramiteDesmarcarAtender,
+  TramiteDesmarcarObservar,
+  TramiteDesmarcarObservadoOut,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
 import { TRAMITE } from "../service/TramiteService";
 import { Menssage } from "../../utils/menssage";
-import { TramiteExternoRecibir } from '../interfaces/TramiteInterface';
+import { TramiteExternoRecibir } from "../interfaces/TramiteInterface";
 
 const UseTramite = () => {
   let message = new Menssage();
@@ -102,6 +108,54 @@ const UseTramite = () => {
     }
   };
 
+  const desmarcarAtender = async (
+    tramiteDesmarcarAtender: TramiteDesmarcarAtender
+  ): Promise<TramiteDesmarcarAtendidoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteDesmarcarAtendidoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.DESMARCAR_ATENDER}`,
+        tramiteDesmarcarAtender
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const observar = async (
+    tramiteObservar: TramiteObservar
+  ): Promise<TramiteObservadoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteObservadoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.OBSERVAR}`,
+        tramiteObservar
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const desmarcarObservar = async (
+    tramiteDesmarcarObservar: TramiteDesmarcarObservar
+  ): Promise<TramiteDesmarcarObservadoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteDesmarcarObservadoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.DESMARCAR_OBSERVAR}`,
+        tramiteDesmarcarObservar
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
   const findAll = async (): Promise<TramitesOut | undefined> => {
     try {
       const tramites = await axios.post<TramitesOut>(
@@ -128,7 +182,7 @@ const UseTramite = () => {
     }
   };
 
-  const findAllRecibidos= async (
+  const findAllRecibidos = async (
     getAllTramiteRecibido: GetAllTramiteRecibido
   ): Promise<TramitesRecibidosOut | undefined> => {
     try {
@@ -185,6 +239,9 @@ const UseTramite = () => {
     recibirExterno,
     recibir,
     atender,
+    desmarcarAtender,
+    observar,
+    desmarcarObservar,
     findAll,
     findAllPendientes,
     findAllRecibidos,

@@ -57,7 +57,13 @@ const TramiteRecibido = () => {
   // custom hooks
   const { userAuth } = useAuth()!;
 
-  const { findAllRecibidos, atender } = UseTramite();
+  const {
+    findAllRecibidos,
+    atender,
+    observar,
+    desmarcarAtender,
+    desmarcarObservar,
+  } = UseTramite();
 
   const { findAll: findAllArchivador } = UseArchivador();
 
@@ -161,56 +167,86 @@ const TramiteRecibido = () => {
       selectedTramitesRecibidos.length == 0 &&
       tramiteRecibido.IdMovimiento != null
     ) {
+      if (
+        !(tramiteRecibido.HistorialMovimientoxEstado[0].Estado.IdEstado = 16)
+      ) {
+        toast.current?.show({
+          severity: "info",
+          detail: `${"Todos los tramites seleccionados deben estar en estado de recibido"}`,
+          life: 4000,
+        });
+
+        setTramiteRecibidoAtendidoDialog({ type: "simple", state: false });
+        setObservaciones("");
+        setSubmitted(false);
+
+        return;
+      }
+
       idMovimientos = [{ IdMovimiento: tramiteRecibido.IdMovimiento }];
     } else {
+      if (
+        !selectedTramitesRecibidos.every(
+          (stp) => stp.HistorialMovimientoxEstado[0].Estado.IdEstado == 16
+        )
+      ) {
+        toast.current?.show({
+          severity: "info",
+          detail: `${"Todos los tramites seleccionados deben estar en estado de recibido"}`,
+          life: 4000,
+        });
+
+        setTramiteRecibidoAtendidoDialog({ type: "simple", state: false });
+        setObservaciones("");
+        setSubmitted(false);
+
+        return;
+      }
+
       idMovimientos = selectedTramitesRecibidos.map((stp) => {
         return { IdMovimiento: stp.IdMovimiento };
       });
     }
 
-    const recibirTramitePendintes = await atender({
+    const atenderTramiteRecibidos = await atender({
       Movimientos: idMovimientos,
       Observaciones: observaciones,
     });
 
     if (
-      recibirTramitePendintes?.message.msgId == 0 &&
-      recibirTramitePendintes.registro
+      atenderTramiteRecibidos?.message.msgId == 0 &&
+      atenderTramiteRecibidos.registro
     ) {
       setTramitesRecibidos((prev) => {
-        return prev?.map((tr: any) => {
+        return prev?.map((tr) => {
           const index =
-            recibirTramitePendintes.registro?.Movimientos.findIndex(
-              (mov) => mov.data.IdMovimiento == tr.IdMovimiento
+            atenderTramiteRecibidos.registro?.findIndex(
+              (mov) => mov.Movimiento.IdMovimiento == tr.IdMovimiento
             ) ?? -1;
 
-          if (typeof index === "number" && index > -1) {
-            console.log("index", index);
-            console.log(tr.IdMovimiento);
-            return {
-              ...tr,
-              Estado:
-                recibirTramitePendintes.registro?.Movimientos[index].data.Estado
-                  .Descripcion,
-            };
-          } else {
-            return {
-              ...tr,
-            };
+          if (index > -1 && atenderTramiteRecibidos.registro) {
+            tr.HistorialMovimientoxEstado.unshift({
+              IdHistorialMxE:
+                atenderTramiteRecibidos.registro[index].IdHistorialMxE,
+              FechaHistorialMxE:
+                atenderTramiteRecibidos.registro[index].FechaHistorialMxE,
+              Estado: { ...atenderTramiteRecibidos.registro[index].Estado },
+            });
           }
+
+          return tr;
         });
       });
-      // setTramitesRecibidos(recibirTramitePendintes.registro);
 
       toast.current?.show({
         severity: "success",
-        detail: `${recibirTramitePendintes.message.msgTxt}`,
+        detail: `${atenderTramiteRecibidos.message.msgTxt}`,
         life: 3000,
       });
-    } else if (recibirTramitePendintes?.message.msgId == 1) {
+    } else if (atenderTramiteRecibidos?.message.msgId == 1) {
       toast.current?.show({
         severity: "error",
-        detail: `${recibirTramitePendintes.message.msgTxt}`,
+        detail: `${atenderTramiteRecibidos.message.msgTxt}`,
         life: 3000,
       });
     }
@@ -218,6 +254,187 @@ const TramiteRecibido = () => {
     setTramiteRecibidoAtendidoDialog({ type: "simple", state: false });
     setObservaciones("");
     setSelectedTramitesRecibidos([]);
+    setSubmitted(false);
+  };
+
+  const desmarcarAtenderTramiteRecibido = async (idMovimiento: number) => {
+    setSubmitted(true);
+
+    const desmarcarAtenderTramiteRecibido = await desmarcarAtender({
+      IdMovimiento: idMovimiento,
+    });
+
+    if (
+      desmarcarAtenderTramiteRecibido?.message.msgId == 0 &&
+      desmarcarAtenderTramiteRecibido.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.map((tr) => {
+          if (
+            desmarcarAtenderTramiteRecibido.registro?.Movimiento
+              ?.IdMovimiento == tr.IdMovimiento
+          ) {
+            tr.HistorialMovimientoxEstado.shift();
+          }
+
+          return tr;
+        });
+      });
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${desmarcarAtenderTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (desmarcarAtenderTramiteRecibido?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${desmarcarAtenderTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setSubmitted(false);
+  };
+
+  const observarTramitesRecibidos = async () => {
+    setSubmitted(true);
+
+    let idMovimientos: {
+      IdMovimiento: number;
+    }[] = [];
+
+    if (
+      selectedTramitesRecibidos.length == 0 &&
+      tramiteRecibido.IdMovimiento != null
+    ) {
+      if (
+        !(tramiteRecibido.HistorialMovimientoxEstado[0].Estado.IdEstado = 16)
+      ) {
+        toast.current?.show({
+          severity: "info",
+          detail: `${"Todos los tramites seleccionados deben estar en estado de recibido"}`,
+          life: 4000,
+        });
+
+        setTramiteRecibidoObservadoDialog(false);
+        setObservaciones("");
+        setSubmitted(false);
+
+        return;
+      }
+
+      idMovimientos = [{ IdMovimiento: tramiteRecibido.IdMovimiento }];
+    } else {
+      if (
+        !selectedTramitesRecibidos.every(
+          (stp) => stp.HistorialMovimientoxEstado[0].Estado.IdEstado == 16
+        )
+      ) {
+        toast.current?.show({
+          severity: "info",
+          detail: `${"Todos los tramites seleccionados deben estar en estado de recibido"}`,
+          life: 4000,
+        });
+
+        setTramiteRecibidoObservadoDialog(false);
+        setObservaciones("");
+        setSubmitted(false);
+
+        return;
+      }
+
+      idMovimientos = selectedTramitesRecibidos.map((stp) => {
+        return { IdMovimiento: stp.IdMovimiento };
+      });
+    }
+
+    const observarTramiteRecibidos = await observar({
+      Movimientos: idMovimientos,
+      Observaciones: observaciones,
+    });
+
+    if (
+      observarTramiteRecibidos?.message.msgId == 0 &&
+      observarTramiteRecibidos.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.map((tr) => {
+          const index =
+            observarTramiteRecibidos.registro?.findIndex(
+              (mov) => mov.Movimiento.IdMovimiento == tr.IdMovimiento
+            ) ?? -1;
+
+          if (index > -1 && observarTramiteRecibidos.registro) {
+            tr.HistorialMovimientoxEstado.unshift({
+              IdHistorialMxE:
+                observarTramiteRecibidos.registro[index].IdHistorialMxE,
+              FechaHistorialMxE:
+                observarTramiteRecibidos.registro[index].FechaHistorialMxE,
+              Estado: { ...observarTramiteRecibidos.registro[index].Estado },
+            });
+          }
+
+          return tr;
+        });
+      });
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${observarTramiteRecibidos.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (observarTramiteRecibidos?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${observarTramiteRecibidos.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setTramiteRecibidoObservadoDialog(false);
+    setObservaciones("");
+    setSelectedTramitesRecibidos([]);
+    setSubmitted(false);
+  };
+
+  const desmarcarObservarTramiteRecibido = async (idMovimiento: number) => {
+    setSubmitted(true);
+
+    const desmarcarObservarTramiteRecibido = await desmarcarObservar({
+      IdMovimiento: idMovimiento,
+    });
+
+    if (
+      desmarcarObservarTramiteRecibido?.message.msgId == 0 &&
+      desmarcarObservarTramiteRecibido.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.map((tr) => {
+          if (
+            desmarcarObservarTramiteRecibido.registro?.Movimiento
+              ?.IdMovimiento == tr.IdMovimiento
+          ) {
+            tr.HistorialMovimientoxEstado.shift();
+          }
+
+          return tr;
+        });
+      });
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${desmarcarObservarTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (desmarcarObservarTramiteRecibido?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${desmarcarObservarTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
     setSubmitted(false);
   };
 
@@ -1283,15 +1500,7 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-eraser",
             command: () => {
-              // showUpdateCarpetaDialog({
-              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-              //   Descripcion: rowData.Descripcion,
-              //   CreadoEl: rowData.FechaEmision,
-              //   Categoria: rowData.Categoria,
-              //   IdUsuario: rowData.Usuario.IdUsuario,
-              //   Activo: rowData.Activo,
-              // });
+              desmarcarAtenderTramiteRecibido(rowData.IdMovimiento);
             },
           },
         ];
@@ -1327,15 +1536,7 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-eraser",
             command: () => {
-              // showUpdateCarpetaDialog({
-              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-              //   Descripcion: rowData.Descripcion,
-              //   CreadoEl: rowData.FechaEmision,
-              //   Categoria: rowData.Categoria,
-              //   IdUsuario: rowData.Usuario.IdUsuario,
-              //   Activo: rowData.Activo,
-              // });
+              desmarcarObservarTramiteRecibido(rowData.IdMovimiento);
             },
           },
         ];
@@ -1346,6 +1547,7 @@ const TramiteRecibido = () => {
   };
 
   const menuActionsTR = useRef<Menu>(null);
+
   const [itemsMenuActionsTR, setItemsMenuActionsTR] = useState<MenuItem[]>([]);
 
   const actionsBodyTemplate = (rowData: TramiteRecibidoEntity) => {
@@ -1655,7 +1857,7 @@ const TramiteRecibido = () => {
         tramiteRecibido={tramiteRecibido}
         observaciones={observaciones}
         setObservaciones={setObservaciones}
-        atenderTramitesRecibidos={atenderTramitesRecibidos}
+        atenderTramitesRecibidos={observarTramitesRecibidos}
         // selectedTramiteDestinos={selectedTramiteDestinos}
         // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
       />
