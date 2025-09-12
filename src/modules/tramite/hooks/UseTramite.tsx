@@ -18,6 +18,12 @@ import {
   TramiteDesmarcarAtender,
   TramiteDesmarcarObservar,
   TramiteDesmarcarObservadoOut,
+  TramiteDesmarcarRecibidoOut,
+  TramiteDesmarcarRecibir,
+  TramiteArchivar,
+  TramiteArchivadoOut,
+  TramiteDesmarcarArchivar,
+  TramiteDesmarcarArchivadoOut,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -92,6 +98,22 @@ const UseTramite = () => {
     }
   };
 
+  const desmarcarRecibir = async (
+    tramiteDesmarcarRecibir: TramiteDesmarcarRecibir
+  ): Promise<TramiteDesmarcarAtendidoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteDesmarcarRecibidoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.DESMARCAR_RECIBIR}`,
+        tramiteDesmarcarRecibir
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
   const atender = async (
     tramiteAtender: TramiteAtender
   ): Promise<TramiteAtendidoOut | undefined> => {
@@ -147,6 +169,38 @@ const UseTramite = () => {
       const tramite = await axios.post<TramiteDesmarcarObservadoOut>(
         `${VITE_API_URL_GDS + TRAMITE.DESMARCAR_OBSERVAR}`,
         tramiteDesmarcarObservar
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const archivar = async (
+    tramiteArchivar: TramiteArchivar
+  ): Promise<TramiteArchivadoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteArchivadoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.ARCHIVAR}`,
+        tramiteArchivar
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const desmarcarArchivar = async (
+    tramiteDesmarcarArchivar: TramiteDesmarcarArchivar
+  ): Promise<TramiteDesmarcarArchivadoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteDesmarcarArchivadoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.DESMARCAR_ARCHIVAR}`,
+        tramiteDesmarcarArchivar
       );
       return tramite.data;
     } catch (error: any) {
@@ -238,10 +292,13 @@ const UseTramite = () => {
     createEmitido,
     recibirExterno,
     recibir,
+    desmarcarRecibir,
     atender,
     desmarcarAtender,
     observar,
     desmarcarObservar,
+    archivar,
+    desmarcarArchivar,
     findAll,
     findAllPendientes,
     findAllRecibidos,

@@ -491,6 +491,22 @@ export interface TramiteDesmarcarAtendidoOut {
     };
   }
 }
+
+export interface TramiteDesmarcarRecibidoOut {
+  message: Message;
+  // registro?: TramiteAtendidoEntity[];
+  registro?: {
+    IdHistorialMxE: number;
+    FechaHistorialMxE: string;
+    Estado: {
+      IdEstado: number;
+      Descripcion: string;
+    };
+    Movimiento: {
+      IdMovimiento: number;
+    };
+  }
+}
 export interface TramiteObservadoOut {
   message: Message;
   // registro?: TramiteObservadoEntity[];
@@ -509,6 +525,36 @@ export interface TramiteObservadoOut {
 export interface TramiteDesmarcarObservadoOut {
   message: Message;
   // registro?: TramiteObservadoEntity[];
+  registro?: {
+    IdHistorialMxE: number;
+    FechaHistorialMxE: string;
+    Estado: {
+      IdEstado: number;
+      Descripcion: string;
+    };
+    Movimiento: {
+      IdMovimiento: number;
+    };
+  }
+}
+export interface TramiteArchivadoOut {
+  message: Message;
+  // registro?: TramiteArchivadoEntity[];
+  registro?: {
+    IdHistorialMxE: number;
+    FechaHistorialMxE: string;
+    Estado: {
+      IdEstado: number;
+      Descripcion: string;
+    };
+    Movimiento: {
+      IdMovimiento: number;
+    };
+  }[];
+}
+export interface TramiteDesmarcarArchivadoOut {
+  message: Message;
+  // registro?: TramiteArchivadoEntity[];
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
@@ -551,6 +597,9 @@ export interface TramiteRecibir {
   }[];
   Observaciones: string;
 }
+export interface TramiteDesmarcarRecibir {
+  IdMovimiento: number
+}
 export interface TramiteAtender {
   Movimientos: {
     IdEstado?: number
@@ -579,6 +628,23 @@ export interface TramiteObservar {
   Observaciones: string;
 }
 export interface TramiteDesmarcarObservar {
+  IdMovimiento: number
+}
+export interface TramiteArchivar {
+  Movimientos: {
+    IdTramite: number;
+    IdEstado?: number
+    IdMovimiento: number
+    Observaciones?: string
+    FechaHistorialMxE?: Date
+    Activo?: boolean
+    CreadoPor?: string
+    CreadoEl?: Date
+  }[];
+  Detalle: string;
+  IdArchivador: number;
+}
+export interface TramiteDesmarcarArchivar {
   IdMovimiento: number
 }
 export interface TramiteAtenderWithDocumento {

@@ -61,8 +61,11 @@ const TramiteRecibido = () => {
     findAllRecibidos,
     atender,
     observar,
+    archivar,
+    desmarcarRecibir,
     desmarcarAtender,
     desmarcarObservar,
+    desmarcarArchivar,
   } = UseTramite();
 
   const { findAll: findAllArchivador } = UseArchivador();
@@ -123,8 +126,10 @@ const TramiteRecibido = () => {
     Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">[]
   >([]);
 
-  const [archivador, setArchivador] =
-    useState<Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">>();
+  const [archivador, setArchivador] = useState<Pick<
+    ArchivadorEntity,
+    "IdArchivador" | "Descripcion"
+  > | null>();
 
   const [estadoDialog, setEstadoDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -155,6 +160,41 @@ const TramiteRecibido = () => {
   const [observaciones, setObservaciones] = useState<string>(" ");
 
   const [detalle, setDetalle] = useState<string>(" ");
+
+  const desmarcarRecibirTramiteRecibido = async (idMovimiento: number) => {
+    setSubmitted(true);
+
+    const desmarcarRecibirTramiteRecibido = await desmarcarRecibir({
+      IdMovimiento: idMovimiento,
+    });
+
+    if (
+      desmarcarRecibirTramiteRecibido?.message.msgId == 0 &&
+      desmarcarRecibirTramiteRecibido.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.filter(
+          (tr) =>
+            desmarcarRecibirTramiteRecibido.registro?.Movimiento
+              ?.IdMovimiento != tr.IdMovimiento
+        );
+      });
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${desmarcarRecibirTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (desmarcarRecibirTramiteRecibido?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${desmarcarRecibirTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setSubmitted(false);
+  };
 
   const atenderTramitesRecibidos = async () => {
     setSubmitted(true);
@@ -225,13 +265,21 @@ const TramiteRecibido = () => {
             ) ?? -1;
 
           if (index > -1 && atenderTramiteRecibidos.registro) {
-            tr.HistorialMovimientoxEstado.unshift({
-              IdHistorialMxE:
-                atenderTramiteRecibidos.registro[index].IdHistorialMxE,
-              FechaHistorialMxE:
-                atenderTramiteRecibidos.registro[index].FechaHistorialMxE,
-              Estado: { ...atenderTramiteRecibidos.registro[index].Estado },
-            });
+            return {
+              ...tr,
+              HistorialMovimientoxEstado: [
+                {
+                  IdHistorialMxE:
+                    atenderTramiteRecibidos.registro[index].IdHistorialMxE,
+                  FechaHistorialMxE:
+                    atenderTramiteRecibidos.registro[index].FechaHistorialMxE,
+                  Estado: {
+                    ...atenderTramiteRecibidos.registro[index].Estado,
+                  },
+                },
+                ...tr.HistorialMovimientoxEstado,
+              ],
+            };
           }
 
           return tr;
@@ -366,13 +414,21 @@ const TramiteRecibido = () => {
             ) ?? -1;
 
           if (index > -1 && observarTramiteRecibidos.registro) {
-            tr.HistorialMovimientoxEstado.unshift({
-              IdHistorialMxE:
-                observarTramiteRecibidos.registro[index].IdHistorialMxE,
-              FechaHistorialMxE:
-                observarTramiteRecibidos.registro[index].FechaHistorialMxE,
-              Estado: { ...observarTramiteRecibidos.registro[index].Estado },
-            });
+            return {
+              ...tr,
+              HistorialMovimientoxEstado: [
+                {
+                  IdHistorialMxE:
+                    observarTramiteRecibidos.registro[index].IdHistorialMxE,
+                  FechaHistorialMxE:
+                    observarTramiteRecibidos.registro[index].FechaHistorialMxE,
+                  Estado: {
+                    ...observarTramiteRecibidos.registro[index].Estado,
+                  },
+                },
+                ...tr.HistorialMovimientoxEstado,
+              ],
+            };
           }
 
           return tr;
@@ -415,7 +471,11 @@ const TramiteRecibido = () => {
             desmarcarObservarTramiteRecibido.registro?.Movimiento
               ?.IdMovimiento == tr.IdMovimiento
           ) {
-            tr.HistorialMovimientoxEstado.shift();
+            return {
+              ...tr,
+              HistorialMovimientoxEstado:
+                tr.HistorialMovimientoxEstado.slice(1),
+            };
           }
 
           return tr;
@@ -431,6 +491,172 @@ const TramiteRecibido = () => {
       toast.current?.show({
         severity: "error",
         detail: `${desmarcarObservarTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setSubmitted(false);
+  };
+
+  const archivarTramitesRecibidos = async () => {
+    setSubmitted(true);
+
+    let movimientos: {
+      IdMovimiento: number;
+      IdTramite: number;
+    }[] = [];
+
+    if (
+      selectedTramitesRecibidos.length == 0 &&
+      tramiteRecibido.IdMovimiento != null
+    ) {
+      if (
+        !(tramiteRecibido.HistorialMovimientoxEstado[0].Estado.IdEstado = 16)
+      ) {
+        toast.current?.show({
+          severity: "info",
+          detail: `${"Todos los tramites seleccionados deben estar en estado de recibido"}`,
+          life: 4000,
+        });
+
+        setTramiteArchivadoDialog(false);
+        setDetalle("");
+        setArchivador(null);
+        setSubmitted(false);
+
+        return;
+      }
+
+      movimientos = [
+        {
+          IdMovimiento: tramiteRecibido.IdMovimiento,
+          IdTramite: tramiteRecibido.Tramite?.IdTramite ?? 0,
+        },
+      ];
+    } else {
+      if (
+        !selectedTramitesRecibidos.every(
+          (stp) => stp.HistorialMovimientoxEstado[0].Estado.IdEstado == 16
+        )
+      ) {
+        toast.current?.show({
+          severity: "info",
+          detail: `${"Todos los tramites seleccionados deben estar en estado de recibido"}`,
+          life: 4000,
+        });
+
+        setTramiteArchivadoDialog(false);
+        setDetalle("");
+        setArchivador(null);
+        setSubmitted(false);
+
+        return;
+      }
+
+      movimientos = selectedTramitesRecibidos.map((stp) => {
+        return {
+          IdMovimiento: stp.IdMovimiento,
+          IdTramite: stp.Tramite?.IdTramite ?? 0,
+        };
+      });
+    }
+
+    const archivarTramiteRecibidos = await archivar({
+      Movimientos: movimientos,
+      Detalle: detalle,
+      IdArchivador: archivador?.IdArchivador ?? 0,
+    });
+
+    if (
+      archivarTramiteRecibidos?.message.msgId == 0 &&
+      archivarTramiteRecibidos.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.map((tr) => {
+          const index =
+            archivarTramiteRecibidos.registro?.findIndex(
+              (mov) => mov.Movimiento.IdMovimiento == tr.IdMovimiento
+            ) ?? -1;
+
+          if (index > -1 && archivarTramiteRecibidos.registro) {
+            return {
+              ...tr,
+              HistorialMovimientoxEstado: [
+                {
+                  IdHistorialMxE:
+                    archivarTramiteRecibidos.registro[index].IdHistorialMxE,
+                  FechaHistorialMxE:
+                    archivarTramiteRecibidos.registro[index].FechaHistorialMxE,
+                  Estado: {
+                    ...archivarTramiteRecibidos.registro[index].Estado,
+                  },
+                },
+                ...tr.HistorialMovimientoxEstado,
+              ],
+            };
+          }
+
+          return tr;
+        });
+      });
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${archivarTramiteRecibidos.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (archivarTramiteRecibidos?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${archivarTramiteRecibidos.message.msgTxt}`,
+        life: 3000,
+      });
+    }
+
+    setTramiteArchivadoDialog(false);
+    setDetalle("");
+    setArchivador(null);
+    setSelectedTramitesRecibidos([]);
+    setSubmitted(false);
+  };
+
+  const desmarcarArchivarTramiteRecibido = async (idMovimiento: number) => {
+    setSubmitted(true);
+
+    const desmarcarArchivarTramiteRecibido = await desmarcarArchivar({
+      IdMovimiento: idMovimiento,
+    });
+
+    if (
+      desmarcarArchivarTramiteRecibido?.message.msgId == 0 &&
+      desmarcarArchivarTramiteRecibido.registro
+    ) {
+      setTramitesRecibidos((prev) => {
+        return prev?.map((tr) => {
+          if (
+            desmarcarArchivarTramiteRecibido.registro?.Movimiento
+              ?.IdMovimiento == tr.IdMovimiento
+          ) {
+            return {
+              ...tr,
+              HistorialMovimientoxEstado:
+                tr.HistorialMovimientoxEstado.slice(1),
+            };
+          }
+
+          return tr;
+        });
+      });
+
+      toast.current?.show({
+        severity: "success",
+        detail: `${desmarcarArchivarTramiteRecibido.message.msgTxt}`,
+        life: 3000,
+      });
+    } else if (desmarcarArchivarTramiteRecibido?.message.msgId == 1) {
+      toast.current?.show({
+        severity: "error",
+        detail: `${desmarcarArchivarTramiteRecibido.message.msgTxt}`,
         life: 3000,
       });
     }
@@ -1455,18 +1681,9 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-eraser",
             command: () => {
-              // confirmRemoveCarpeta({
-              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-              //   Descripcion: rowData.Descripcion,
-              //   CreadoEl: rowData.FechaEmision,
-              //   Categoria: rowData.Categoria,
-              //   IdUsuario: rowData.Usuario.IdUsuario,
-              //   Activo: rowData.Activo,
-              // });
+              desmarcarRecibirTramiteRecibido(rowData.IdMovimiento);
             },
           },
-          // { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
         ];
       case 17: // Derivado
         return [
@@ -1514,15 +1731,7 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-eraser",
             command: () => {
-              // showUpdateCarpetaDialog({
-              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-              //   Descripcion: rowData.Descripcion,
-              //   CreadoEl: rowData.FechaEmision,
-              //   Categoria: rowData.Categoria,
-              //   IdUsuario: rowData.Usuario.IdUsuario,
-              //   Activo: rowData.Activo,
-              // });
+              desmarcarArchivarTramiteRecibido(rowData.IdMovimiento);
             },
           },
         ];
@@ -1857,9 +2066,7 @@ const TramiteRecibido = () => {
         tramiteRecibido={tramiteRecibido}
         observaciones={observaciones}
         setObservaciones={setObservaciones}
-        atenderTramitesRecibidos={observarTramitesRecibidos}
-        // selectedTramiteDestinos={selectedTramiteDestinos}
-        // setSelectedTramiteDestinos={setSelectedTramiteDestinos}
+        observarTramitesRecibidos={observarTramitesRecibidos}
       />
 
       <TramiteArchivadoModal
@@ -1873,6 +2080,7 @@ const TramiteRecibido = () => {
         archivador={archivador}
         detalle={detalle}
         setDetalle={setDetalle}
+        archivarTramitesRecibidos={archivarTramitesRecibidos}
       />
 
       <ConfirmModal

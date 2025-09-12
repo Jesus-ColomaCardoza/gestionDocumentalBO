@@ -24,7 +24,7 @@ type TramiteRecibidoObservadoModalProps = {
   tramiteRecibido: TramiteRecibidoEntity;
   observaciones: string;
   setObservaciones: Dispatch<SetStateAction<string>>;
-  atenderTramitesRecibidos: () => Promise<void>;
+  observarTramitesRecibidos: () => Promise<void>;
   // selectedTramiteDestinos: TramiteEntity[];
   // setSelectedTramiteDestinos: Dispatch<SetStateAction<MovimientoEntity[]>>;
 };
@@ -49,7 +49,7 @@ const TramiteRecibidoObservadoModal = (
           label="Guardar"
           icon="pi pi-check"
           size="small"
-          onClick={props.atenderTramitesRecibidos}
+          onClick={props.observarTramitesRecibidos}
         />
       </div>
     </div>

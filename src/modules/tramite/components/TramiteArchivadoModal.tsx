@@ -24,14 +24,16 @@ type TramiteArchivadoModalProps = {
   archivadores: Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">[];
   setArchivador: Dispatch<
     SetStateAction<
-      Pick<ArchivadorEntity, "IdArchivador" | "Descripcion"> | undefined
+      Pick<ArchivadorEntity, "IdArchivador" | "Descripcion"> | null | undefined
     >
   >;
   archivador:
     | Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">
+    | null
     | undefined;
   detalle: string;
   setDetalle: Dispatch<SetStateAction<string>>;
+  archivarTramitesRecibidos: () => Promise<void>;
   // selectedTramiteDestinos: TramiteEntity[];
   // setSelectedTramiteDestinos: Dispatch<SetStateAction<MovimientoEntity[]>>;
 };
@@ -48,10 +50,10 @@ const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
         }}
       />
       <Button
-        // loading={props.loadingEstadoCreateOrUpdate}
+        loading={props.submitted}
         label="Archivar"
         icon="pi pi-check"
-        onClick={() => {}}
+        onClick={props.archivarTramitesRecibidos}
       />
     </>
   );
