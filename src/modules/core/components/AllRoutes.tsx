@@ -48,7 +48,7 @@ const AllRoutes = () => {
             <Route path="/dashboard" element={<Dashboard />}></Route>
 
             <Route path="/" element={<Dashboard />}>
-              <Route path="perfil_Usuario" element={<UsuarioPerfil />}></Route>
+              <Route path="perfil_usuario" element={<UsuarioPerfil />}></Route>
 
               <Route path="firma_digital/archivos_digitales" element={<FileManager />}></Route>
 
@@ -76,7 +76,7 @@ const AllRoutes = () => {
               <Route path="mantenimiento/tipo_tramite" element={<TipoTramite />}></Route>
               <Route path="mantenimiento/tipo_identificacion" element={<TipoIdentificacion />}></Route>
 
-              <Route path="otros/archivador" element={<Archivador />}></Route>
+              <Route path="archivado/archivador" element={<Archivador />}></Route>
             </Route>
 
             <Route path="nofound" element={<NotFound />}></Route>

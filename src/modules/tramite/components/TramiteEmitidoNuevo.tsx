@@ -498,9 +498,9 @@ const TramiteEmitidoNuevo = () => {
       // }
 
       // clear input file
-      if (anexosRef.current) {
-        anexosRef.current.value = "";
-      }
+      // if (anexosRef.current) {
+      //   anexosRef.current.value = "";
+      // }
     }
   };
 

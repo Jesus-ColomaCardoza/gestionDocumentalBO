@@ -493,9 +493,9 @@ const TramiteRecibidoDerivados = () => {
       // }
 
       // clear input file
-      if (anexosRef.current) {
-        anexosRef.current.value = "";
-      }
+      // if (anexosRef.current) {
+      //   anexosRef.current.value = "";
+      // }
     }
   };
 
@@ -798,6 +798,53 @@ const TramiteRecibidoDerivados = () => {
                   </small>
                 )}
               </div>
+            </div>
+
+            <div className="flex flex-row justify-content-end py-3 px-4">
+              <Button
+                type="button"
+                onClick={() => {
+                  navigate("../tramite/recibido");
+                }}
+                size="small"
+                severity="contrast"
+                style={{
+                  padding: "0",
+                  width: "50%",
+                  height: "2.5rem",
+                  margin: "0",
+                  color: "#000",
+                  background: "#eee",
+                  border: "none",
+                }}
+              >
+                <span className="flex justify-content-between gap-2 align-items-center m-auto">
+                  {/* <i className="pi pi-plus text-sm"></i> */}
+                  <span>Volver</span>
+                </span>
+              </Button>
+
+              {/* <Button
+                type="button"
+                onClick={() => {
+                  if (validateForm()) {
+                    // createTramiteEmitido();
+                  }
+                }}
+                size="small"
+                style={{
+                  padding: "0",
+                  width: "50%",
+                  height: "2.5rem",
+                  margin: "0",
+                  color: "#000",
+                }}
+              >
+                <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+                  <i className="pi pi-send text-sm"></i>
+                  <span>Enviar</span>
+                </span>
+              </Button> */}
             </div>
           </div>
         </div>

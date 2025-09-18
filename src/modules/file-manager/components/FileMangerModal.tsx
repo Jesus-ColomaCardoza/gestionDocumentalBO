@@ -137,9 +137,8 @@ const FileManagerModal = (props: FileManagerModalProps) => {
   const [fileManager, setFileManager] =
     useState<FileManagerEntity>(emptyFileManager);
 
-  const [selectedFileManagers, setSelectedFileManagers] = useState<
-    FileManagerEntity[]
-  >([]);
+  const [selectedFileManagers, setSelectedFileManagers] =
+    useState<FileManagerEntity | null>(null);
 
   const [carpetaDialog, setCarpetaDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -1263,21 +1262,24 @@ const FileManagerModal = (props: FileManagerModalProps) => {
                 const repeatedDigitalFile = props.selectedDigitalFiles.filter(
                   (df) => df.IdFM == rowData.IdFM
                 );
-                
-                if (repeatedDigitalFile.length>0) {
+
+                if (repeatedDigitalFile.length > 0) {
                   toastx.current?.show({
                     severity: "info",
                     detail: `Este archivo digital ya ha sido selecionado anteriomente`,
                     life: 4000,
                   });
-                  return
+                  return;
                 }
 
                 // we select this file
                 props.setSelectedDigitalFiles((prev) => [...prev, rowData]);
 
                 // we close the fileMangerModal
-                props.hideFileManagerDialog()
+                props.hideFileManagerDialog();
+
+                // we clean the selectedFileManagers
+                setSelectedFileManagers(null);
               }}
               aria-controls="popup_menu_right"
               aria-haspopup
@@ -1313,9 +1315,28 @@ const FileManagerModal = (props: FileManagerModalProps) => {
       <Button
         label="Cancel"
         icon="pi pi-times"
+        size="small"
         outlined
         onClick={() => {
           props.hideFileManagerDialog();
+        }}
+      />
+      <Button
+        size="small"
+        label="Seleccionar"
+        icon="pi pi-check"
+        onClick={() => {
+
+          // we select this file
+          if (selectedFileManagers) {
+            props.setSelectedDigitalFiles((prev) => [...prev, selectedFileManagers]);
+          }
+
+          // we close the fileMangerModal
+          props.hideFileManagerDialog();
+
+          // we clean the selectedFileManagers
+          setSelectedFileManagers(null);
         }}
       />
     </>
@@ -1324,7 +1345,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
   return (
     <Dialog
       visible={props.fileManagerDialog}
-      style={{ width: "60%" }}
+      style={{ width: "70%" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
       header="Buscar archivo digital"
       headerStyle={{ padding: "1em 1em 0em 1em" }}
@@ -1345,7 +1366,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
             rows={10}
             rowsPerPageOptions={[5, 10, 25, 50]}
             scrollable
-            scrollHeight="60vh"
+            scrollHeight="55vh"
             header={headerDataTable}
             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
             currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
@@ -1359,19 +1380,17 @@ const FileManagerModal = (props: FileManagerModalProps) => {
               "FechaEmision",
             ]}
             emptyMessage={<EmptyMessageData loading={loading} />}
-            selectionMode="checkbox"
+            selectionMode="single"
             selection={selectedFileManagers}
             onSelectionChange={(e) => {
-              if (Array.isArray(e.value)) {
-                setSelectedFileManagers(e.value);
-              }
+              setSelectedFileManagers(e.value as FileManagerEntity | null);
             }}
             dataKey="IdFM"
             selectionPageOnly
             // loading={loading}
           >
             <Column
-              selectionMode="multiple"
+              selectionMode="single"
               exportable={false}
               headerStyle={{ width: "0%" }}
             />

@@ -145,6 +145,7 @@ export interface TramiteRecibidoEntity {
   HistorialMovimientoxEstado: {
     IdHistorialMxE: number,
     FechaHistorialMxE: string,
+    IdDocumento: number,
     Estado: {
       IdEstado: number,
       Descripcion: string,
@@ -218,6 +219,7 @@ export interface TramiteAtendidoEntity {
   HistorialMovimientoxEstado: {
     IdHistorialMxE: number,
     FechaHistorialMxE: string,
+    IdDocumento: number,
     Estado: {
       IdEstado: number,
       Descripcion: string,
@@ -344,16 +346,17 @@ export interface TramiteRecibidoAtendidoCreate {
   },
 
   //data documento
-  Visible: boolean;
   CodigoReferenciaDoc: string;
   Asunto: string;
   Observaciones: string;
   Folios: number;
+  Visible: boolean;
   IdTipoDocumento: number;
   TipoDocumento?: {
     IdTipoDocumento: number;
     Descripcion: string;
   };
+  IdEstado: number;
 
   //data others
   DigitalFiles?: FileManagerEntity[];
@@ -362,7 +365,18 @@ export interface TramiteRecibidoAtendidoCreate {
 export interface TramiteRecibidoDerivadoCreate {
   //NOTA EL REMITENTE AQUI ES EL IDUSUARIO EN LA TABLA DOCUMENTO
   //data Movimiento
-  IdMovimiento?: number;
+  Movimientos?: {
+    IdMovimiento: number,
+    Tramite: {
+      IdTramite: number,
+    }
+  }[];
+
+  IdAreaEmision: number;
+  Area?: {
+    IdArea: number;
+    Descripcion: string;
+  };
 
   IdRemitente: number;
   Remitente?: {
@@ -383,9 +397,13 @@ export interface TramiteRecibidoDerivadoCreate {
     IdTipoDocumento: number;
     Descripcion: string;
   };
+  IdEstado: number;
 
   //data others
+  Acciones: string
+  Indicaciones: string
   DigitalFiles?: FileManagerEntity[];
+  TramiteDestinos?: MovimientoEntity[];
   Anexos?: AnexoEntity[]
 }
 export interface TramiteExternoRecibir {
@@ -467,6 +485,7 @@ export interface TramiteAtendidoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;
@@ -482,6 +501,39 @@ export interface TramiteDesmarcarAtendidoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
+    Estado: {
+      IdEstado: number;
+      Descripcion: string;
+    };
+    Movimiento: {
+      IdMovimiento: number;
+    };
+  }
+}
+export interface TramiteDerivadoOut {
+  message: Message;
+  // registro?: TramiteAtendidoEntity[];
+  registro?: {
+    IdHistorialMxE: number;
+    FechaHistorialMxE: string;
+    IdDocumento: number,
+    Estado: {
+      IdEstado: number;
+      Descripcion: string;
+    };
+    Movimiento: {
+      IdMovimiento: number;
+    };
+  }[];
+}
+export interface TramiteDesmarcarDerivadoOut {
+  message: Message;
+  // registro?: TramiteAtendidoEntity[];
+  registro?: {
+    IdHistorialMxE: number;
+    FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;
@@ -498,6 +550,7 @@ export interface TramiteDesmarcarRecibidoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;
@@ -513,6 +566,7 @@ export interface TramiteObservadoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;
@@ -528,6 +582,7 @@ export interface TramiteDesmarcarObservadoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;
@@ -543,6 +598,7 @@ export interface TramiteArchivadoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;
@@ -558,6 +614,7 @@ export interface TramiteDesmarcarArchivadoOut {
   registro?: {
     IdHistorialMxE: number;
     FechaHistorialMxE: string;
+    IdDocumento: number,
     Estado: {
       IdEstado: number;
       Descripcion: string;

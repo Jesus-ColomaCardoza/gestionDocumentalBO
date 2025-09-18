@@ -24,6 +24,9 @@ import {
   TramiteArchivadoOut,
   TramiteDesmarcarArchivar,
   TramiteDesmarcarArchivadoOut,
+  TramiteRecibidoAtendidoCreate,
+  TramiteRecibidoDerivadoCreate,
+  TramiteDerivadoOut,
 } from "../interfaces/TramiteInterface";
 import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
@@ -121,6 +124,38 @@ const UseTramite = () => {
       const tramite = await axios.post<TramiteAtendidoOut>(
         `${VITE_API_URL_GDS + TRAMITE.ATENDER}`,
         tramiteAtender
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const atender2 = async (
+    tramiteRecibidoAtendidoCreate: TramiteRecibidoAtendidoCreate
+  ): Promise<TramiteAtendidoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteAtendidoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.ATENDER2}`,
+        tramiteRecibidoAtendidoCreate
+      );
+      return tramite.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
+  const derivar = async (
+    tramiteRecibidoDerivadoCreate: TramiteRecibidoDerivadoCreate
+  ): Promise<TramiteDerivadoOut | undefined> => {
+    try {
+      const tramite = await axios.post<TramiteDerivadoOut>(
+        `${VITE_API_URL_GDS + TRAMITE.DERIVAR}`,
+        tramiteRecibidoDerivadoCreate
       );
       return tramite.data;
     } catch (error: any) {
@@ -294,7 +329,9 @@ const UseTramite = () => {
     recibir,
     desmarcarRecibir,
     atender,
+    atender2,
     desmarcarAtender,
+    derivar,
     observar,
     desmarcarObservar,
     archivar,

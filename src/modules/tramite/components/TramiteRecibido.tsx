@@ -273,6 +273,8 @@ const TramiteRecibido = () => {
                     atenderTramiteRecibidos.registro[index].IdHistorialMxE,
                   FechaHistorialMxE:
                     atenderTramiteRecibidos.registro[index].FechaHistorialMxE,
+                  IdDocumento:
+                    atenderTramiteRecibidos.registro[index].IdDocumento,
                   Estado: {
                     ...atenderTramiteRecibidos.registro[index].Estado,
                   },
@@ -322,7 +324,11 @@ const TramiteRecibido = () => {
             desmarcarAtenderTramiteRecibido.registro?.Movimiento
               ?.IdMovimiento == tr.IdMovimiento
           ) {
-            tr.HistorialMovimientoxEstado.shift();
+            return {
+              ...tr,
+              HistorialMovimientoxEstado:
+                tr.HistorialMovimientoxEstado.slice(1),
+            };
           }
 
           return tr;
@@ -422,6 +428,8 @@ const TramiteRecibido = () => {
                     observarTramiteRecibidos.registro[index].IdHistorialMxE,
                   FechaHistorialMxE:
                     observarTramiteRecibidos.registro[index].FechaHistorialMxE,
+                  IdDocumento:
+                    observarTramiteRecibidos.registro[index].IdDocumento,
                   Estado: {
                     ...observarTramiteRecibidos.registro[index].Estado,
                   },
@@ -587,6 +595,8 @@ const TramiteRecibido = () => {
                     archivarTramiteRecibidos.registro[index].IdHistorialMxE,
                   FechaHistorialMxE:
                     archivarTramiteRecibidos.registro[index].FechaHistorialMxE,
+                  IdDocumento:
+                    archivarTramiteRecibidos.registro[index].IdDocumento,
                   Estado: {
                     ...archivarTramiteRecibidos.registro[index].Estado,
                   },
@@ -1688,22 +1698,36 @@ const TramiteRecibido = () => {
       case 17: // Derivado
         return [
           {
-            label: "Desmarcar derivación",
+            label: "Derivar",
             className: "text-sm",
             style: {
               whiteSpace: "nowrap",
             },
-            icon: "pi pi-eraser",
+            icon: "pi pi-file-plus",
             command: () => {
-              // showUpdateCarpetaDialog({
-              //   IdCarpeta: parseInt(rowData.IdFM.split("_")[1]),
-              //   IdCarpetaPadre: rowData.Carpeta?.IdCarpeta,
-              //   Descripcion: rowData.Descripcion,
-              //   CreadoEl: rowData.FechaEmision,
-              //   Categoria: rowData.Categoria,
-              //   IdUsuario: rowData.Usuario.IdUsuario,
-              //   Activo: rowData.Activo,
-              // });
+              setSelectedTramitesRecibidos([]);
+
+              if (rowData) {
+                setTramiteRecibido(rowData);
+              }
+
+              navigate(`../tramite/recibido/derivado`, {
+                state: {
+                  selectedTramites: [],
+                  tramiteRecibido: rowData,
+                },
+              });
+            },
+          },
+          {
+            label: "Derivaciones",
+            className: "text-sm",
+            style: {
+              whiteSpace: "nowrap",
+            },
+            icon: "pi pi-list-check",
+            command: () => {
+              navigate("../tramite/recibido/derivados");
             },
           },
         ];

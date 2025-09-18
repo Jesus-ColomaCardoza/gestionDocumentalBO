@@ -39,18 +39,41 @@ import UseFile from "../../file/hooks/UseFile";
 import UseAnexo from "../../anexo/hooks/UseAnexo";
 import { AnexoEntity } from "../../anexo/interfaces/AnexoInterface";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { RadioButton } from "primereact/radiobutton";
+import { RadioButton, RadioButtonChangeEvent } from "primereact/radiobutton";
 import { Toolbar } from "primereact/toolbar";
 import { TabPanel, TabView, TabViewTabChangeEvent } from "primereact/tabview";
 import UseMovimiento from "../../movimiento/hooks/UseMovimiento";
 
 const TramiteRecibidoDerivado = () => {
   // custom hooks
+  const opcionesAcciones = [
+    { id: 1, label: "1. Acciones necesarias", value: "acciones_necesarias" },
+    { id: 2, label: "2. Conocimiento", value: "conocimiento" },
+    { id: 3, label: "3. Coordinar", value: "coordinar" },
+    { id: 4, label: "4. Informar", value: "informar" },
+    { id: 5, label: "5. Opinión", value: "opinion" },
+    {
+      id: 6,
+      label: "6. Atención según lo solicitado",
+      value: "atencion_solicitada",
+    },
+    { id: 7, label: "7. Difusión", value: "difusion" },
+    { id: 8, label: "8. Archivo", value: "archivo" },
+    { id: 9, label: "9. Publicación", value: "publicacion" },
+    { id: 10, label: "10. Devolución", value: "devolucion" },
+    { id: 11, label: "11. Asistir", value: "asistir" },
+    { id: 12, label: "12. Seguimiento", value: "seguimiento" },
+    { id: 13, label: "13. Revisión", value: "revision" },
+    { id: 14, label: "14. Aprobación", value: "aprobacion" },
+    { id: 15, label: "15. Reunión", value: "reunion" },
+    { id: 16, label: "16. Otros", value: "otros" },
+  ];
+
   const { themePrimeFlex } = useTheme();
 
   const { userAuth } = useAuth()!;
 
-  const { createEmitido } = UseTramite();
+  const { createEmitido, derivar } = UseTramite();
 
   const { findOneDetails } = UseMovimiento();
 
@@ -80,7 +103,7 @@ const TramiteRecibidoDerivado = () => {
 
   const anexosRef = useRef<HTMLInputElement>(null);
 
-  const [showAnexos, setShowAnexos] = useState<boolean>(false);
+  const [typeTab, setTypeTab] = useState<boolean>(false);
 
   //useStates
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -157,121 +180,198 @@ const TramiteRecibidoDerivado = () => {
   //   }
   // };
   //functions
-  const createTramiteEmitido = async () => {
+  const createTramiteRecibidoDerivadoCreate = async () => {
     setSubmitted(true);
-    if (
-      tramiteRecibidoDerivadoCreate.Asunto.trim() &&
-      tramiteRecibidoDerivadoCreate.IdTipoDocumento != 0 &&
-      tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc.trim() &&
-      tramiteRecibidoDerivadoCreate.IdRemitente != 0 &&
-      tramiteRecibidoDerivadoCreate.Folios != 0
-    ) {
-      // setLoadingTramiteCreateOrUpdate(true);
-      let arrayAnexosUpload: AnexoEntity[] = [];
-
-      //1 we create anexos physical files
-      const uploadResults = await Promise.all(
-        Array.from(selectedAnexos).map(async (anexo) => {
-          const formData = new FormData();
-
-          formData.append("file", anexo);
-
-          const anexoUpload = await createFile(formData);
-
-          if (anexoUpload?.message?.msgId === 0) {
-            const data = {
-              Titulo: anexoUpload.registro?.parseoriginalname!,
-              FormatoAnexo: anexoUpload.registro?.mimetype,
-              NombreAnexo: anexoUpload.registro?.filename,
-              UrlAnexo: anexoUpload.registro?.url!,
-              SizeAnexo: anexoUpload.registro?.size,
-              UrlBase: anexoUpload.registro?.path,
-              IdTramite: 0,
-              Activo: true,
-            };
-
-            arrayAnexosUpload.push(data);
-
-            return {
-              success: true,
-              data: data,
-            };
-          } else {
-            return {
-              success: false,
-              error: anexoUpload?.message?.msgTxt || "Error desconocido",
-            };
-          }
-        })
-      );
-
-      // const successfulUploads = uploadResults
-      //   .filter((r) => r.success)
-      //   .map((r) => r.data);
-
-      const failedUploads = uploadResults.filter((r) => !r.success);
-
-      if (failedUploads.length > 0) {
-        toast.current?.show({
-          severity: "error",
-          detail: "No se pudieron cargar todos los anexos.",
-          life: 3000,
-        });
-        return;
-      }
-
-      //2 we create tramiteRecibidoDerivadoCreate
-      let tramiteCreateEmitido = await createEmitido({
-        CodigoReferenciaDoc: tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc,
-        Asunto: tramiteRecibidoDerivadoCreate.Asunto,
-        // Descripcion: tramiteRecibidoDerivadoCreate.Descripcion,
-        Observaciones: tramiteRecibidoDerivadoCreate.Observaciones,
-        FechaInicio: new Date().toISOString(),
-        // FechaFin:tramiteRecibidoDerivadoCreate.FechaFin,
-        Folios: tramiteRecibidoDerivadoCreate.Folios,
-
-        IdTipoTramite: tramiteRecibidoDerivadoCreate.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
-
-        IdTipoDocumento: tramiteRecibidoDerivadoCreate.IdTipoDocumento,
-        IdAreaEmision: tramiteRecibidoDerivadoCreate.IdAreaEmision,
-        IdEstado: tramiteRecibidoDerivadoCreate.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
-        IdRemitente: tramiteRecibidoDerivadoCreate.IdRemitente,
-        Activo: tramiteRecibidoDerivadoCreate.Activo,
-
-        DigitalFiles: selectedDigitalFiles,
-        TramiteDestinos: selectedTramiteDestinos,
-        Anexos: arrayAnexosUpload,
-      });
-
-      // setLoadingTramiteCreateOrUpdate(false);
-
+    if (typeTab) {
       if (
-        tramiteCreateEmitido?.message.msgId == 0 &&
-        tramiteCreateEmitido.registro
+        tramiteRecibidoDerivadoCreate.Asunto.trim() &&
+        tramiteRecibidoDerivadoCreate.IdTipoDocumento != 0 &&
+        tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc.trim() &&
+        tramiteRecibidoDerivadoCreate.IdRemitente != 0 &&
+        tramiteRecibidoDerivadoCreate.Folios != 0
       ) {
-        setTramites([...tramites, tramiteCreateEmitido.registro]);
+        // setLoadingTramiteCreateOrUpdate(true);
+        let arrayAnexosUpload: AnexoEntity[] = [];
 
-        navigate("../tramiteRecibidoDerivadoCreate/emitido");
+        //1 we create anexos physical files
+        const uploadResults = await Promise.all(
+          Array.from(selectedAnexos).map(async (anexo) => {
+            const formData = new FormData();
 
-        toast.current?.show({
-          severity: "success",
-          detail: `${tramiteCreateEmitido.message.msgTxt}`,
-          life: 3000,
+            formData.append("file", anexo);
+
+            const anexoUpload = await createFile(formData);
+
+            if (anexoUpload?.message?.msgId === 0) {
+              const data = {
+                Titulo: anexoUpload.registro?.parseoriginalname!,
+                FormatoAnexo: anexoUpload.registro?.mimetype,
+                NombreAnexo: anexoUpload.registro?.filename,
+                UrlAnexo: anexoUpload.registro?.url!,
+                SizeAnexo: anexoUpload.registro?.size,
+                UrlBase: anexoUpload.registro?.path,
+                IdTramite: 0,
+                Activo: true,
+              };
+
+              arrayAnexosUpload.push(data);
+
+              return {
+                success: true,
+                data: data,
+              };
+            } else {
+              return {
+                success: false,
+                error: anexoUpload?.message?.msgTxt || "Error desconocido",
+              };
+            }
+          })
+        );
+
+        // const successfulUploads = uploadResults
+        //   .filter((r) => r.success)
+        //   .map((r) => r.data);
+
+        const failedUploads = uploadResults.filter((r) => !r.success);
+
+        if (failedUploads.length > 0) {
+          toast.current?.show({
+            severity: "error",
+            detail: "No se pudieron cargar todos los anexos.",
+            life: 3000,
+          });
+          return;
+        }
+
+        //2 we create tramiteRecibidoDerivadoCreate
+        console.log(tramiteRecibido?.IdMovimiento);
+
+        let atenderTramiteRecibido = await derivar({
+          Movimientos:
+            selectedTramitesRecibidos?.length > 0
+              ? selectedTramitesRecibidos
+              : [tramiteRecibido],
+
+          // tramiteRecibido?.IdMovimiento,
+          // selectedTramitesRecibidos, tramiteRecibido
+
+          //data documento
+          CodigoReferenciaDoc:
+            tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc,
+          Asunto: tramiteRecibidoDerivadoCreate.Asunto,
+          Observaciones: tramiteRecibidoDerivadoCreate.Observaciones,
+          Folios: tramiteRecibidoDerivadoCreate.Folios,
+          Visible: tramiteRecibidoDerivadoCreate.Visible,
+          IdTipoDocumento: tramiteRecibidoDerivadoCreate.IdTipoDocumento,
+          IdEstado: tramiteRecibidoDerivadoCreate.IdEstado || 4, // IdEstado - Adjuntado - 4
+
+          //data tramite
+          // FechaInicio: new Date().toISOString(),
+          // IdTipoTramite: tramiteRecibidoDerivadoCreate.IdTipoTramite || 1, // IdTipoTramite - Interno - 1
+          IdAreaEmision: userAuth?.Area?.IdArea || 0,
+          // IdEstado: tramiteRecibidoDerivadoCreate.IdEstado || 12, // IdTipoTramite - Pendiente - 12
+          IdRemitente: tramiteRecibidoDerivadoCreate.IdRemitente,
+          // Activo: tramiteRecibidoAtendidoCreate.Activo,
+
+          //others
+          Acciones: tramiteRecibidoDerivadoCreate.Acciones,
+          Indicaciones: tramiteRecibidoDerivadoCreate.Indicaciones,
+          DigitalFiles: selectedDigitalFiles,
+          TramiteDestinos: selectedTramiteDestinos,
+          Anexos: arrayAnexosUpload,
         });
-      } else if (tramiteCreateEmitido?.message.msgId == 1) {
-        toast.current?.show({
-          severity: "error",
-          detail: `${tramiteCreateEmitido.message.msgTxt}`,
-          life: 3000,
-        });
+
+        // setLoadingTramiteCreateOrUpdate(false);
+
+        if (
+          atenderTramiteRecibido?.message.msgId == 0 &&
+          atenderTramiteRecibido.registro
+        ) {
+          // setTramites([...tramites, atenderTramiteRecibido.registro]);
+
+          navigate("../tramite/recibido");
+
+          toast.current?.show({
+            severity: "success",
+            detail: `${atenderTramiteRecibido.message.msgTxt}`,
+            life: 3000,
+          });
+        } else if (atenderTramiteRecibido?.message.msgId == 1) {
+          toast.current?.show({
+            severity: "error",
+            detail: `${atenderTramiteRecibido.message.msgTxt}`,
+            life: 3000,
+          });
+        }
+
+        // setSelectedAnexos([])
+        // setFileManagerDialog(false);
+        // setTramiteRecibidoAtendidoCreate(emptyTramite);
       }
+    } else {
+      if (tramiteRecibidoDerivadoCreate.Indicaciones.trim()) {
+        //2 we create tramiteRecibidoDerivadoCreate
+        let atenderTramiteRecibido = await derivar({
+          Movimientos:
+            selectedTramitesRecibidos?.length > 0
+              ? selectedTramitesRecibidos
+              : [tramiteRecibido],
 
-      // setSelectedAnexos([])
-      // setFileManagerDialog(false);
-      // setTramiteRecibidoDerivadoCreate(emptyTramite);
+          //data documento
+          CodigoReferenciaDoc:
+            tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc,
+          Asunto: tramiteRecibidoDerivadoCreate.Asunto,
+          Observaciones: tramiteRecibidoDerivadoCreate.Observaciones,
+          Folios: tramiteRecibidoDerivadoCreate.Folios,
+          Visible: tramiteRecibidoDerivadoCreate.Visible,
+          IdTipoDocumento: tramiteRecibidoDerivadoCreate.IdTipoDocumento,
+          IdEstado: tramiteRecibidoDerivadoCreate.IdEstado || 4, // IdEstado - Adjuntado - 4
+
+          //data tramite
+          // FechaInicio: new Date().toISOString(),
+          // IdTipoTramite: tramiteRecibidoDerivadoCreate.IdTipoTramite || 1, // IdTipoTramite - Interno - 1
+          IdAreaEmision: userAuth?.Area?.IdArea || 0,
+          // IdEstado: tramiteRecibidoDerivadoCreate.IdEstado || 12, // IdTipoTramite - Pendiente - 12
+          IdRemitente: tramiteRecibidoDerivadoCreate.IdRemitente,
+          // Activo: tramiteRecibidoAtendidoCreate.Activo,
+
+          //others
+          Acciones: tramiteRecibidoDerivadoCreate.Acciones,
+          Indicaciones: tramiteRecibidoDerivadoCreate.Indicaciones,
+          DigitalFiles: selectedDigitalFiles,
+          TramiteDestinos: selectedTramiteDestinos,
+        });
+
+        // setLoadingTramiteCreateOrUpdate(false);
+
+        if (
+          atenderTramiteRecibido?.message.msgId == 0 &&
+          atenderTramiteRecibido.registro
+        ) {
+          // setTramites([...tramites, atenderTramiteRecibido.registro]);
+
+          navigate("../tramite/recibido");
+
+          toast.current?.show({
+            severity: "success",
+            detail: `${atenderTramiteRecibido.message.msgTxt}`,
+            life: 3000,
+          });
+        } else if (atenderTramiteRecibido?.message.msgId == 1) {
+          toast.current?.show({
+            severity: "error",
+            detail: `${atenderTramiteRecibido.message.msgTxt}`,
+            life: 3000,
+          });
+        }
+
+        // setSelectedAnexos([])
+        // setFileManagerDialog(false);
+        // setTramiteRecibidoAtendidoCreate(emptyTramite);
+      }
     }
   };
-
   // actions CRUD - Esquema TipoDocumento (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllTipoDocumentoCombox = async () => {
     setLoading(true);
@@ -532,9 +632,9 @@ const TramiteRecibidoDerivado = () => {
       // }
 
       // clear input file
-      if (anexosRef.current) {
-        anexosRef.current.value = "";
-      }
+      // if (anexosRef.current) {
+      //   anexosRef.current.value = "";
+      // }
     }
   };
 
@@ -642,62 +742,50 @@ const TramiteRecibidoDerivado = () => {
   };
 
   const onSwitchChange = (e: InputSwitchChangeEvent, name: string) => {
+    let _movimiento: any = { ...movimiento };
+    _movimiento[name] = e.value;
+    setMovimiento(_movimiento);
+  };
+
+  const onRadioButtonChange = (e: RadioButtonChangeEvent, name: string) => {
     let _trac: any = { ...tramiteRecibidoDerivadoCreate };
     _trac[name] = e.value;
     setTramiteRecibidoDerivadoCreate(_trac);
   };
 
-  const [selectedAccion, setSelectedAccion] = useState<string>("");
-
-  const opcionesAcciones = [
-    { id: 1, label: "1. Acciones necesarias", value: "acciones_necesarias" },
-    { id: 2, label: "2. Conocimiento", value: "conocimiento" },
-    { id: 3, label: "3. Coordinar", value: "coordinar" },
-    { id: 4, label: "4. Informar", value: "informar" },
-    { id: 5, label: "5. Opinión", value: "opinion" },
-    {
-      id: 6,
-      label: "6. Atención según lo solicitado",
-      value: "atencion_solicitada",
-    },
-    { id: 7, label: "7. Difusión", value: "difusion" },
-    { id: 8, label: "8. Archivo", value: "archivo" },
-    { id: 9, label: "9. Publicación", value: "publicacion" },
-    { id: 10, label: "10. Devolución", value: "devolucion" },
-    { id: 11, label: "11. Asistir", value: "asistir" },
-    { id: 12, label: "12. Seguimiento", value: "seguimiento" },
-    { id: 13, label: "13. Revisión", value: "revision" },
-    { id: 14, label: "14. Aprobación", value: "aprobacion" },
-    { id: 15, label: "15. Reunión", value: "reunion" },
-    { id: 16, label: "16. Otros", value: "otros" },
-  ];
-
-  const handleAccionChange = (e: any) => {
-    setSelectedAccion(e.value);
-  };
-
   const validateForm = () => {
     let fieldErrors: any = {};
 
-    if (!tramiteRecibidoDerivadoCreate.Asunto.trim()) {
-      fieldErrors.Asunto = "Asunto es obligatorio.";
+    if (typeTab) {
+      if (!tramiteRecibidoDerivadoCreate.Asunto.trim()) {
+        fieldErrors.Asunto = "Asunto es obligatorio.";
+      }
+
+      if (tramiteRecibidoDerivadoCreate.IdTipoDocumento == 0) {
+        fieldErrors.IdTipoDocumento = "Tipo de documento es obligatorio.";
+      }
+
+      if (!tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc.trim()) {
+        fieldErrors.CodigoReferenciaDoc =
+          "Codigo de referencia es obligatoria.";
+      }
+
+      if (tramiteRecibidoDerivadoCreate.IdRemitente == 0) {
+        fieldErrors.IdRemitente = "Remitente es obligatorio.";
+      }
+
+      if (tramiteRecibidoDerivadoCreate.Folios <= 0) {
+        fieldErrors.Folios = "Folios es obligatorio.";
+      }
+    } else {
+      if (!tramiteRecibidoDerivadoCreate.Indicaciones.trim()) {
+        fieldErrors.Indicaciones = "Indicaciones es obligatoria.";
+      }
     }
 
-    if (tramiteRecibidoDerivadoCreate.IdTipoDocumento == 0) {
-      fieldErrors.IdTipoDocumento = "Tipo de documento es obligatorio.";
-    }
-
-    if (!tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc.trim()) {
-      fieldErrors.CodigoReferenciaDoc = "Codigo de referencia es obligatoria.";
-    }
-
-    if (tramiteRecibidoDerivadoCreate.IdRemitente == 0) {
-      fieldErrors.IdRemitente = "Remitente es obligatorio.";
-    }
-
-    if (tramiteRecibidoDerivadoCreate.Folios <= 0) {
-      fieldErrors.Folios = "Folios es obligatorio.";
-    }
+    // if ((tramiteRecibidoDerivadoCreate?.TramiteDestinos?.length || 0) <= 0) {
+    //   fieldErrors.TramiteDestinos = "Los destinos son obligatorio.";
+    // }
 
     // if (tramiteRecibidoDerivadoCreate.IdAreaEmision == 0) {
     //   fieldErrors.IdAreaEmision = "Área de emisión es obligatoria.";
@@ -766,9 +854,9 @@ const TramiteRecibidoDerivado = () => {
             onBeforeTabChange={(event: TabViewTabChangeEvent) => {
               console.log(event);
               if (event.index === 1) {
-                setShowAnexos(true);
+                setTypeTab(true);
               } else {
-                setShowAnexos(false);
+                setTypeTab(false);
                 setSelectedAnexos([]);
               }
             }}
@@ -798,8 +886,13 @@ const TramiteRecibidoDerivado = () => {
                           inputId={`accion_${opcion.id}`}
                           name="acciones"
                           value={opcion.value}
-                          onChange={handleAccionChange}
-                          checked={selectedAccion === opcion.value}
+                          onChange={(e) => {
+                            onRadioButtonChange(e, "Acciones");
+                          }}
+                          checked={
+                            tramiteRecibidoDerivadoCreate.Acciones ===
+                            opcion.value
+                          }
                         />
                         <label htmlFor={`accion_${opcion.id}`}>
                           {opcion.label}
@@ -817,7 +910,7 @@ const TramiteRecibidoDerivado = () => {
                   }}
                 >
                   <label
-                    htmlFor="Observaciones"
+                    htmlFor="Indicaciones"
                     className="block text-900 text-sm font-medium mb-2"
                   >
                     Indicaciones
@@ -825,17 +918,17 @@ const TramiteRecibidoDerivado = () => {
                   <div className="flex flex-column mb-3 gap-1">
                     <div className="p-inputgroup">
                       <InputTextarea
-                        id="Observaciones"
-                        value={tramiteRecibidoDerivadoCreate.Observaciones}
+                        id="Indicaciones"
+                        value={tramiteRecibidoDerivadoCreate.Indicaciones}
                         onChange={(e) =>
-                          onInputTextAreaChange(e, "Observaciones")
+                          onInputTextAreaChange(e, "Indicaciones")
                         }
                         rows={3}
                       />
                     </div>
-                    {tramiteErrors.Observaciones && (
+                    {tramiteErrors.Indicaciones && (
                       <small className="p-error">
-                        {tramiteErrors.Observaciones}
+                        {tramiteErrors.Indicaciones}
                       </small>
                     )}
                   </div>
@@ -1574,7 +1667,7 @@ const TramiteRecibidoDerivado = () => {
                           >
                             {destino.NombreCompleto
                               ? `${destino.NombreCompleto} | Responsable de oficina`
-                              : destino.AreaDestino.Descripcion}
+                              : destino.AreaDestino?.Descripcion || ""}
                           </span>
                           <span className="flex flex-row gap-2 m-0">
                             {destino.FirmaDigital && (
@@ -1583,7 +1676,7 @@ const TramiteRecibidoDerivado = () => {
 
                             {destino.NombreCompleto && (
                               <span className="text-xs">
-                                {destino.AreaDestino.Descripcion}
+                                {destino.AreaDestino?.Descripcion || ""}
                               </span>
                             )}
                           </span>
@@ -1611,7 +1704,7 @@ const TramiteRecibidoDerivado = () => {
               </div>
             </div>
 
-            {showAnexos && (
+            {typeTab && (
               <>
                 <div className="flex flex-row justify-content-between align-items-center mt-3 py-2 px-4  pb-3 border-bottom-1 border-top-1 border-gray-500">
                   <label
@@ -1627,7 +1720,15 @@ const TramiteRecibidoDerivado = () => {
                   <Button
                     type="button"
                     onClick={() => {
-                      anexosRef.current?.click();
+                      if (selectedDigitalFiles.length >= 1) {
+                        anexosRef.current?.click();
+                      } else {
+                        toast.current?.show({
+                          severity: "info",
+                          detail: `Se requiere al menos subir un archivo para agregar anexos`,
+                          life: 3000,
+                        });
+                      }
                     }}
                     size="small"
                     severity="contrast"
@@ -1742,7 +1843,9 @@ const TramiteRecibidoDerivado = () => {
           <div className="flex flex-row py-3 px-4" style={{ gap: "1rem" }}>
             <Button
               type="button"
-              // onClick={findAllTramite}
+              onClick={() => {
+                navigate("../tramite/recibido");
+              }}
               size="small"
               severity="contrast"
               style={{
@@ -1763,9 +1866,19 @@ const TramiteRecibidoDerivado = () => {
 
             <Button
               type="button"
+              loading={submitted}
               onClick={() => {
+                if (selectedTramiteDestinos.length == 0) {
+                  toast.current?.show({
+                    severity: "info",
+                    detail: "Se deben agregar la(s) área(s) de destino.",
+                    life: 3000,
+                  });
+                  return;
+                }
+
                 if (validateForm()) {
-                  // createTramiteEmitido();
+                  createTramiteRecibidoDerivadoCreate();
                 }
               }}
               size="small"

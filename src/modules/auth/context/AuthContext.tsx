@@ -65,7 +65,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/auth/reset_password/:token",
 
     //perfil Usuario
-    "/perfil_Usuario",
+    "/perfil_usuario",
 
     //firma digital
     "/firma_digital/archivos_digitales",
@@ -96,7 +96,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/mantenimiento/tipo_identificacion",
 
     //otros
-    "/otros/archivador", 
+    "/archivado/archivador", 
   ];
 
   //functions

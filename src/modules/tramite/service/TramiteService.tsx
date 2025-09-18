@@ -5,6 +5,8 @@ export const TRAMITE = {
   RECIBIR: "/tramite/recibir/",
   DESMARCAR_RECIBIR: "/tramite/desmarcar_recibir/",
   ATENDER: "/tramite/atender/",
+  ATENDER2: "/tramite/atender2/",
+  DERIVAR: "/tramite/derivar/",
   DESMARCAR_ATENDER: "/tramite/desmarcar_atender/",
   OBSERVAR: "/tramite/observar/",
   DESMARCAR_OBSERVAR: "/tramite/desmarcar_observar/",

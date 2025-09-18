@@ -450,6 +450,7 @@ export let emptyTramiteRecibido: TramiteRecibidoEntity = {
     {
       IdHistorialMxE: 0,
       FechaHistorialMxE: "",
+      IdDocumento: 0,
       Estado: {
         IdEstado: 0,
         Descripcion: "",
@@ -555,7 +556,7 @@ export let emptyTramiteEmitidoCreate: TramiteEmitidoCreate = {
 
 export let emptyTramiteRecibidoAtendidoCreate: TramiteRecibidoAtendidoCreate = {
   IdMovimiento: 0,
-  
+
   IdRemitente: 0,
   Remitente: {
     IdUsuario: 0,
@@ -575,10 +576,18 @@ export let emptyTramiteRecibidoAtendidoCreate: TramiteRecibidoAtendidoCreate = {
     IdTipoDocumento: 0,
     Descripcion: "",
   },
+  IdEstado: 0,
 };
+
 export let emptyTramiteRecibidoDerivadoCreate: TramiteRecibidoDerivadoCreate = {
   IdMovimiento: 0,
-  
+
+  IdAreaEmision: 0,
+  Area: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+
   IdRemitente: 0,
   Remitente: {
     IdUsuario: 0,
@@ -598,6 +607,11 @@ export let emptyTramiteRecibidoDerivadoCreate: TramiteRecibidoDerivadoCreate = {
     IdTipoDocumento: 0,
     Descripcion: "",
   },
+  IdEstado: 0,
+
+  //data others
+  Acciones: "",
+  Indicaciones: "",
 };
 
 export let emptyTramiteExternoRecibir: TramiteExternoRecibir = {

@@ -51,7 +51,7 @@ const TramiteRecibidoAtendido = () => {
 
   const { userAuth } = useAuth()!;
 
-  const { createEmitido } = UseTramite();
+  const { createEmitido, atender2 } = UseTramite();
 
   const { findOneDetails } = UseMovimiento();
 
@@ -136,7 +136,7 @@ const TramiteRecibidoAtendido = () => {
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
   const params = useParams();
-  
+
   const findOneDetailsMovimiento = async () => {
     setLoading(true);
     const movimiento = await findOneDetails(params.id ?? "0");
@@ -154,7 +154,7 @@ const TramiteRecibidoAtendido = () => {
   };
 
   //functions
-  const createTramiteEmitido = async () => {
+  const createTramiteRecibidoAtendidoCreate = async () => {
     setSubmitted(true);
     if (
       tramiteRecibidoAtendidoCreate.Asunto.trim() &&
@@ -218,47 +218,51 @@ const TramiteRecibidoAtendido = () => {
       }
 
       //2 we create tramiteRecibidoAtendidoCreate
-      let tramiteCreateEmitido = await createEmitido({
-        CodigoReferencia: tramiteRecibidoAtendidoCreate.CodigoReferencia,
+      let atenderTramiteRecibido = await atender2({
+        IdMovimiento: moviminetoDetails?.IdMovimiento,
+
+        //data documento
+        CodigoReferenciaDoc: tramiteRecibidoAtendidoCreate.CodigoReferenciaDoc,
         Asunto: tramiteRecibidoAtendidoCreate.Asunto,
-        // Descripcion: tramiteRecibidoAtendidoCreate.Descripcion,
         Observaciones: tramiteRecibidoAtendidoCreate.Observaciones,
-        FechaInicio: new Date().toISOString(),
-        // FechaFin:tramiteRecibidoAtendidoCreate.FechaFin,
         Folios: tramiteRecibidoAtendidoCreate.Folios,
-
-        IdTipoTramite: tramiteRecibidoAtendidoCreate.IdTipoTramite || 1, // IdTipoTramite - 1 - interno
-
+        Visible: tramiteRecibidoAtendidoCreate.Visible,
         IdTipoDocumento: tramiteRecibidoAtendidoCreate.IdTipoDocumento,
-        IdAreaEmision: tramiteRecibidoAtendidoCreate.IdAreaEmision,
-        IdEstado: tramiteRecibidoAtendidoCreate.IdEstado || 1, // IdTipoTramite - 1 - ver estado nuevo o algo asi
-        IdRemitente: tramiteRecibidoAtendidoCreate.IdRemitente,
-        Activo: tramiteRecibidoAtendidoCreate.Activo,
+        IdEstado: tramiteRecibidoAtendidoCreate.IdEstado || 4, // IdEstado - Adjuntado - 4
 
+        //data tramite
+        // FechaInicio: new Date().toISOString(),
+        // IdTipoTramite: tramiteRecibidoAtendidoCreate.IdTipoTramite || 1, // IdTipoTramite - Interno - 1
+        // IdAreaEmision: tramiteRecibidoAtendidoCreate.IdAreaEmision,
+        // IdEstado: tramiteRecibidoAtendidoCreate.IdEstado || 12, // IdTipoTramite - Pendiente - 12
+        IdRemitente: tramiteRecibidoAtendidoCreate.IdRemitente,
+        // Activo: tramiteRecibidoAtendidoCreate.Activo,
+
+        //others
         DigitalFiles: selectedDigitalFiles,
-        TramiteDestinos: selectedTramiteDestinos,
+        // TramiteDestinos: selectedTramiteDestinos,
         Anexos: arrayAnexosUpload,
       });
 
       // setLoadingTramiteCreateOrUpdate(false);
 
       if (
-        tramiteCreateEmitido?.message.msgId == 0 &&
-        tramiteCreateEmitido.registro
+        atenderTramiteRecibido?.message.msgId == 0 &&
+        atenderTramiteRecibido.registro
       ) {
-        setTramites([...tramites, tramiteCreateEmitido.registro]);
+        // setTramites([...tramites, atenderTramiteRecibido.registro]);
 
-        navigate("../tramiteRecibidoAtendidoCreate/emitido");
+        navigate("../tramite/recibido");
 
         toast.current?.show({
           severity: "success",
-          detail: `${tramiteCreateEmitido.message.msgTxt}`,
+          detail: `${atenderTramiteRecibido.message.msgTxt}`,
           life: 3000,
         });
-      } else if (tramiteCreateEmitido?.message.msgId == 1) {
+      } else if (atenderTramiteRecibido?.message.msgId == 1) {
         toast.current?.show({
           severity: "error",
-          detail: `${tramiteCreateEmitido.message.msgTxt}`,
+          detail: `${atenderTramiteRecibido.message.msgTxt}`,
           life: 3000,
         });
       }
@@ -529,9 +533,9 @@ const TramiteRecibidoAtendido = () => {
       // }
 
       // clear input file
-      if (anexosRef.current) {
-        anexosRef.current.value = "";
-      }
+      // if (anexosRef.current) {
+      //   anexosRef.current.value = "";
+      // }
     }
   };
 
@@ -689,7 +693,7 @@ const TramiteRecibidoAtendido = () => {
       setTramiteRecibidoAtendidoCreate({
         ...tramiteRecibidoAtendidoCreate,
         IdRemitente: userAuth?.IdUsuario ?? 0,
-        IdMovimiento:parseInt(params.id ?? "0"),
+        IdMovimiento: parseInt(params.id ?? "0"),
         Remitente: {
           IdUsuario: userAuth?.IdUsuario ?? 0,
           Nombres: userAuth?.Nombres ?? "",
@@ -698,7 +702,7 @@ const TramiteRecibidoAtendido = () => {
         },
       });
     }
-  }, [userAuth?.IdUsuario,params.id ]);
+  }, [userAuth?.IdUsuario, params.id]);
 
   return (
     <div className="card p-0 m-0">
@@ -1306,7 +1310,15 @@ const TramiteRecibidoAtendido = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  anexosRef.current?.click();
+                  if (selectedDigitalFiles.length >= 1) {
+                    anexosRef.current?.click();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Se requiere al menos subir un archivo para agregar anexos`,
+                      life: 3000,
+                    });
+                  }
                 }}
                 size="small"
                 severity="contrast"
@@ -1347,10 +1359,10 @@ const TramiteRecibidoAtendido = () => {
                   minHeight: "3rem",
                 }}
               >
-                {selectedAnexos.map((anexo) => {
+                {selectedAnexos.map((anexo, index) => {
                   return (
                     <div
-                      key={anexo.lastModified}
+                      key={`${anexo.lastModified}-${anexo.name}-${index}`}
                       className="flex flex-row justify-content-between p-2"
                       style={{
                         gap: "1rem",
@@ -1422,7 +1434,9 @@ const TramiteRecibidoAtendido = () => {
           <div className="flex flex-row py-3 px-4" style={{ gap: "1rem" }}>
             <Button
               type="button"
-              // onClick={findAllTramite}
+              onClick={() => {
+                navigate("../tramite/recibido");
+              }}
               size="small"
               severity="contrast"
               style={{
@@ -1445,7 +1459,7 @@ const TramiteRecibidoAtendido = () => {
               type="button"
               onClick={() => {
                 if (validateForm()) {
-                  // createTramiteEmitido();
+                  createTramiteRecibidoAtendidoCreate();
                 }
               }}
               size="small"
