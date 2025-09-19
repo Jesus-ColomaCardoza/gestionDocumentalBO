@@ -400,6 +400,7 @@ export interface TramiteRecibidoDerivadoCreate {
   IdEstado: number;
 
   //data others
+  TypeTab: boolean
   Acciones: string
   Indicaciones: string
   DigitalFiles?: FileManagerEntity[];

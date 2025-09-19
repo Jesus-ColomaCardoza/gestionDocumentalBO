@@ -248,6 +248,8 @@ const TramiteRecibidoDerivado = () => {
         console.log(tramiteRecibido?.IdMovimiento);
 
         let atenderTramiteRecibido = await derivar({
+          TypeTab: typeTab,
+
           Movimientos:
             selectedTramitesRecibidos?.length > 0
               ? selectedTramitesRecibidos
@@ -313,6 +315,8 @@ const TramiteRecibidoDerivado = () => {
       if (tramiteRecibidoDerivadoCreate.Indicaciones.trim()) {
         //2 we create tramiteRecibidoDerivadoCreate
         let atenderTramiteRecibido = await derivar({
+          TypeTab: typeTab,
+
           Movimientos:
             selectedTramitesRecibidos?.length > 0
               ? selectedTramitesRecibidos
