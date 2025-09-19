@@ -78,7 +78,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/tramite/recibido/externo",
     "/tramite/recibido/atendido/:id",
     "/tramite/recibido/derivado",
-    "/tramite/recibido/derivados",
+    "/tramite/recibido/derivados/:id",
     "/tramite/emitido",
     "/tramite/emitido/nuevo",
 

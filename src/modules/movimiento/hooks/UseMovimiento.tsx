@@ -2,6 +2,7 @@ import {
   MovimientoCreate,
   MovimientoDetailsOut,
   MovimientoOut,
+  MovimientosDetailsOut,
   MovimientosOut,
   MovimientoUpdate,
 } from "../interfaces/MovimientoInterface";
@@ -9,6 +10,7 @@ import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
 import { MOVIMIENTO } from "../service/MovimientoService";
 import { Menssage } from "../../utils/menssage";
+import { CombinationsFilters } from "../../utils/Interfaces";
 
 const UseMovimiento = () => {
   let message = new Menssage();
@@ -41,6 +43,20 @@ const UseMovimiento = () => {
     }
   };
 
+  const findAllDetails = async (combinationsFilters:CombinationsFilters): Promise<
+    MovimientosDetailsOut | undefined
+  > => {
+    try {
+      const movimientos = await axios.post<MovimientosDetailsOut>(
+        `${VITE_API_URL_GDS + MOVIMIENTO.FIND_ALL_DETAILS}`,
+        combinationsFilters
+      );
+      return movimientos.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const findOne = async (id: string): Promise<MovimientoOut | undefined> => {
     try {
       const movimiento = await axios.get<MovimientoOut>(
@@ -52,7 +68,9 @@ const UseMovimiento = () => {
     }
   };
 
-  const findOneDetails = async (id: string): Promise<MovimientoDetailsOut | undefined> => {
+  const findOneDetails = async (
+    id: string
+  ): Promise<MovimientoDetailsOut | undefined> => {
     try {
       const movimiento = await axios.get<MovimientoDetailsOut>(
         `${VITE_API_URL_GDS + MOVIMIENTO.FIND_ONE_DETAILS + id}`
@@ -92,6 +110,7 @@ const UseMovimiento = () => {
   return {
     create,
     findAll,
+    findAllDetails,
     findOne,
     findOneDetails,
     update,

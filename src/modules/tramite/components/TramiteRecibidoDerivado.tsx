@@ -93,7 +93,6 @@ const TramiteRecibidoDerivado = () => {
 
   const location = useLocation();
 
-  // Obtener los trámites seleccionados del estado de navegación
   const { selectedTramitesRecibidos, tramiteRecibido } = location.state || {};
 
   //useRefs

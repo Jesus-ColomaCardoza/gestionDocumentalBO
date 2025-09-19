@@ -1727,7 +1727,17 @@ const TramiteRecibido = () => {
             },
             icon: "pi pi-list-check",
             command: () => {
-              navigate("../tramite/recibido/derivados");
+              setSelectedTramitesRecibidos([]);
+
+              if (rowData) {
+                setTramiteRecibido(rowData);
+              }
+              navigate(`../tramite/recibido/derivados/${rowData.IdMovimiento}`, {
+                state: {
+                  selectedTramites: [],
+                  tramiteRecibido: rowData,
+                },
+              });
             },
           },
         ];

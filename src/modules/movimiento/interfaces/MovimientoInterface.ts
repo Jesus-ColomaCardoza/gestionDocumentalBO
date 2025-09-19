@@ -121,6 +121,10 @@ export interface MovimientoDetailsOut {
   message: Message;
   registro?: MovimientoDetailsEntity;
 }
+export interface MovimientosDetailsOut {
+  message: Message;
+  registro?: MovimientoDetailsEntity[];
+}
 export interface MovimientosOut {
   message: Message;
   registro?: MovimientoEntity[];

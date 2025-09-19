@@ -69,6 +69,8 @@ const TramiteRecibidoAtendido = () => {
 
   const navigate = useNavigate();
 
+  const params = useParams();
+
   //useRefs
   const toast = useRef<Toast>(null);
 
@@ -134,8 +136,6 @@ const TramiteRecibidoAtendido = () => {
   const [selectedLoadFiles, setSelectedLoadFiles] = useState<File[]>([]);
 
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
-
-  const params = useParams();
 
   const findOneDetailsMovimiento = async () => {
     setLoading(true);
