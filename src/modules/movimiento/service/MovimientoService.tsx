@@ -6,4 +6,5 @@ export const MOVIMIENTO = {
   FIND_ONE_DETAILS: "/movimiento/find_one_details/",
   UPDATE: "/movimiento/update/",
   REMOVE: "/movimiento/remove/",
+  REMOVE_DETAILS: "/movimiento/remove_details/",
 };

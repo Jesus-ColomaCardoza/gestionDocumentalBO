@@ -43,9 +43,9 @@ const UseMovimiento = () => {
     }
   };
 
-  const findAllDetails = async (combinationsFilters:CombinationsFilters): Promise<
-    MovimientosDetailsOut | undefined
-  > => {
+  const findAllDetails = async (
+    combinationsFilters: CombinationsFilters
+  ): Promise<MovimientosDetailsOut | undefined> => {
     try {
       const movimientos = await axios.post<MovimientosDetailsOut>(
         `${VITE_API_URL_GDS + MOVIMIENTO.FIND_ALL_DETAILS}`,
@@ -107,6 +107,19 @@ const UseMovimiento = () => {
     }
   };
 
+  const removeDetails = async (
+    id: string
+  ): Promise<MovimientoOut | undefined> => {
+    try {
+      const movimiento = await axios.post<MovimientoOut>(
+        `${VITE_API_URL_GDS + MOVIMIENTO.REMOVE_DETAILS + id}`
+      );
+      return movimiento.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   return {
     create,
     findAll,
@@ -115,6 +128,7 @@ const UseMovimiento = () => {
     findOneDetails,
     update,
     remove,
+    removeDetails,
   };
 };
 

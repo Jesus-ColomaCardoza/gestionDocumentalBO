@@ -171,6 +171,15 @@ export const columnsTramitePendiente: ColumnMeta[] = [
 
 export const columnsTramiteRecibido: ColumnMeta[] = [
   {
+    field: "IdMovimiento",
+    filterField: "IdMovimiento",
+    header: "Id Mov",
+    dataType: "numeric",
+    width: "5%",
+    show: false,
+    filterPlaceholder: "Buscar por IdMovimiento",
+  },
+  {
     field: "IdTramite",
     filterField: "Tramite.IdTramite",
     header: "Id",
@@ -254,6 +263,10 @@ export const columnsTramiteRecibido: ColumnMeta[] = [
 
 export const defaultFiltersTramitePendiente: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  IdMovimiento: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
   "Tramite.IdTramite": {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
@@ -286,6 +299,10 @@ export const defaultFiltersTramitePendiente: DataTableFilterMeta = {
 
 export const defaultFiltersTramiteRecibido: DataTableFilterMeta = {
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  IdMovimiento: {
+    operator: FilterOperator.AND,
+    constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+  },
   "Tramite.IdTramite": {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
@@ -580,7 +597,7 @@ export let emptyTramiteRecibidoAtendidoCreate: TramiteRecibidoAtendidoCreate = {
 };
 
 export let emptyTramiteRecibidoDerivadoCreate: TramiteRecibidoDerivadoCreate = {
-  IdMovimiento: 0,
+  Movimientos: [],
 
   IdAreaEmision: 0,
   Area: {
@@ -610,6 +627,7 @@ export let emptyTramiteRecibidoDerivadoCreate: TramiteRecibidoDerivadoCreate = {
   IdEstado: 0,
 
   //data others
+  TypeTab: false,
   Acciones: "",
   Indicaciones: "",
 };

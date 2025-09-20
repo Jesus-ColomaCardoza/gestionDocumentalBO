@@ -168,6 +168,8 @@ const TramiteRecibido = () => {
       IdMovimiento: idMovimiento,
     });
 
+    console.log(desmarcarRecibirTramiteRecibido);
+
     if (
       desmarcarRecibirTramiteRecibido?.message.msgId == 0 &&
       desmarcarRecibirTramiteRecibido.registro
@@ -1732,12 +1734,15 @@ const TramiteRecibido = () => {
               if (rowData) {
                 setTramiteRecibido(rowData);
               }
-              navigate(`../tramite/recibido/derivados/${rowData.IdMovimiento}`, {
-                state: {
-                  selectedTramites: [],
-                  tramiteRecibido: rowData,
-                },
-              });
+              navigate(
+                `../tramite/recibido/derivados/${rowData.IdMovimiento}`,
+                {
+                  state: {
+                    selectedTramites: [],
+                    tramiteRecibido: rowData,
+                  },
+                }
+              );
             },
           },
         ];
@@ -1902,6 +1907,7 @@ const TramiteRecibido = () => {
         currentPageReportTemplate="Mostrando {first} de {last} del total {totalRecords} registros"
         filters={filters}
         globalFilterFields={[
+          "IdMovimiento",
           "Tramite.IdTramite",
           "Detalle",
           "Origen",
@@ -1918,7 +1924,7 @@ const TramiteRecibido = () => {
             setSelectedTramitesRecibidos(e.value);
           }
         }}
-        dataKey="Tramite.IdTramite"
+        dataKey="IdMovimiento"
         selectionPageOnly
         // loading={loading}
       >
