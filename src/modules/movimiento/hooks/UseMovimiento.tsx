@@ -3,6 +3,8 @@ import {
   MovimientoDetailsOut,
   MovimientoOut,
   MovimientosDetailsOut,
+  MovimientoSeguimiento,
+  MovimientoSeguimientoOut,
   MovimientosOut,
   MovimientoUpdate,
 } from "../interfaces/MovimientoInterface";
@@ -81,6 +83,20 @@ const UseMovimiento = () => {
     }
   };
 
+  const findOneSeguimiento = async (
+    movimientoSeguimiento: MovimientoSeguimiento
+  ): Promise<MovimientoSeguimientoOut | undefined> => {
+    try {
+      const movimiento = await axios.post<MovimientoSeguimientoOut>(
+        `${VITE_API_URL_GDS + MOVIMIENTO.FIND_ONE_SEGUIMIENTO}`,
+        movimientoSeguimiento
+      );
+      return movimiento.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const update = async (
     id: string,
     movimientoUpdate: MovimientoUpdate
@@ -126,6 +142,7 @@ const UseMovimiento = () => {
     findAllDetails,
     findOne,
     findOneDetails,
+    findOneSeguimiento,
     update,
     remove,
     removeDetails,

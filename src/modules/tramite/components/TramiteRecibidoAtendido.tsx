@@ -133,10 +133,9 @@ const TramiteRecibidoAtendido = () => {
   const [moviminetoDetails, setMoviminetoDetails] =
     useState<MovimientoDetailsEntity>();
 
-  const [selectedLoadFiles, setSelectedLoadFiles] = useState<File[]>([]);
-
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
+  //functions
   const findOneDetailsMovimiento = async () => {
     setLoading(true);
     const movimiento = await findOneDetails(params.id ?? "0");
@@ -146,14 +145,9 @@ const TramiteRecibidoAtendido = () => {
 
     if (movimiento?.message.msgId == 0 && movimiento.registro) {
       setMoviminetoDetails(movimiento.registro);
-      // setTramiteRecibidoAtendidoCreate({
-      //   ...tramiteRecibidoAtendidoCreate,
-      //   IdMovimiento: parseInt(params.id??"0"),
-      // });
     }
   };
 
-  //functions
   const createTramiteRecibidoAtendidoCreate = async () => {
     setSubmitted(true);
     if (

@@ -10,6 +10,7 @@ import { LoginAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
+import { useTheme } from "../../../ThemeContext";
 
 const Login = () => {
   // variables and constants
@@ -31,6 +32,8 @@ const Login = () => {
 
   // custom hooks
   const { login, loginGoogle, loadingAuth } = useAuth()!;
+
+  const { themePrimeFlex, switchTheme } = useTheme();
 
   // functions
   const validateForm = () => {
@@ -73,13 +76,13 @@ const Login = () => {
       }
       style={{
         height: "100dvh",
-        margin: "0 2em",
+        // background:"#383636ff",
       }}
     >
       <div className="flex flex-column align-items-center justify-content-center">
         {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
         <div className="my-5">
-          <Card className="w-full py-3 px-2" style={{ borderRadius: "10px" }}>
+          <Card className="w-full py-3 px-2" style={{ borderRadius: "10px", border:`${themePrimeFlex === "light" ? "1px solid #e9e9e9ff" :"none"}` }}>
             <div className="text-center mb-3">
               {/* <img
                 src="/demo/images/login/avatar.png"
@@ -88,7 +91,12 @@ const Login = () => {
                 className="mb-3"
               /> */}
               <div className="text-2xl">Inicio de Sesión</div>
-              <span className="text-200 text-xs">
+              <span
+                className=" text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#575152ff" : "#756a6cff",
+                }}
+              >
                 Bienvenido! Selecciona el metodo para
                 <br /> acceder al SGD
               </span>

@@ -12,6 +12,7 @@ import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import UseArea from "../../area/hooks/UseArea";
 import { AreaEntity } from "../../area/interfaces/AreaInterface";
+import { useTheme } from "../../../ThemeContext";
 
 const Signup = () => {
   // variables and constants
@@ -44,6 +45,8 @@ const Signup = () => {
 
   const { findAll } = UseArea();
 
+  const { themePrimeFlex, switchTheme } = useTheme();
+  
   // functions
   const validateForm = () => {
     const fieldErrors: Partial<SignupAuth> = {};
@@ -149,7 +152,12 @@ const Signup = () => {
                 className="mb-3"
               /> */}
               <div className="text-900 text-xl">Registro de Usuario</div>
-              <span className="text-200 text-xs">
+              <span
+                className="text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#575152ff" : "#756a6cff",
+                }}
+              >
                 Bienvenido! Selecciona el metodo para registrte al SGD
               </span>
             </div>

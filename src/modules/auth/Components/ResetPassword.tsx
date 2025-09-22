@@ -7,6 +7,7 @@ import { Card } from "primereact/card";
 import { ResetPasswordAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTheme } from "../../../ThemeContext";
 
 const ResetPassword = () => {
   // variables and constants
@@ -30,6 +31,8 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   const { token } = useParams<{ token: string }>();
+
+  const { themePrimeFlex, switchTheme } = useTheme();
 
   // functions
   const validateForm = () => {
@@ -89,7 +92,12 @@ const ResetPassword = () => {
                 className="mb-3"
               /> */}
               <div className="text-900 text-xl mb-1">Cambio de contraseña</div>
-              <span className="text-200 text-xs">
+              <span
+                className="text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#575152ff" : "#756a6cff",
+                }}
+              >
                 A continución ingrese su nueva contraseña
               </span>
             </div>

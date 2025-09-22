@@ -5,10 +5,12 @@ import { useTheme } from "../../../ThemeContext";
 import { Tooltip } from "primereact/tooltip";
 import { useAuth } from "../../auth/context/AuthContext";
 import { formatFileSize } from "../../utils/Methods";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Tag } from "primereact/tag";
 import { OrganizationChart } from "primereact/organizationchart";
 import { TreeNode } from "primereact/treenode";
+import UseMovimiento from "../../movimiento/hooks/UseMovimiento";
+import { MovimientoSeguimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
 
 const TramiteSeguimiento = () => {
   // custom hooks
@@ -17,6 +19,10 @@ const TramiteSeguimiento = () => {
   const { userAuth } = useAuth()!;
 
   const navigate = useNavigate();
+
+  const { findOneSeguimiento } = UseMovimiento();
+
+  const params = useParams();
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -30,11 +36,98 @@ const TramiteSeguimiento = () => {
   const dragStart = useRef({ x: 0, y: 0 });
 
   //useStates
+  const [loading, setLoading] = useState<boolean>(true);
+
   const [transform, setTransform] = useState({ scale: 1, x: 0, y: 0 });
 
   const [selectedAnexos, setSelectedAnexos] = useState<File[]>([]);
 
+  const [moviminetoSeguimiento, setMoviminetoSeguimiento] =
+    useState<MovimientoSeguimientoEntity>();
+
   //functions
+  const nodeTemplate2 = (node: OrgNode) => {
+    if (node.type === "movimiento") {
+      return (
+        <div
+          className="flex flex-column align-items-center p-2 pb-3 border-round shadow-2 bg-white"
+          style={{ width: "10em" }}
+        >
+          <span className="font-bold text-sm mb-1 text-gray-500">
+            {node.data.asunto ?? "Sin asunto"}
+          </span>
+          <span className="text-xs text-gray-500">{node.data.areaDestino}</span>
+          <span className="text-xs text-blue-500">{node.data.estado}</span>
+          <span className="text-xxs text-gray-500">
+            {new Date(node.data.fecha).toLocaleDateString()}
+          </span>
+        </div>
+      );
+    }
+    return node.label;
+  };
+
+  interface OrgNode extends TreeNode {
+    data?: any;
+    type?: string;
+  }
+
+  const [treeMovimientos, setTreeMovimientos] = useState<OrgNode[]>([]);
+
+  function mapToOrgNodes(movimientos: any[]): OrgNode[] {
+    return movimientos
+      .filter((mov) => !!mov) // evita nulls directos
+      .map((mov) => {
+        const nodo: OrgNode = {
+          key: mov.IdMovimiento?.toString() ?? crypto.randomUUID(),
+          label: "movimiento",
+          type: "movimiento",
+          expanded: true,
+          // className: "bg-indigo-500 text-white",
+          className: "p-0",
+          style: { borderRadius: "12px" },
+          data: {
+            asunto: mov.Documento?.Asunto ?? "",
+            areaDestino: mov.AreaDestino?.Descripcion ?? "",
+            estado:
+              mov.HistorialMovimientoxEstado?.at(-1)?.Estado?.Descripcion ?? "",
+            fecha: mov.FechaMovimiento ?? "",
+          },
+          children: Array.isArray(mov.Children)
+            ? mapToOrgNodes(mov.Children)
+            : [],
+        };
+
+        // 👇 Aquí debug para ver el nodo generado
+        console.log("Nodo generado:", JSON.stringify(nodo, null, 2));
+
+        return nodo;
+      });
+  }
+
+  const findOneSeguimientoMovimiento = async () => {
+    setLoading(true);
+    const movimiento = await findOneSeguimiento({
+      IdTramite: parseInt(params.id ?? "0") || 0,
+      IdMovimiento: parseInt(params.id2 ?? "0") || 0,
+    });
+    console.log(movimiento);
+
+    setLoading(false);
+
+    if (movimiento?.message.msgId == 0 && movimiento.registro) {
+      console.log(movimiento.registro.Seguimiento);
+
+      const roots = mapToOrgNodes(movimiento.registro.Seguimiento);
+
+      console.log(roots);
+
+      setTreeMovimientos(roots);
+
+      setMoviminetoSeguimiento(movimiento.registro);
+    }
+  };
+
   const handleMouseDown = (e: React.MouseEvent) => {
     isDragging.current = true;
     dragStart.current = { x: e.clientX, y: e.clientY };
@@ -98,7 +191,9 @@ const TramiteSeguimiento = () => {
     };
   }, [transform.scale]);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    findOneSeguimientoMovimiento();
+  }, []);
 
   const [data] = useState<TreeNode[]>([
     {
@@ -222,7 +317,7 @@ const TramiteSeguimiento = () => {
         style={{ height: "70vh" }}
       >
         <div
-          className="flex flex-column justify-content-between border-solid border-1 border-gray-500 border-round-md"
+          className="flex flex-column border-solid border-1 border-gray-500 border-round-md"
           style={{ width: "24%" }}
         >
           <div className="flex flex-column">
@@ -287,7 +382,10 @@ const TramiteSeguimiento = () => {
               </div>
             </div> */}
 
-            <div className="flex flex-row py-1 px-3" style={{ gap: "1rem" }}>
+            <div
+              className="flex flex-row pt-3 pb-1 px-3"
+              style={{ gap: "1rem" }}
+            >
               <div
                 style={{
                   width: "100%",
@@ -317,7 +415,10 @@ const TramiteSeguimiento = () => {
               </div>
             </div>
 
-            <div className="flex flex-row py-1 px-3" style={{ gap: "1rem" }}>
+            <div
+              className="flex flex-row pt-1 pb-3 px-3"
+              style={{ gap: "1rem" }}
+            >
               <div
                 style={{
                   width: "100%",
@@ -502,7 +603,17 @@ const TramiteSeguimiento = () => {
                   : "transform 0.1s ease-out",
               }}
             >
-              <OrganizationChart value={data} nodeTemplate={nodeTemplate} />
+              {/* <OrganizationChart value={data} nodeTemplate={nodeTemplate} /> */}
+              {/* <OrganizationChart
+                value={treeMovimientos ?? []}
+                nodeTemplate={nodeTemplate2}
+              /> */}
+              {treeMovimientos && treeMovimientos.length > 0 && (
+                <OrganizationChart
+                  value={treeMovimientos}
+                  nodeTemplate={nodeTemplate2}
+                />
+              )}
             </div>
           </div>
 

@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/firma_digital/archivos_digitales",
 
     //tramite
-    "/tramite/seguimiento",
+    "/tramite/seguimiento/:id/:id2",
     "/tramite/documento",
     "/tramite/pendiente",
     "/tramite/recibido",

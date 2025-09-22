@@ -438,7 +438,7 @@ const TramiteRecibidoDerivados = () => {
                 severity="contrast"
                 style={{
                   padding: "0",
-                  width: "50%",
+                  width: "30%",
                   height: "2.5rem",
                   margin: "0",
                   color: "#000",

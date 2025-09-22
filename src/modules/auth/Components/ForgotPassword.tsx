@@ -7,6 +7,7 @@ import { Card } from "primereact/card";
 import { ForgotPasswordAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../../ThemeContext";
 
 const ForgotPassword = () => {
   // variables and constants
@@ -26,6 +27,8 @@ const ForgotPassword = () => {
   const { forgotPassword, loadingAuth } = useAuth()!;
 
   const navigate = useNavigate();
+
+  const { themePrimeFlex, switchTheme } = useTheme();
 
   // functions
   const validateForm = () => {
@@ -73,7 +76,12 @@ const ForgotPassword = () => {
                 className="mb-3"
               /> */}
               <div className="text-900 text-xl mb-1">Valicación de Email</div>
-              <span className="text-200 text-xs">
+              <span
+                className="text-xs"
+                style={{
+                  color: themePrimeFlex === "light" ? "#575152ff" : "#756a6cff",
+                }}
+              >
                 Se enviará un correo con un link para cambiar
                 <br /> tu contraseña
               </span>

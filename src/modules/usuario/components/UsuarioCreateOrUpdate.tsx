@@ -35,7 +35,7 @@ type UsuarioCreateOrUpdateProps = {
     nameFK: string,
     nameObj: string
   ) => void;
-  onActivoChange: (e: RadioButtonChangeEvent) => void;
+  onRadioChange: (e: RadioButtonChangeEvent, name: string) => void;
   loadingUsuarioCreateOrUpdate: boolean;
 };
 
@@ -340,7 +340,7 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
         </label>
         <InputText
           id="CodigoConfirmacionExp"
-          value={props.usuario.CodigoConfirmacionExp+""}
+          value={props.usuario.CodigoConfirmacionExp + ""}
           onChange={(e) => props.onInputChange(e, "CodigoConfirmacionExp")}
           className={classNames({
             "p-invalid":
@@ -384,6 +384,35 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
         )}
       </div>
       <div className="field">
+        <label className="mb-3 font-bold">Género</label>
+        <div className="formgrid grid">
+          <div className="field-radiobutton col-6">
+            <RadioButton
+              inputId="GeneroM"
+              name="GeneroM"
+              value={"M"}
+              onChange={(e) => {
+                props.onRadioChange(e, "Genero");
+              }}
+              checked={props.usuario.Genero === "M"}
+            />
+            <label htmlFor="GeneroM">Masculino</label>
+          </div>
+          <div className="field-radiobutton col-6">
+            <RadioButton
+              inputId="GeneroF"
+              name="GeneroF"
+              value={"F"}
+              onChange={(e) => {
+                props.onRadioChange(e, "Genero");
+              }}
+              checked={props.usuario.Genero === "F"}
+            />
+            <label htmlFor="GeneroF">Femenino</label>
+          </div>
+        </div>
+      </div>
+      <div className="field">
         <label className="mb-3 font-bold">Activo</label>
         <div className="formgrid grid">
           <div className="field-radiobutton col-6">
@@ -391,7 +420,9 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
               inputId="Activot"
               name="Activot"
               value={true}
-              onChange={props.onActivoChange}
+              onChange={(e) => {
+                props.onRadioChange(e, "Activo");
+              }}
               checked={props.usuario.Activo === true}
             />
             <label htmlFor="Activot">True</label>
@@ -401,7 +432,9 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
               inputId="Activof"
               name="Activof"
               value={false}
-              onChange={props.onActivoChange}
+              onChange={(e) => {
+                props.onRadioChange(e, "Activo");
+              }}
               checked={props.usuario.Activo === false}
             />
             <label htmlFor="Activof">False</label>

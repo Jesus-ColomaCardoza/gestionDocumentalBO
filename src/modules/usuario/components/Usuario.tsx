@@ -37,6 +37,8 @@ import UseArea from "../../area/hooks/UseArea";
 import UseCargo from "../../cargo/hooks/UseCargo";
 import UseRol from "../../rol/hooks/UseRol";
 import UseTipoUsuario from "../../tipo-usuario/hooks/UseTipoUsuario";
+import { REACT_APP_SALT } from "../../utils/Constants";
+import { sha256 } from "js-sha256";
 
 const Usuario = () => {
   // custom hooks
@@ -202,6 +204,10 @@ const Usuario = () => {
       usuario.IdCargo != 0 &&
       usuario.IdArea != 0
     ) {
+      const hashedPassword = sha256(
+        REACT_APP_SALT + sha256(usuario.Contrasena)
+      );
+
       setLoadingUsuarioCreateOrUpdate(true);
       let usuarioCreate = await create({
         Nombres: usuario.Nombres,
@@ -211,7 +217,7 @@ const Usuario = () => {
           ? new Date(usuario.FechaNacimiento)
           : null,
         Email: usuario.Email,
-        Contrasena: usuario.Contrasena,
+        Contrasena: hashedPassword,
         Celular: usuario.Celular,
         Genero: usuario.Genero,
         RazonSocial: usuario.RazonSocial,
@@ -531,10 +537,10 @@ const Usuario = () => {
   };
   //here
 
-  const onActivoChange = (e: RadioButtonChangeEvent) => {
-    let _usuario = { ...usuario };
+  const onRadioChange = (e: RadioButtonChangeEvent, name: string) => {
+    let _usuario: any = { ...usuario };
 
-    _usuario["Activo"] = e.value;
+    _usuario[name] = e.value;
     setUsuario(_usuario);
   };
 
@@ -1109,7 +1115,7 @@ const Usuario = () => {
                 filterElement={tipoUsuarioFilterTemplate}
               />
             );
-          }else if (col.field == "Rol") {
+          } else if (col.field == "Rol") {
             return (
               <Column
                 key={col.field}
@@ -1127,8 +1133,7 @@ const Usuario = () => {
                 filterElement={rolFilterTemplate}
               />
             );
-          }
-          else if (col.field == "Cargo") {
+          } else if (col.field == "Cargo") {
             return (
               <Column
                 key={col.field}
@@ -1146,8 +1151,7 @@ const Usuario = () => {
                 filterElement={cargoFilterTemplate}
               />
             );
-          }
-          else if (col.field == "Area") {
+          } else if (col.field == "Area") {
             return (
               <Column
                 key={col.field}
@@ -1248,7 +1252,7 @@ const Usuario = () => {
         updateUsuario={updateUsuario}
         onInputChange={onInputChange}
         onDropdownChange={onDropdownChange}
-        onActivoChange={onActivoChange}
+        onRadioChange={onRadioChange}
         loadingUsuarioCreateOrUpdate={loadingUsuarioCreateOrUpdate}
       />
 
