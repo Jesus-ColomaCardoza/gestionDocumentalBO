@@ -85,63 +85,114 @@ export interface MovimientoDetailsEntity {
   };
 }
 
-export interface MovimientoSeguimientoEntity {
-  IdMovimiento?: number;
-  IdMovimientoPadre?: number;
-  HistorialMovimientoxEstado?: {
-    IdHistorialMxE: number,
-    FechaHistorialMxE: Date,
-    Estado: {
-      IdEstado: number,
-      Descripcion: string
-    }
-  }[];
-  Documento?: {
-    IdDocumento: number;
-    CodigoReferenciaDoc: string;
-    Asunto: string;
-    Folios: number;
-    Visible: boolean;
+export type MovimientoNode = {
+  Documento: {
+    CreadoEl: Date
+    IdDocumento: number
+    Folios: number
+    Asunto: string
+    CodigoReferenciaDoc: string
+    Visible: boolean
     TipoDocumento: {
-      Descripcion: string;
-      IdTipoDocumento: number;
+      Descripcion: string
+      IdTipoDocumento: number
+    }
+  }
+  AreaOrigen: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  AreaDestino: {
+    IdArea: number,
+    Descripcion: string,
+  },
+  IdMovimiento: number
+  FechaMovimiento: Date
+  IdMovimientoPadre: number
+  NombreResponsable: string
+  Acciones: string
+  Motivo: string
+  FirmaDigital: boolean,
+  Copia: boolean,
+  HistorialMovimientoxEstado: {
+    Estado: {
+      Descripcion: string
+      IdEstado: number
     };
-  };
-  AreaDestino?: {
-    IdArea: number;
-    Descripcion: string;
-  };
-  AreaOrigen?: {
-    IdArea: number;
-    Descripcion: string;
-  };
-  Motivo?: string;
-  Acciones?: string
-  FechaMovimiento?: Date;
-  NombreResponsable?: string;
+    IdHistorialMxE: number
+    FechaHistorialMxE: Date
+  }[],
+  Children: MovimientoNode[]
+}
 
-  Tramite?: {
+export interface MovimientoSeguimientoEntity {
+  Tramite: {
     IdTramite: number;
-    CodigoReferenciaTram?: string;
-    Descripcion?: string;
-    FechaInicio?: Date;
-    FechaFin?: Date;
-    Remitente?: {
-      IdUsuario: number;
-      Nombres: string;
-      ApellidoPaterno: string;
-      ApellidoMaterno: string;
-      // NroIdentificacion?: string;
-    };
     TipoTramite?: {
       Descripcion: string;
       IdTipoTramite: number;
     };
-    Estado?: {
-      Descripcion: string;
-      IdEstado: number;
+    Movimiento: {
+      Documento: {
+        CreadoEl: Date;
+        IdDocumento: number;
+        Folios: number;
+        Asunto: string;
+        CodigoReferenciaDoc: string;
+        Visible: boolean;
+        TipoDocumento: {
+          Descripcion: string;
+          IdTipoDocumento: number;
+        };
+      };
+      IdMovimiento: number;
+      FechaMovimiento: Date;
+      IdMovimientoPadre: number;
+      NombreResponsable: string;
+      Acciones: string;
+      Motivo: string;
+      HistorialMovimientoxEstado: {
+        Estado: {
+          Descripcion: string;
+          IdEstado: number;
+        };
+        IdHistorialMxE: number;
+        FechaHistorialMxE: Date;
+      }[];
+      AreaDestino: {
+        IdArea: number;
+        Descripcion: string;
+      };
+      AreaOrigen: {
+        IdArea: number;
+        Descripcion: string;
+      };
+    }[];
+  }
+
+  Movimiento: {
+    IdMomiento: number;
+    Asunto: string;
+  }
+
+  Seguimiento: MovimientoNode[]
+
+  Documentos: {
+    Documento: {
+      CreadoEl: Date;
+      IdDocumento: number;
+      Folios: number;
+      Asunto: string;
+      CodigoReferenciaDoc: string;
+      Visible: boolean;
+      TipoDocumento: {
+        Descripcion: string;
+        IdTipoDocumento: number;
+      };
     };
-  };
+    FirmaDigital: boolean;
+    Copia: boolean;
+  }[]
 }
 
 export interface MovimientoCreate {

@@ -4,13 +4,17 @@ import { Toast } from "primereact/toast";
 import { useTheme } from "../../../ThemeContext";
 import { Tooltip } from "primereact/tooltip";
 import { useAuth } from "../../auth/context/AuthContext";
-import { formatFileSize } from "../../utils/Methods";
+import { formatDate, formatFileSize } from "../../utils/Methods";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tag } from "primereact/tag";
 import { OrganizationChart } from "primereact/organizationchart";
 import { TreeNode } from "primereact/treenode";
 import UseMovimiento from "../../movimiento/hooks/UseMovimiento";
-import { MovimientoSeguimientoEntity } from "../../movimiento/interfaces/MovimientoInterface";
+import {
+  MovimientoNode,
+  MovimientoSeguimientoEntity,
+} from "../../movimiento/interfaces/MovimientoInterface";
+import { Avatar } from "primereact/avatar";
 
 const TramiteSeguimiento = () => {
   // custom hooks
@@ -50,17 +54,66 @@ const TramiteSeguimiento = () => {
     if (node.type === "movimiento") {
       return (
         <div
-          className="flex flex-column align-items-center p-2 pb-3 border-round shadow-2 bg-white"
-          style={{ width: "10em" }}
+          className="flex flex-column p-2 pb-3"
+          style={{
+            width: "17em",
+            background: themePrimeFlex === "dark" ? "#1f1f2cff" : "#ffffffde",
+            border:
+              themePrimeFlex === "dark"
+                ? "1px solid #1f1f2cff"
+                : "1px solid #f5f5f5de",
+            borderRadius: "10px",
+          }}
         >
-          <span className="font-bold text-sm mb-1 text-gray-500">
-            {node.data.asunto ?? "Sin asunto"}
-          </span>
-          <span className="text-xs text-gray-500">{node.data.areaDestino}</span>
-          <span className="text-xs text-blue-500">{node.data.estado}</span>
-          <span className="text-xxs text-gray-500">
-            {new Date(node.data.fecha).toLocaleDateString()}
-          </span>
+          <div className="flex flex-row justify-content-between align-items-center my-2">
+            <div
+              className="flex flex-column justify-content-start align-items-start"
+              style={{ width: "70%" }}
+            >
+              <span className="text-xs">Enviado</span>
+              <span style={{ textAlign: "left" }} className="text-xs">
+                {node?.data?.FechaMovimiento
+                  ? formatDate(new Date(node.data.FechaMovimiento))
+                  : "--:--:--"}
+              </span>
+              <span className="text-xs">
+                {node?.data?.Documento?.CodigoReferenciaDoc ?? "Sin código"}
+              </span>
+            </div>
+            <div style={{ width: "20%" }}>
+              <Avatar
+                label={`${
+                  userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+                  "" +
+                  userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+                }`}
+                image={`${userAuth?.UrlFotoPerfil}`}
+                shape="circle"
+              />
+            </div>
+          </div>
+          <div className="flex flex-row  justify-content-between align-items-center border-top-1 border-bottom-1 border-gray-600 py-2">
+            <div style={{ width: "20%" }}>
+              <Avatar
+                icon="pi pi-file-plus"
+                shape="circle"
+                style={{ color: themePrimeFlex === "dark"
+                ?  "rgba(106, 123, 216, 1)"
+                :  "rgba(43, 71, 230, 1)"}}
+              />
+            </div>
+            <div
+              className="flex flex-column justify-content-start align-items-start"
+              style={{ width: "75%" }}
+            >
+              <span className="text-xs">
+                {node?.data?.NombreResponsable || "Sin responsable"}
+              </span>
+              <span style={{ textAlign: "left" }} className="text-sm font-bold">
+                {node?.data?.AreaDestino?.Descripcion || "Sin área destino"}
+              </span>
+            </div>
+          </div>
         </div>
       );
     }
@@ -68,13 +121,13 @@ const TramiteSeguimiento = () => {
   };
 
   interface OrgNode extends TreeNode {
-    data?: any;
+    data?: MovimientoNode;
     type?: string;
   }
 
   const [treeMovimientos, setTreeMovimientos] = useState<OrgNode[]>([]);
 
-  function mapToOrgNodes(movimientos: any[]): OrgNode[] {
+  function mapToOrgNodes(movimientos: MovimientoNode[]): OrgNode[] {
     return movimientos
       .filter((mov) => !!mov) // evita nulls directos
       .map((mov) => {
@@ -86,20 +139,11 @@ const TramiteSeguimiento = () => {
           // className: "bg-indigo-500 text-white",
           className: "p-0",
           style: { borderRadius: "12px" },
-          data: {
-            asunto: mov.Documento?.Asunto ?? "",
-            areaDestino: mov.AreaDestino?.Descripcion ?? "",
-            estado:
-              mov.HistorialMovimientoxEstado?.at(-1)?.Estado?.Descripcion ?? "",
-            fecha: mov.FechaMovimiento ?? "",
-          },
+          data: { ...mov },
           children: Array.isArray(mov.Children)
             ? mapToOrgNodes(mov.Children)
             : [],
         };
-
-        // 👇 Aquí debug para ver el nodo generado
-        console.log("Nodo generado:", JSON.stringify(nodo, null, 2));
 
         return nodo;
       });
@@ -107,20 +151,20 @@ const TramiteSeguimiento = () => {
 
   const findOneSeguimientoMovimiento = async () => {
     setLoading(true);
+
     const movimiento = await findOneSeguimiento({
       IdTramite: parseInt(params.id ?? "0") || 0,
       IdMovimiento: parseInt(params.id2 ?? "0") || 0,
     });
-    console.log(movimiento);
 
     setLoading(false);
 
     if (movimiento?.message.msgId == 0 && movimiento.registro) {
-      console.log(movimiento.registro.Seguimiento);
+      // console.log(movimiento.registro.Seguimiento);
 
       const roots = mapToOrgNodes(movimiento.registro.Seguimiento);
 
-      console.log(roots);
+      // console.log(roots);
 
       setTreeMovimientos(roots);
 
@@ -324,7 +368,7 @@ const TramiteSeguimiento = () => {
             <div className="flex flex-row justify-content-between align-items-center py-3 px-3 border-bottom-1 border-gray-500">
               <label
                 htmlFor="ApellidoPaterno"
-                className="block text-900 font-medium"
+                className="block text-900 text-md font-bold"
                 style={{
                   width: "30%",
                 }}
@@ -391,11 +435,14 @@ const TramiteSeguimiento = () => {
                   width: "100%",
                 }}
               >
-                <label className="block text-900 text-sm font-medium mb-2">
-                  Origen
+                <label className="block text-900 text-sm font-bold mb-2">
+                  Código de trámite
                 </label>
                 <span className="block text-900 text-xs mb-2">
-                  Archivo digital
+                  {moviminetoSeguimiento?.Tramite?.IdTramite.toString().padStart(
+                    8,
+                    "0"
+                  )}
                 </span>
               </div>
             </div>
@@ -406,11 +453,27 @@ const TramiteSeguimiento = () => {
                   width: "100%",
                 }}
               >
-                <label className="block text-900 text-sm font-medium mb-2">
+                <label className="block text-900 text-sm font-bold mb-2">
+                  Origen
+                </label>
+                <span className="block text-900 text-xs mb-2">
+                  {moviminetoSeguimiento?.Tramite?.TipoTramite?.Descripcion ||
+                    "Externo"}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex flex-row py-1 px-3" style={{ gap: "1rem" }}>
+              <div
+                style={{
+                  width: "100%",
+                }}
+              >
+                <label className="block text-900 text-sm font-bold mb-2">
                   Asunto
                 </label>
                 <span className="block text-900 text-xs mb-2">
-                  Archivo digital
+                  {moviminetoSeguimiento?.Movimiento?.Asunto || "Sin Asunto"}
                 </span>
               </div>
             </div>
@@ -424,7 +487,7 @@ const TramiteSeguimiento = () => {
                   width: "100%",
                 }}
               >
-                <label className="block text-900 text-sm font-medium mb-2">
+                <label className="block text-900 text-sm font-bold mb-2">
                   Estado
                 </label>
 
@@ -438,9 +501,9 @@ const TramiteSeguimiento = () => {
           </div>
 
           <div className="flex flex-column border-top-1 border-gray-500">
-            <div className="flex flex-row align-items-center pt-3 px-4 ">
+            <div className="flex flex-row align-items-center pt-3 px-3 ">
               <label
-                className="block text-900 font-medium"
+                className="block text-900 text-sm font-bold"
                 style={{
                   width: "30%",
                 }}
@@ -541,7 +604,7 @@ const TramiteSeguimiento = () => {
         >
           <div className="flex flex-row justify-content-between align-items-center py-2 px-3 border-bottom-1 border-gray-500">
             <label
-              className="block text-900 font-medium"
+              className="block text-900 text-md font-bold"
               style={{
                 width: "20%",
               }}
