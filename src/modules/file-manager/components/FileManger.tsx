@@ -406,6 +406,7 @@ const FileManager = () => {
           Categoria: titleFM?.id,
           IdEstado: 1, // set at diagram state
           Activo: documento.Activo,
+          FechaEmision:new Date().toISOString(),
         });
 
         setLoadingDocumentoCreateOrUpdate(false);
