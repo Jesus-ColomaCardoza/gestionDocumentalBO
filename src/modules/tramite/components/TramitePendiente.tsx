@@ -784,7 +784,9 @@ const TramitePendiente = () => {
         onClick={() => {
           //call endpoint findone
           //navigate tramite/seguimiento
-          navigate("../tramite/seguimiento");
+          navigate(
+            `../tramite/seguimiento/${rowData.Tramite?.IdTramite}/${rowData.IdMovimiento}`
+          );
         }}
       >
         {rowData.Tramite?.IdTramite.toString().padStart(8, "0")}
