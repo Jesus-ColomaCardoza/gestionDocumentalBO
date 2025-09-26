@@ -85,8 +85,35 @@ export interface MovimientoDetailsEntity {
   };
 }
 
+// export type TramiteNode = {
+//   Area: {
+//     IdArea: number;
+//     Descripcion: string;
+//   };
+//   FechaInicio: Date;
+// }
+
 export type MovimientoNode = {
-  Documento: {
+  Tramite: {
+    IdTramite: number;
+    Area: {
+      IdArea: number;
+      Descripcion: string;
+    };
+    FechaInicio: Date;
+    TipoTramite?: {
+      Descripcion: string;
+      IdTipoTramite: number;
+    };
+    Remitente: {
+      IdUsuario: number,
+      Nombres: string,
+      ApellidoPaterno: string,
+      ApellidoMaterno: string,
+      NroIdentificacion: string,
+    },
+  }
+  Documento?: {
     CreadoEl: Date
     IdDocumento: number
     Folios: number
@@ -98,23 +125,23 @@ export type MovimientoNode = {
       IdTipoDocumento: number
     }
   }
-  AreaOrigen: {
+  AreaOrigen?: {
     IdArea: number,
     Descripcion: string,
   },
-  AreaDestino: {
+  AreaDestino?: {
     IdArea: number,
     Descripcion: string,
   },
-  IdMovimiento: number
-  FechaMovimiento: Date
-  IdMovimientoPadre: number
-  NombreResponsable: string
-  Acciones: string
-  Motivo: string
-  FirmaDigital: boolean,
-  Copia: boolean,
-  HistorialMovimientoxEstado: {
+  IdMovimiento?: number
+  FechaMovimiento?: Date
+  IdMovimientoPadre?: number
+  NombreResponsable?: string
+  Acciones?: string
+  Motivo?: string
+  FirmaDigital?: boolean,
+  Copia?: boolean,
+  HistorialMovimientoxEstado?: {
     Estado: {
       Descripcion: string
       IdEstado: number
@@ -122,16 +149,28 @@ export type MovimientoNode = {
     IdHistorialMxE: number
     FechaHistorialMxE: Date
   }[],
-  Children: MovimientoNode[]
+  Children?: MovimientoNode[]
 }
 
 export interface MovimientoSeguimientoEntity {
   Tramite: {
     IdTramite: number;
+    Area: {
+      IdArea: number;
+      Descripcion: string;
+    };
+    FechaInicio: Date;
     TipoTramite?: {
       Descripcion: string;
       IdTipoTramite: number;
     };
+    Remitente: {
+      IdUsuario: number,
+      Nombres: string,
+      ApellidoPaterno: string,
+      ApellidoMaterno: string,
+      NroIdentificacion: string,
+    },
     Movimiento: {
       Documento: {
         CreadoEl: Date;

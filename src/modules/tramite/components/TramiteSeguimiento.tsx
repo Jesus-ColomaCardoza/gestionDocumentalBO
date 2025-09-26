@@ -97,9 +97,12 @@ const TramiteSeguimiento = () => {
               <Avatar
                 icon="pi pi-file-plus"
                 shape="circle"
-                style={{ color: themePrimeFlex === "dark"
-                ?  "rgba(106, 123, 216, 1)"
-                :  "rgba(43, 71, 230, 1)"}}
+                style={{
+                  color:
+                    themePrimeFlex === "dark"
+                      ? "rgba(106, 123, 216, 1)"
+                      : "rgba(43, 71, 230, 1)",
+                }}
               />
             </div>
             <div
@@ -112,6 +115,103 @@ const TramiteSeguimiento = () => {
               <span style={{ textAlign: "left" }} className="text-sm font-bold">
                 {node?.data?.AreaDestino?.Descripcion || "Sin área destino"}
               </span>
+            </div>
+          </div>
+        </div>
+      );
+    } else if (node.type === "tramite") {
+      return (
+        <div
+          className="flex flex-column p-2 pb-3"
+          style={{
+            width: "17em",
+            background: themePrimeFlex === "dark" ? "#1f1f2cff" : "#ffffffde",
+            border:
+              themePrimeFlex === "dark"
+                ? "1px solid #1f1f2cff"
+                : "1px solid #f5f5f5de",
+            borderRadius: "10px",
+          }}
+        >
+          <div className="flex flex-row  justify-content-between align-items-center border-bottom-1 border-gray-600 py-2">
+            <div style={{ width: "20%" }}>
+              <Avatar
+                icon={
+                  node?.data?.Tramite?.TipoTramite?.IdTipoTramite === 1
+                    ? // interno
+                      "pi pi-building"
+                    : // externo
+                      "pi pi-globe"
+                }
+                shape="circle"
+                style={{
+                  color:
+                    themePrimeFlex === "dark"
+                      ? "rgba(106, 123, 216, 1)"
+                      : "rgba(43, 71, 230, 1)",
+                }}
+              />
+            </div>
+            <div
+              className="flex flex-column justify-content-start align-items-start"
+              style={{ width: "75%" }}
+            >
+              {node?.data?.Tramite?.TipoTramite?.IdTipoTramite === 1 ? (
+                // interno
+                // área de origen
+                <span
+                  style={{ textAlign: "left" }}
+                  className="text-sm font-bold"
+                >
+                  {node?.data?.Tramite?.Area?.Descripcion || "Sin área destino"}
+                </span>
+              ) : (
+                // externo
+                <>
+                  {/* documento de identificacion */}
+                  <span
+                    style={{ textAlign: "left" }}
+                    className="text-sm font-bold"
+                  >
+                    {node?.data?.Tramite?.Remitente?.NroIdentificacion ||
+                      "Sin Nro. Identificación"}
+                  </span>
+                  {/* usuario */}
+                  <span className="text-xs">
+                    {`${
+                      node?.data?.Tramite?.Remitente?.Nombres +
+                      " " +
+                      node?.data?.Tramite?.Remitente?.ApellidoPaterno +
+                      " " +
+                      node?.data?.Tramite?.Remitente?.ApellidoMaterno
+                    }` || "Sin remitente"}
+                  </span>
+                </>
+              )}
+            </div>
+          </div>
+          <div className="flex flex-row justify-content-between align-items-center my-2">
+            <div
+              className="flex flex-column justify-content-start align-items-start"
+              style={{ width: "70%" }}
+            >
+              <span className="text-xs">Inicio trámite</span>
+              <span style={{ textAlign: "left" }} className="text-xs">
+                {node?.data?.Tramite?.FechaInicio
+                  ? formatDate(new Date(node?.data?.Tramite?.FechaInicio))
+                  : "--:--:--"}
+              </span>
+            </div>
+            <div style={{ width: "20%" }}>
+              <Avatar
+                label={`${
+                  userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+                  "" +
+                  userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+                }`}
+                image={`${userAuth?.UrlFotoPerfil}`}
+                shape="circle"
+              />
             </div>
           </div>
         </div>
@@ -160,13 +260,32 @@ const TramiteSeguimiento = () => {
     setLoading(false);
 
     if (movimiento?.message.msgId == 0 && movimiento.registro) {
-      // console.log(movimiento.registro.Seguimiento);
-
       const roots = mapToOrgNodes(movimiento.registro.Seguimiento);
 
-      // console.log(roots);
+      const rootNode: OrgNode = {
+        key: movimiento.registro.Tramite.IdTramite.toString(),
+        label: "tramite",
+        type: "tramite",
+        expanded: true,
+        className: "p-0",
+        style: { borderRadius: "12px" },
+        data: {
+          Tramite: {
+            IdTramite: movimiento.registro.Tramite.IdTramite,
+            Area: movimiento.registro.Tramite.Area,
+            FechaInicio: movimiento.registro.Tramite.FechaInicio,
+            TipoTramite: movimiento.registro.Tramite.TipoTramite,
+            Remitente: movimiento.registro.Tramite.Remitente,
+          },
+        },
+        children: roots,
+      };
 
-      setTreeMovimientos(roots);
+      console.log("RootNode generado:", JSON.stringify(rootNode, null, 2));
+
+      setTreeMovimientos([rootNode]);
+
+      // setTreeMovimientos(roots);
 
       setMoviminetoSeguimiento(movimiento.registro);
     }
