@@ -329,7 +329,19 @@ const TramiteRecibidoExterno = () => {
   // actions CRUD - Remitente (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllRemitenteCombox = async () => {
     setLoading(true);
-    const remitentesFindAll = await findAllRemitentes();
+    const remitentesFindAll = await findAllRemitentes({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdArea",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: `${TramiteExternoRecibir.IdAreaEmision ?? "0"}`,
+          valor2: "",
+        },
+      ],
+    });
     setLoading(false);
 
     if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
@@ -745,12 +757,12 @@ const TramiteRecibidoExterno = () => {
   useEffect(() => {
     findAllTipoDocumentoCombox();
     findAllTipoIdentificacionCombox();
-    findAllRemitenteCombox();
     findAllAreaCombox();
   }, []);
 
   useEffect(() => {
     if (userAuth?.IdUsuario) {
+      findAllRemitenteCombox();
       setTramiteExternoRecibir({
         ...emptyTramiteExternoRecibir,
         IdAreaEmision: userAuth.Area.IdArea,
@@ -761,6 +773,10 @@ const TramiteRecibidoExterno = () => {
       });
     }
   }, [userAuth?.IdUsuario]);
+
+  useEffect(() => {
+    findAllRemitenteCombox();
+  }, [TramiteExternoRecibir.IdAreaEmision]);
 
   return (
     <div className="card p-0 m-0">
@@ -1778,7 +1794,7 @@ const TramiteRecibidoExterno = () => {
         setSelectedDigitalFiles={setSelectedDigitalFiles}
       />
 
-      <TramiteDestinosModal
+      {/* <TramiteDestinosModal
         submitted={submitted}
         hideTramiteDestinosDialog={hideTramiteDestinosDialog}
         tramiteDestinosDialog={tramiteDestinosDialog}
@@ -1788,12 +1804,12 @@ const TramiteRecibidoExterno = () => {
         setTramiteDestinosErrors={setTramiteDestinosErrors}
         movimiento={movimiento}
         areas={areas}
-        remitentes={remitentes}
+        remitentesDestino={remitentes}
         setMovimiento={setMovimiento}
         onInputTextChange={onInputTextChange}
         onDropdownChangeMovimiento={onDropdownChangeMovimiento}
         onSwitchChange={onSwitchChange}
-      />
+      /> */}
     </div>
   );
 };

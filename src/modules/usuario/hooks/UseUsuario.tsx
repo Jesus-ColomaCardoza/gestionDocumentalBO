@@ -8,6 +8,7 @@ import axios from "axios";
 import { filterBodyRequest, VITE_API_URL_GDS } from "../../utils/Constants";
 import { USUARIO } from "../service/UsuarioService";
 import { Menssage } from "../../utils/menssage";
+import { CombinationsFilters } from "../../utils/Interfaces";
 
 const UseUsuario = () => {
   let message = new Menssage();
@@ -28,11 +29,13 @@ const UseUsuario = () => {
     }
   };
 
-  const findAll = async (): Promise<UsuariosOut | undefined> => {
+  const findAll = async (
+    combinationsFilters: CombinationsFilters
+  ): Promise<UsuariosOut | undefined> => {
     try {
       const usuarios = await axios.post<UsuariosOut>(
         `${VITE_API_URL_GDS + USUARIO.FIND_ALL}`,
-        filterBodyRequest
+        combinationsFilters
       );
       return usuarios.data;
     } catch (error) {

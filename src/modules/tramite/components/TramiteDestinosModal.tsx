@@ -17,7 +17,7 @@ type TramiteDestinosModalProps = {
   setTramiteDestinosErrors: Dispatch<any>;
   movimiento: MovimientoEntity;
   areas: Pick<AreaEntity, "IdArea" | "Descripcion">[];
-  remitentes: Pick<
+  remitentesDestino: Pick<
     UsuarioEntity,
     "IdUsuario" | "Nombres" | "ApellidoPaterno" | "ApellidoMaterno"
   >[];
@@ -145,7 +145,7 @@ const TramiteDestinosModal = (props: TramiteDestinosModalProps) => {
                   "NombreCompleto"
                 );
               }}
-              options={props.remitentes}
+              options={props.remitentesDestino}
               optionLabel="NombreCompleto"
               filter
               placeholder="Seleccionar personal"

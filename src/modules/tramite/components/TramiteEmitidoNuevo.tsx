@@ -98,6 +98,13 @@ const TramiteEmitidoNuevo = () => {
     >[]
   >([]);
 
+  const [remitentesDestino, setRemitentesDestino] = useState<
+    Pick<
+      UsuarioEntity,
+      "IdUsuario" | "Nombres" | "ApellidoPaterno" | "ApellidoMaterno"
+    >[]
+  >([]);
+
   const [areas, setAreas] = useState<
     Pick<AreaEntity, "IdArea" | "Descripcion">[]
   >([]);
@@ -215,7 +222,7 @@ const TramiteEmitidoNuevo = () => {
       ) {
         setTramites([...tramites, tramiteCreateEmitido.registro]);
 
-        setSelectedAnexos([])
+        setSelectedAnexos([]);
 
         navigate("../tramite/emitido");
 
@@ -263,11 +270,56 @@ const TramiteEmitidoNuevo = () => {
   // actions CRUD - Remitente (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllRemitenteCombox = async () => {
     setLoading(true);
-    const remitentesFindAll = await findAllRemitentes();
+    const remitentesFindAll = await findAllRemitentes({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdArea",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: `${userAuth?.Area?.IdArea ?? "0"}`,
+          valor2: "",
+        },
+      ],
+    });
     setLoading(false);
 
     if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
       setRemitentes(
+        Array.isArray(remitentesFindAll.registro)
+          ? remitentesFindAll.registro?.map((af) => {
+              return {
+                IdUsuario: af.IdUsuario,
+                Nombres: af.Nombres,
+                ApellidoPaterno: af.ApellidoPaterno,
+                ApellidoMaterno: af.ApellidoMaterno,
+                NombreCompleto: `${af.Nombres} ${af.ApellidoPaterno} ${af.ApellidoMaterno}`,
+              };
+            })
+          : []
+      );
+    }
+  };
+  const findAllRemitenteCombox2 = async () => {
+    setLoading(true);
+    const remitentesFindAll = await findAllRemitentes({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdArea",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: `${movimiento.IdAreaDestino ?? "0"}`,
+          valor2: "",
+        },
+      ],
+    });
+    setLoading(false);
+
+    if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
+      setRemitentesDestino(
         Array.isArray(remitentesFindAll.registro)
           ? remitentesFindAll.registro?.map((af) => {
               return {
@@ -326,6 +378,7 @@ const TramiteEmitidoNuevo = () => {
     setTramiteDestinosDialog(true);
   };
 
+  // onChanges
   const onChangeLoadFiles = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -504,7 +557,6 @@ const TramiteEmitidoNuevo = () => {
     }
   };
 
-  // onChanges
   const onInputTextChange = (
     e: React.ChangeEvent<HTMLInputElement>,
     name: string
@@ -648,12 +700,12 @@ const TramiteEmitidoNuevo = () => {
   //useEffects
   useEffect(() => {
     findAllTipoDocumentoCombox();
-    findAllRemitenteCombox();
     findAllAreaCombox();
   }, []);
 
   useEffect(() => {
     if (userAuth?.IdUsuario) {
+      findAllRemitenteCombox();
       setTramiteEmitidoCreate({
         ...emptyTramiteEmitidoCreate,
         IdAreaEmision: userAuth.Area.IdArea,
@@ -665,6 +717,10 @@ const TramiteEmitidoNuevo = () => {
       });
     }
   }, [userAuth?.IdUsuario]);
+
+  useEffect(() => {
+    findAllRemitenteCombox2();
+  }, [movimiento.IdAreaDestino]);
 
   return (
     <div className="card p-0 m-0">
@@ -1452,7 +1508,7 @@ const TramiteEmitidoNuevo = () => {
         setTramiteDestinosErrors={setTramiteDestinosErrors}
         movimiento={movimiento}
         areas={areas}
-        remitentes={remitentes}
+        remitentesDestino={remitentesDestino}
         setMovimiento={setMovimiento}
         onInputTextChange={onInputTextChange}
         onDropdownChangeMovimiento={onDropdownChangeMovimiento}

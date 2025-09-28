@@ -418,6 +418,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
           Categoria: titleFM?.id,
           IdEstado: 1, // set at diagram state
           Activo: documento.Activo,
+          FechaEmision: new Date().toISOString(),
         });
 
         setLoadingDocumentoCreateOrUpdate(false);
@@ -1326,10 +1327,12 @@ const FileManagerModal = (props: FileManagerModalProps) => {
         label="Seleccionar"
         icon="pi pi-check"
         onClick={() => {
-
           // we select this file
           if (selectedFileManagers) {
-            props.setSelectedDigitalFiles((prev) => [...prev, selectedFileManagers]);
+            props.setSelectedDigitalFiles((prev) => [
+              ...prev,
+              selectedFileManagers,
+            ]);
           }
 
           // we close the fileMangerModal

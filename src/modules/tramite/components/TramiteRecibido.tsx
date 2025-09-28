@@ -110,6 +110,10 @@ const TramiteRecibido = () => {
     TramiteRecibidoEntity[]
   >([]);
 
+  const [tramiteArchivadosErrors, setTramiteArchivadosErrors] = useState<any>(
+    {}
+  );
+
   const [estados, setEstados] = useState<EstadoEntity[]>([]);
 
   const [selectedTramitesRecibidos, setSelectedTramitesRecibidos] = useState<
@@ -1024,6 +1028,7 @@ const TramiteRecibido = () => {
     // setMovimiento(emptyMovimiento);
     setTramiteArchivadoDialog(false);
     setDetalle("");
+    setArchivador(null);
   };
 
   const showTramiteArchivadoDialog = (
@@ -1377,7 +1382,9 @@ const TramiteRecibido = () => {
         onClick={() => {
           //call endpoint findone
           //navigate tramite/seguimiento
-          navigate(`../tramite/seguimiento/${rowData.Tramite?.IdTramite}/${rowData.IdMovimiento}`);
+          navigate(
+            `../tramite/seguimiento/${rowData.Tramite?.IdTramite}/${rowData.IdMovimiento}`
+          );
         }}
       >
         {rowData.Tramite?.IdTramite.toString().padStart(8, "0")}
@@ -2121,6 +2128,8 @@ const TramiteRecibido = () => {
         detalle={detalle}
         setDetalle={setDetalle}
         archivarTramitesRecibidos={archivarTramitesRecibidos}
+        tramiteArchivadosErrors={tramiteArchivadosErrors}
+        setTramiteArchivadosErrors={setTramiteArchivadosErrors}
       />
 
       <ConfirmModal

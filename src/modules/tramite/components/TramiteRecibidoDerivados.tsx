@@ -148,27 +148,27 @@ const TramiteRecibidoDerivados = () => {
   };
 
   // actions CRUD - Remitente (create, read, update, remove) -> (create, findAll-findOne, update, remove)
-  const findAllRemitenteCombox = async () => {
-    setLoading(true);
-    const remitentesFindAll = await findAllRemitentes();
-    setLoading(false);
+  // const findAllRemitenteCombox = async () => {
+  //   setLoading(true);
+  //   const remitentesFindAll = await findAllRemitentes();
+  //   setLoading(false);
 
-    if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
-      setRemitentes(
-        Array.isArray(remitentesFindAll.registro)
-          ? remitentesFindAll.registro?.map((af) => {
-              return {
-                IdUsuario: af.IdUsuario,
-                Nombres: af.Nombres,
-                ApellidoPaterno: af.ApellidoPaterno,
-                ApellidoMaterno: af.ApellidoMaterno,
-                NombreCompleto: `${af.Nombres} ${af.ApellidoPaterno} ${af.ApellidoMaterno}`,
-              };
-            })
-          : []
-      );
-    }
-  };
+  //   if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
+  //     setRemitentes(
+  //       Array.isArray(remitentesFindAll.registro)
+  //         ? remitentesFindAll.registro?.map((af) => {
+  //             return {
+  //               IdUsuario: af.IdUsuario,
+  //               Nombres: af.Nombres,
+  //               ApellidoPaterno: af.ApellidoPaterno,
+  //               ApellidoMaterno: af.ApellidoMaterno,
+  //               NombreCompleto: `${af.Nombres} ${af.ApellidoPaterno} ${af.ApellidoMaterno}`,
+  //             };
+  //           })
+  //         : []
+  //     );
+  //   }
+  // };
 
   // actions CRUD - Area (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllAreaCombox = async () => {
@@ -206,7 +206,7 @@ const TramiteRecibidoDerivados = () => {
   //useEffects
   useEffect(() => {
     findAllTipoDocumentoCombox();
-    findAllRemitenteCombox();
+    // findAllRemitenteCombox();
     findAllAreaCombox();
     findAllDetailsMovimiento();
   }, []);

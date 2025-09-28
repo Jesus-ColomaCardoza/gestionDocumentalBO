@@ -14,6 +14,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { InputText } from "primereact/inputtext";
 import { InputTextarea } from "primereact/inputtextarea";
 import { ArchivadorEntity } from "../../archivador/interfaces/ArchivadorInterface";
+import { ar } from "date-fns/locale";
 
 type TramiteArchivadoModalProps = {
   submitted: boolean;
@@ -34,11 +35,23 @@ type TramiteArchivadoModalProps = {
   detalle: string;
   setDetalle: Dispatch<SetStateAction<string>>;
   archivarTramitesRecibidos: () => Promise<void>;
-  // selectedTramiteDestinos: TramiteEntity[];
-  // setSelectedTramiteDestinos: Dispatch<SetStateAction<MovimientoEntity[]>>;
+  tramiteArchivadosErrors: any;
+  setTramiteArchivadosErrors: Dispatch<any>;
 };
 
 const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
+  const validateForm = () => {
+    let fieldErrors: any = {};
+
+    if (props?.archivador?.IdArchivador == null) {
+      fieldErrors.archivador = "Archivador es obligatorio.";
+    }
+
+    props.setTramiteArchivadosErrors(fieldErrors);
+
+    return Object.keys(fieldErrors).length === 0;
+  };
+
   const estadoDialogFooter = (
     <>
       <Button
@@ -53,7 +66,12 @@ const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
         loading={props.submitted}
         label="Archivar"
         icon="pi pi-check"
-        onClick={props.archivarTramitesRecibidos}
+        onClick={() => {
+          if (validateForm()) {
+            props.archivarTramitesRecibidos();
+            props.hideTramiteArchivadoDialog();
+          }
+        }}
       />
     </>
   );
@@ -195,12 +213,18 @@ const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
                 value={props.archivador}
                 onChange={(e: DropdownChangeEvent) => {
                   const value = e.value || "";
+
                   props.setArchivador(value);
+                  
+                  props.setTramiteArchivadosErrors((prev: any) => ({
+                    ...prev,
+                    ["archivador"]: undefined,
+                  }));
                 }}
                 options={props.archivadores}
                 optionLabel="Descripcion"
                 filter
-                // placeholder="Seleccionar Área de Emisión"
+                placeholder="Seleccionar archivador"
                 className="w-full flex flex-row align-items-center p-inputtext-sm"
                 showClear
                 style={{
@@ -211,9 +235,11 @@ const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
                 }}
               />
             </div>
-            {/* {tramiteErrors.IdAreaEmision && (
-              <small className="p-error">{tramiteErrors.IdAreaEmision}</small>
-            )} */}
+            {props.tramiteArchivadosErrors?.archivador && (
+              <small className="p-error">
+                {props.tramiteArchivadosErrors.archivador}
+              </small>
+            )}
           </div>
         </div>
       </div>

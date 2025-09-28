@@ -137,6 +137,13 @@ const TramiteRecibidoDerivado = () => {
     >[]
   >([]);
 
+  const [remitentesDestino, setRemitentesDestino] = useState<
+    Pick<
+      UsuarioEntity,
+      "IdUsuario" | "Nombres" | "ApellidoPaterno" | "ApellidoMaterno"
+    >[]
+  >([]);
+
   const [areas, setAreas] = useState<
     Pick<AreaEntity, "IdArea" | "Descripcion">[]
   >([]);
@@ -401,11 +408,57 @@ const TramiteRecibidoDerivado = () => {
   // actions CRUD - Remitente (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllRemitenteCombox = async () => {
     setLoading(true);
-    const remitentesFindAll = await findAllRemitentes();
+    const remitentesFindAll = await findAllRemitentes({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdArea",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: `${userAuth?.Area?.IdArea ?? "0"}`,
+          valor2: "",
+        },
+      ],
+    });
     setLoading(false);
 
     if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
       setRemitentes(
+        Array.isArray(remitentesFindAll.registro)
+          ? remitentesFindAll.registro?.map((af) => {
+              return {
+                IdUsuario: af.IdUsuario,
+                Nombres: af.Nombres,
+                ApellidoPaterno: af.ApellidoPaterno,
+                ApellidoMaterno: af.ApellidoMaterno,
+                NombreCompleto: `${af.Nombres} ${af.ApellidoPaterno} ${af.ApellidoMaterno}`,
+              };
+            })
+          : []
+      );
+    }
+  };
+
+  const findAllRemitenteCombox2 = async () => {
+    setLoading(true);
+    const remitentesFindAll = await findAllRemitentes({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdArea",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: `${movimiento.IdAreaDestino ?? "0"}`,
+          valor2: "",
+        },
+      ],
+    });
+    setLoading(false);
+
+    if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
+      setRemitentesDestino(
         Array.isArray(remitentesFindAll.registro)
           ? remitentesFindAll.registro?.map((af) => {
               return {
@@ -806,6 +859,10 @@ const TramiteRecibidoDerivado = () => {
     findAllAreaCombox();
     // findOneDetailsMovimiento();
   }, []);
+
+  useEffect(() => {
+    findAllRemitenteCombox2();
+  }, [movimiento.IdAreaDestino]);
 
   useEffect(() => {
     if (
@@ -1920,7 +1977,7 @@ const TramiteRecibidoDerivado = () => {
         setTramiteDestinosErrors={setTramiteDestinosErrors}
         movimiento={movimiento}
         areas={areas}
-        remitentes={remitentes}
+        remitentesDestino={remitentesDestino}
         setMovimiento={setMovimiento}
         onInputTextChange={onInputTextChange}
         onDropdownChangeMovimiento={onDropdownChangeMovimiento}
