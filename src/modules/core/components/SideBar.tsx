@@ -116,7 +116,9 @@ const SideBar = (props: SideBarProps) => {
           </svg> */}
 
           {/* text logo */}
-          <span className="font-semibold text-2xl text-primary">MDSMF</span>
+          <span className="font-semibold text-2xl" style={{ color: "#D63939" }}>
+            MDSMF
+          </span>
         </span>
 
         {/* button close */}
@@ -131,6 +133,7 @@ const SideBar = (props: SideBarProps) => {
             className="h-2rem w-2rem"
             style={{
               border: "none",
+              color: "#D63939",
             }}
           ></Button>
         </span>

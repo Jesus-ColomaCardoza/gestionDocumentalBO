@@ -281,11 +281,7 @@ const TramiteSeguimiento = () => {
         children: roots,
       };
 
-      console.log("RootNode generado:", JSON.stringify(rootNode, null, 2));
-
       setTreeMovimientos([rootNode]);
-
-      // setTreeMovimientos(roots);
 
       setMoviminetoSeguimiento(movimiento.registro);
     }
@@ -310,26 +306,6 @@ const TramiteSeguimiento = () => {
 
   const handleMouseUp = () => {
     isDragging.current = false;
-  };
-
-  const nodeTemplate = (node: TreeNode) => {
-    if (node.label === "person") {
-      return (
-        <div className="flex flex-column">
-          <div className="flex flex-column align-items-center">
-            <img
-              alt={node.data.name}
-              src={node.data.image}
-              className="mb-3 w-3rem h-3rem"
-            />
-            <span className="font-bold mb-2">{node.data.name}</span>
-            <span>{node.data.title}</span>
-          </div>
-        </div>
-      );
-    }
-
-    return node.label;
   };
 
   //useEffects
@@ -498,7 +474,8 @@ const TramiteSeguimiento = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  anexosRef.current?.click();
+                  // anexosRef.current?.click();
+                  window.print()
                 }}
                 size="small"
                 severity="contrast"
@@ -644,10 +621,10 @@ const TramiteSeguimiento = () => {
                   minHeight: "3rem",
                 }}
               >
-                {selectedAnexos.map((anexo) => {
+                {moviminetoSeguimiento?.Documentos.map((doc) => {
                   return (
                     <div
-                      key={anexo.lastModified}
+                      key={doc.Documento.IdDocumento}
                       className="flex flex-row justify-content-between p-2"
                       style={{
                         gap: "1rem",
@@ -659,36 +636,63 @@ const TramiteSeguimiento = () => {
                     >
                       <div className="flex flex-row gap-2">
                         {/* icon */}
-                        <div className="flex align-items-center justify-content-center pr-2">
+                        {/* <div className="flex align-items-center justify-content-center pr-2">
                           <i
                             className="pi pi-file-pdf"
                             style={{ color: "#559", fontSize: "1.5rem" }}
                           ></i>
+                        </div> */}
+                        <div
+                          className="flex align-items-center justify-content-center text-center border-round-md mr-2"
+                          style={{
+                            background:
+                              themePrimeFlex === "light" ? "#eee" : "#333",
+                          }}
+                        >
+                          <i
+                            className="pi pi-file-pdf px-3 py-2 "
+                            style={{
+                              color:
+                                themePrimeFlex === "light"
+                                  ? "rgba(75, 75, 165, 1)"
+                                  : "rgba(121, 121, 179, 1)",
+                              fontSize: "1.3rem",
+                            }}
+                          ></i>
                         </div>
                         {/* descripcion */}
-                        <div className="flex flex-column gap-2">
+                        <div className="flex flex-column">
                           <a
-                            className="hover:underline hover:text-blue-300 text-xs"
+                            className="hover:underline hover:text-blue-300 text-sm font-bold"
                             style={{
                               textDecoration: "none",
                               color: "var(--text-color)",
                             }}
-                            href={`${URL.createObjectURL(anexo)}`}
-                            onClick={() => {
-                              const url = URL.createObjectURL(anexo);
-                              console.log(url);
-                            }}
+                            href={`${doc.Documento.UrlDocumento}`}
+                            // href={`${URL.createObjectURL(doc)}`}
+                            // onClick={() => {
+                            //   const url = URL.createObjectURL(doc);
+                            //   console.log(url);
+                            // }}
                             target="_blank"
                           >
-                            {anexo.name}
+                            {doc.Documento
+                              ? `${
+                                  doc.Documento.TipoDocumento?.Descripcion?.substring(
+                                    0,
+                                    3
+                                  ) ?? "Doc"
+                                }. ${doc.Documento.CodigoReferenciaDoc ?? ""} `
+                              : ""}{" "}
                           </a>
-                          <span className="flex flex-row gap-2  m-0">
+                          <span className="flex flex-column m-0">
                             <span className="text-sm">
-                              {anexo.type.split("/")[1].toUpperCase()}
+                              {doc.Documento.Asunto}
                             </span>
-                            <span className="text-sm">-</span>
-                            <span className="text-sm">
-                              {formatFileSize(anexo.size)}
+                            <span className="text-xs font-bold">
+                              {doc.Documento.CreadoEl
+                                ? formatDate(new Date(doc.Documento.CreadoEl))
+                                : ""}{" "}
                             </span>
                           </span>
                         </div>
@@ -697,17 +701,19 @@ const TramiteSeguimiento = () => {
                       <div className="flex align-items-center justify-content-center pr-1">
                         <Tooltip target=".icon-bolt" />
 
-                        <i
-                          className="pi pi-trash m-1"
-                          style={{ color: "#559", fontSize: "1rem" }}
-                          onClick={() => {
-                            setSelectedAnexos((prev) => {
-                              return prev.filter(
-                                (p) => p.lastModified != anexo.lastModified
-                              );
-                            });
-                          }}
-                        ></i>
+                        {doc.Anexos > 0 && (
+                          <i
+                            className="pi pi-copy m-1"
+                            style={{ color: "#559", fontSize: "1.5rem" }}
+                            // onClick={() => {
+                            //   setSelectedAnexos((prev) => {
+                            //     return prev.filter(
+                            //       (p) => p.lastModified != doc.lastModified
+                            //     );
+                            //   });
+                            // }}
+                          ></i>
+                        )}
                       </div>
                     </div>
                   );

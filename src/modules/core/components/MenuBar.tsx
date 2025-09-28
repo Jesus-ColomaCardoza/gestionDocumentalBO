@@ -179,8 +179,8 @@ const MenuBar = (props: MenuBarProps) => {
       >
         <Button
           icon="pi pi-moon"
-          className="mr-2 text-white"
-          severity="secondary"
+          className="mr-2"
+          severity="contrast"
           onClick={() => switchTheme("lara-dark-blue", "dark")}
           style={{
             width: "2em",
@@ -189,8 +189,8 @@ const MenuBar = (props: MenuBarProps) => {
         ></Button>
         <Button
           icon="pi pi-sun"
-          className="mr-2 text-white"
-          severity="secondary"
+          className="mr-2"
+          severity="contrast"
           onClick={() => switchTheme("lara-light-blue", "light")}
           style={{
             width: "2em",

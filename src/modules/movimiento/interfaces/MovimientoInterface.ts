@@ -220,6 +220,7 @@ export interface MovimientoSeguimientoEntity {
     Documento: {
       CreadoEl: Date;
       IdDocumento: number;
+      UrlDocumento: string;
       Folios: number;
       Asunto: string;
       CodigoReferenciaDoc: string;
@@ -231,6 +232,7 @@ export interface MovimientoSeguimientoEntity {
     };
     FirmaDigital: boolean;
     Copia: boolean;
+    Anexos:number
   }[]
 }
 
