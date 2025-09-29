@@ -4,7 +4,7 @@ import { Toast } from "primereact/toast";
 import { useTheme } from "../../../ThemeContext";
 import { Tooltip } from "primereact/tooltip";
 import { useAuth } from "../../auth/context/AuthContext";
-import { formatDate, formatFileSize } from "../../utils/Methods";
+import { formatDate } from "../../utils/Methods";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tag } from "primereact/tag";
 import { OrganizationChart } from "primereact/organizationchart";
@@ -117,6 +117,44 @@ const TramiteSeguimiento = () => {
               </span>
             </div>
           </div>
+
+          {node.data?.HistorialMovimientoxEstado?.map((HxM) => {
+            if (HxM?.Estado?.IdEstado === 15 || HxM?.Estado?.IdEstado === 17) {
+              return null;
+            }
+            return (
+              <div className="flex flex-row justify-content-between align-items-center my-2">
+                <div
+                  className="flex flex-column justify-content-start align-items-start"
+                  style={{ width: "100%" }}
+                >
+                  <span className="text-xs">{HxM?.Estado?.Descripcion}</span>
+                  {HxM?.Observaciones && HxM?.Observaciones !== "" && (
+                    <span className="text-xs">{HxM?.Observaciones ?? ""}</span>
+                  )}
+                  {HxM?.Detalle && HxM?.Detalle !== "" && (
+                    <span className="text-xs">{HxM?.Detalle ?? ""}</span>
+                  )}
+                  <span style={{ textAlign: "left" }} className="text-xs">
+                    {HxM.FechaHistorialMxE
+                      ? formatDate(new Date(HxM.FechaHistorialMxE))
+                      : "--:--:--"}
+                  </span>
+                </div>
+                {/* <div style={{ width: "20%" }}>
+                  <Avatar
+                    label={`${
+                      userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+                      "" +
+                      userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+                    }`}
+                    image={`${userAuth?.UrlFotoPerfil}`}
+                    shape="circle"
+                  />
+                </div> */}
+              </div>
+            );
+          })}
         </div>
       );
     } else if (node.type === "tramite") {
@@ -190,6 +228,28 @@ const TramiteSeguimiento = () => {
               )}
             </div>
           </div>
+          {node?.data?.Tramite?.TipoTramite?.IdTipoTramite === 1 ? (
+            // interno
+            <></>
+          ) : (
+            // externo
+            <div className="flex flex-row justify-content-between align-items-center border-bottom-1 border-gray-600 py-2 ">
+              <div
+                className="flex flex-column justify-content-start align-items-start"
+                style={{ width: "70%" }}
+              >
+                <span className="text-xs">
+                  {node?.data?.Tramite?.Remitente?.Email}
+                </span>
+                {/* <span style={{ textAlign: "left" }} className="text-xs">
+                {node?.data?.Tramite?.FechaInicio
+                  ? formatDate(new Date(node?.data?.Tramite?.FechaInicio))
+                  : "--:--:--"}
+              </span> */}
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-row justify-content-between align-items-center my-2">
             <div
               className="flex flex-column justify-content-start align-items-start"
@@ -475,7 +535,7 @@ const TramiteSeguimiento = () => {
                 type="button"
                 onClick={() => {
                   // anexosRef.current?.click();
-                  window.print()
+                  window.print();
                 }}
                 size="small"
                 severity="contrast"
@@ -703,8 +763,12 @@ const TramiteSeguimiento = () => {
 
                         {doc.Anexos > 0 && (
                           <i
-                            className="pi pi-copy m-1"
-                            style={{ color: "#559", fontSize: "1.5rem" }}
+                            data-pr-tooltip="Anexos"
+                            className="pi pi-copy icon-bolt m-1"
+                            style={{
+                              color: "rgba(206, 154, 59, 1)",
+                              fontSize: "1.5rem",
+                            }}
                             // onClick={() => {
                             //   setSelectedAnexos((prev) => {
                             //     return prev.filter(

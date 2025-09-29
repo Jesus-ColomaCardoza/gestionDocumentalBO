@@ -35,7 +35,9 @@ export interface MovimientoDetailsEntity {
     Estado: {
       IdEstado: number,
       Descripcion: string
-    }
+    },
+    // Observaciones: string,
+    // Detalle: string,
   }[];
   Documento?: {
     IdDocumento: number;
@@ -111,6 +113,7 @@ export type MovimientoNode = {
       ApellidoPaterno: string,
       ApellidoMaterno: string,
       NroIdentificacion: string,
+      Email: string,
     },
   }
   Documento?: {
@@ -147,7 +150,9 @@ export type MovimientoNode = {
       IdEstado: number
     };
     IdHistorialMxE: number
-    FechaHistorialMxE: Date
+    FechaHistorialMxE: Date,
+    Observaciones: string,
+    Detalle: string,
   }[],
   Children?: MovimientoNode[]
 }
@@ -170,6 +175,7 @@ export interface MovimientoSeguimientoEntity {
       ApellidoPaterno: string,
       ApellidoMaterno: string,
       NroIdentificacion: string,
+      Email: string,
     },
     Movimiento: {
       Documento: {
@@ -197,6 +203,8 @@ export interface MovimientoSeguimientoEntity {
         };
         IdHistorialMxE: number;
         FechaHistorialMxE: Date;
+        Observaciones: string;
+        Detalle: string;
       }[];
       AreaDestino: {
         IdArea: number;
@@ -232,7 +240,7 @@ export interface MovimientoSeguimientoEntity {
     };
     FirmaDigital: boolean;
     Copia: boolean;
-    Anexos:number
+    Anexos: number
   }[]
 }
 
