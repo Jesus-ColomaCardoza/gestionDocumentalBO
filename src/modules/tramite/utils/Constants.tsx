@@ -135,10 +135,10 @@ export const columnsTramitePendiente: ColumnMeta[] = [
   {
     field: "Remitente",
     filterField: "Remitente.NombreCompleto",
-    header: "Remitente",
+    header: "Remitente raíz",
     dataType: "text",
     width: "20%",
-    show: true,
+    show: false,
     filterPlaceholder: "Buscar por Remitente",
   },
   {
@@ -169,6 +169,7 @@ export const columnsTramitePendiente: ColumnMeta[] = [
   },
 ];
 
+// tramite recibido
 export const columnsTramiteRecibido: ColumnMeta[] = [
   {
     field: "IdMovimiento",
@@ -209,10 +210,10 @@ export const columnsTramiteRecibido: ColumnMeta[] = [
   {
     field: "Remitente",
     filterField: "Remitente.NombreCompleto",
-    header: "Remitente",
+    header: "Remitente raíz",
     dataType: "text",
     width: "20%",
-    show: true,
+    show: false,
     filterPlaceholder: "Buscar por Remitente",
   },
   {

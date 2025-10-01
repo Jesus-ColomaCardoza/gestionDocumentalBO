@@ -51,6 +51,32 @@ const TramiteSeguimiento = () => {
 
   //functions
   const nodeTemplate2 = (node: OrgNode) => {
+    let iconEstatdo = "";
+
+    switch (node.data?.HistorialMovimientoxEstado?.[0]?.Estado.IdEstado) {
+      case 15:
+        iconEstatdo = "pi pi-clock";
+        break;
+      case 16:
+        iconEstatdo = "pi pi-book";
+        break;
+      case 17:
+        iconEstatdo = "pi pi-file-plus";
+        break;
+      case 18:
+        iconEstatdo = "pi pi-calendar-clock";
+        break;
+      case 19:
+        iconEstatdo = "pi pi-info-circle";
+        break;
+      case 20:
+        iconEstatdo = "pi pi-trash";
+        break;
+      default:
+        iconEstatdo = "pi pi-clock";
+        break;
+    }
+
     if (node.type === "movimiento") {
       return (
         <div
@@ -83,11 +109,15 @@ const TramiteSeguimiento = () => {
             <div style={{ width: "20%" }}>
               <Avatar
                 label={`${
-                  userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+                  ((node?.data?.NombreResponsable || "SR")
+                    .split(" ")[0][0]
+                    ?.toUpperCase() || "") +
                   "" +
-                  userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+                  ((node?.data?.NombreResponsable || "Sin responsable")
+                    .split(" ")[1][0]
+                    ?.toUpperCase() || "SR")
                 }`}
-                image={`${userAuth?.UrlFotoPerfil}`}
+                image={`${""}`}
                 shape="circle"
               />
             </div>
@@ -95,7 +125,7 @@ const TramiteSeguimiento = () => {
           <div className="flex flex-row  justify-content-between align-items-center border-top-1 border-bottom-1 border-gray-600 py-2">
             <div style={{ width: "20%" }}>
               <Avatar
-                icon="pi pi-file-plus"
+                icon={iconEstatdo}
                 shape="circle"
                 style={{
                   color:
@@ -118,12 +148,15 @@ const TramiteSeguimiento = () => {
             </div>
           </div>
 
-          {node.data?.HistorialMovimientoxEstado?.map((HxM) => {
+          {node.data?.HistorialMovimientoxEstado?.map((HxM, index) => {
             if (HxM?.Estado?.IdEstado === 15 || HxM?.Estado?.IdEstado === 17) {
               return null;
             }
             return (
-              <div className="flex flex-row justify-content-between align-items-center my-2">
+              <div
+                key={`historial-${HxM.IdHistorialMxE || index}`}
+                className="flex flex-row justify-content-between align-items-center my-2"
+              >
                 <div
                   className="flex flex-column justify-content-start align-items-start"
                   style={{ width: "100%" }}
@@ -197,12 +230,24 @@ const TramiteSeguimiento = () => {
               {node?.data?.Tramite?.TipoTramite?.IdTipoTramite === 1 ? (
                 // interno
                 // área de origen
-                <span
-                  style={{ textAlign: "left" }}
-                  className="text-sm font-bold"
-                >
-                  {node?.data?.Tramite?.Area?.Descripcion || "Sin área destino"}
-                </span>
+                <>
+                  <span style={{ textAlign: "left" }} className="text-xs">
+                    {node?.data?.Tramite?.Remitente?.Nombres +
+                      " " +
+                      node?.data?.Tramite?.Remitente?.ApellidoPaterno +
+                      " " +
+                      node?.data?.Tramite?.Remitente?.ApellidoMaterno ||
+                      "Sin remitente" ||
+                      ""}
+                  </span>
+                  <span
+                    style={{ textAlign: "left" }}
+                    className="text-sm font-bold"
+                  >
+                    {node?.data?.Tramite?.Area?.Descripcion ||
+                      "Sin área destino"}
+                  </span>
+                </>
               ) : (
                 // externo
                 <>
@@ -228,6 +273,7 @@ const TramiteSeguimiento = () => {
               )}
             </div>
           </div>
+
           {node?.data?.Tramite?.TipoTramite?.IdTipoTramite === 1 ? (
             // interno
             <></>
@@ -265,11 +311,15 @@ const TramiteSeguimiento = () => {
             <div style={{ width: "20%" }}>
               <Avatar
                 label={`${
-                  userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+                  node?.data?.Tramite?.Remitente?.Nombres.split(
+                    " "
+                  )[0][0].toUpperCase() +
                   "" +
-                  userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+                  node?.data?.Tramite?.Remitente?.ApellidoPaterno.split(
+                    " "
+                  )[0][0].toUpperCase()
                 }`}
-                image={`${userAuth?.UrlFotoPerfil}`}
+                image={`${""}`}
                 shape="circle"
               />
             </div>

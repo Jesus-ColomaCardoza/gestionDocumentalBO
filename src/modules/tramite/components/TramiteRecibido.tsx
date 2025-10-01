@@ -685,7 +685,7 @@ const TramiteRecibido = () => {
     const tramitesFindAllRecibidos = await findAllRecibidos({
       IdAreaDestino: userAuth?.Area.IdArea!,
     });
-    console.log(tramitesFindAllRecibidos);
+    // console.log(tramitesFindAllRecibidos);
 
     setLoading(false);
 
