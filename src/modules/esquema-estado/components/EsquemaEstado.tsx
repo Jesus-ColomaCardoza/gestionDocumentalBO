@@ -23,7 +23,11 @@ import {
 } from "../interfaces/EsquemaEstadoInterface";
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyEsquemaEstado } from "../utils/Constants";
+import {
+  columns,
+  defaultFilters,
+  emptyEsquemaEstado,
+} from "../utils/Constants";
 import EsquemaEstadoCreateOrUpdate from "./EsquemaEstadoCreateOrUpdate";
 import EsquemaEstadoRemove from "./EsquemaEstadoRemove";
 import EsquemaEstadosRemove from "./EsquemaEstadosRemove";
@@ -32,10 +36,13 @@ import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { UseEsquemaEstado } from "../hooks/UseEsquemaEstado";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const EsquemaEstado = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseEsquemaEstado();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -55,14 +62,21 @@ const EsquemaEstado = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingEsquemaEstadoCreateOrUpdate, setLoadingEsquemaEstadoCreateOrUpdate] =
-    useState<boolean>(false);
+  const [
+    loadingEsquemaEstadoCreateOrUpdate,
+    setLoadingEsquemaEstadoCreateOrUpdate,
+  ] = useState<boolean>(false);
 
-  const [esquemaEstado, setEsquemaEstado] = useState<EsquemaEstadoEntity>(emptyEsquemaEstado);
+  const [esquemaEstado, setEsquemaEstado] =
+    useState<EsquemaEstadoEntity>(emptyEsquemaEstado);
 
-  const [esquemaEstados, setEsquemaEstados] = useState<EsquemaEstadoEntity[]>([]);
+  const [esquemaEstados, setEsquemaEstados] = useState<EsquemaEstadoEntity[]>(
+    []
+  );
 
-  const [selectedEsquemaEstados, setSelectedEsquemaEstados] = useState<EsquemaEstadoEntity[]>([]);
+  const [selectedEsquemaEstados, setSelectedEsquemaEstados] = useState<
+    EsquemaEstadoEntity[]
+  >([]);
 
   const [esquemaEstadoDialog, setEsquemaEstadoDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -71,9 +85,11 @@ const EsquemaEstado = () => {
     state: false,
   });
 
-  const [removeEsquemaEstadoDialog, setRemoveEsquemaEstadoDialog] = useState<boolean>(false);
+  const [removeEsquemaEstadoDialog, setRemoveEsquemaEstadoDialog] =
+    useState<boolean>(false);
 
-  const [removeEsquemaEstadosDialog, setRemoveEsquemaEstadosDialog] = useState<boolean>(false);
+  const [removeEsquemaEstadosDialog, setRemoveEsquemaEstadosDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -105,7 +121,11 @@ const EsquemaEstado = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -115,7 +135,10 @@ const EsquemaEstado = () => {
     const esquemaEstadosFindAll = await findAll();
     setLoading(false);
 
-    if (esquemaEstadosFindAll?.message.msgId == 0 && esquemaEstadosFindAll.registro) {
+    if (
+      esquemaEstadosFindAll?.message.msgId == 0 &&
+      esquemaEstadosFindAll.registro
+    ) {
       setEsquemaEstados(
         Array.isArray(esquemaEstadosFindAll.registro)
           ? esquemaEstadosFindAll.registro?.map((af) => {
@@ -156,7 +179,10 @@ const EsquemaEstado = () => {
       });
       setLoadingEsquemaEstadoCreateOrUpdate(false);
 
-      if (esquemaEstadoCreate?.message.msgId == 0 && esquemaEstadoCreate.registro) {
+      if (
+        esquemaEstadoCreate?.message.msgId == 0 &&
+        esquemaEstadoCreate.registro
+      ) {
         setEsquemaEstados([...esquemaEstados, esquemaEstadoCreate.registro]);
         toast.current?.show({
           severity: "success",
@@ -180,16 +206,23 @@ const EsquemaEstado = () => {
     setSubmitted(true);
     if (esquemaEstado.IdEsquemaEstado) {
       setLoadingEsquemaEstadoCreateOrUpdate(true);
-      let esquemaEstadoUpdate = await update(esquemaEstado.IdEsquemaEstado.toString(), {
-        Descripcion: esquemaEstado.Descripcion,
-        Activo: esquemaEstado.Activo,
-      });
+      let esquemaEstadoUpdate = await update(
+        esquemaEstado.IdEsquemaEstado.toString(),
+        {
+          Descripcion: esquemaEstado.Descripcion,
+          Activo: esquemaEstado.Activo,
+        }
+      );
       setLoadingEsquemaEstadoCreateOrUpdate(false);
 
-      if (esquemaEstadoUpdate?.message.msgId == 0 && esquemaEstadoUpdate.registro) {
+      if (
+        esquemaEstadoUpdate?.message.msgId == 0 &&
+        esquemaEstadoUpdate.registro
+      ) {
         setEsquemaEstados(
           esquemaEstados?.map((esquemaEstado) =>
-            esquemaEstado.IdEsquemaEstado === esquemaEstadoUpdate?.registro?.IdEsquemaEstado
+            esquemaEstado.IdEsquemaEstado ===
+            esquemaEstadoUpdate?.registro?.IdEsquemaEstado
               ? { ...esquemaEstado, ...esquemaEstadoUpdate.registro }
               : esquemaEstado
           )
@@ -214,11 +247,20 @@ const EsquemaEstado = () => {
 
   const removeEsquemaEstado = async () => {
     if (esquemaEstado.IdEsquemaEstado) {
-      let esquemaEstadoRemove = await remove(esquemaEstado.IdEsquemaEstado.toString());
+      let esquemaEstadoRemove = await remove(
+        esquemaEstado.IdEsquemaEstado.toString()
+      );
 
-      if (esquemaEstadoRemove?.message.msgId == 0 && esquemaEstadoRemove.registro) {
+      if (
+        esquemaEstadoRemove?.message.msgId == 0 &&
+        esquemaEstadoRemove.registro
+      ) {
         setEsquemaEstados(
-          esquemaEstados?.filter((esquemaEstado) => esquemaEstado.IdEsquemaEstado !== esquemaEstadoRemove?.registro?.IdEsquemaEstado)
+          esquemaEstados?.filter(
+            (esquemaEstado) =>
+              esquemaEstado.IdEsquemaEstado !==
+              esquemaEstadoRemove?.registro?.IdEsquemaEstado
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -266,7 +308,9 @@ const EsquemaEstado = () => {
     setEsquemaEstadoDialog({ type: "create", state: true });
   };
 
-  const showUpdateEsquemaEstadoDialog = (esquemaEstado: EsquemaEstadoEntity) => {
+  const showUpdateEsquemaEstadoDialog = (
+    esquemaEstado: EsquemaEstadoEntity
+  ) => {
     setEsquemaEstado({ ...esquemaEstado });
     setEsquemaEstadoDialog({ type: "update", state: true });
   };
@@ -569,6 +613,7 @@ const EsquemaEstado = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

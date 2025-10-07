@@ -34,10 +34,13 @@ import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { UseEsquemaEstado } from "../../esquema-estado/hooks/UseEsquemaEstado";
 import { EsquemaEstadoEntity } from "../../esquema-estado/interfaces/EsquemaEstadoInterface";
 import { DropdownChangeEvent } from "primereact/dropdown";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Estado = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseEstado();
+
+  const { userAuth } = useAuth()!;
 
   const { findAll: findAllEsquemaEstado } = UseEsquemaEstado();
 
@@ -661,6 +664,7 @@ const Estado = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

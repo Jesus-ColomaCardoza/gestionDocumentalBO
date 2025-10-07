@@ -39,10 +39,13 @@ import UseRol from "../../rol/hooks/UseRol";
 import UseTipoUsuario from "../../tipo-usuario/hooks/UseTipoUsuario";
 import { REACT_APP_SALT } from "../../utils/Constants";
 import { sha256 } from "js-sha256";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Usuario = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseUsuario();
+  
+  const { userAuth } = useAuth()!;
 
   const { findAll: findAllTipoIdentificacion } = UseTipoIdentificacion();
 
@@ -155,7 +158,19 @@ const Usuario = () => {
   // actions CRUD - Usuario (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllUsuario = async () => {
     setLoading(true);
-    const usuariosFindAll = await findAll();
+    const usuariosFindAll = await findAll({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "0",
+          operador: "EQ",
+          tipo: "other",
+          valor1: "",
+          valor2: "",
+        },
+      ],
+    });
     setLoading(false);
 
     if (usuariosFindAll?.message.msgId == 0 && usuariosFindAll.registro) {
@@ -221,6 +236,7 @@ const Usuario = () => {
         Celular: usuario.Celular,
         Genero: usuario.Genero,
         RazonSocial: usuario.RazonSocial,
+        Direccion: usuario.Direccion,
         IdTipoIdentificacion: usuario.IdTipoIdentificacion,
         NroIdentificacion: usuario.NroIdentificacion,
         IdTipoUsuario: usuario.IdTipoUsuario,
@@ -263,6 +279,10 @@ const Usuario = () => {
   const updateUsuario = async () => {
     setSubmitted(true);
     if (usuario.IdUsuario) {
+      // const hashedPassword = sha256(
+      //   REACT_APP_SALT + sha256(usuario.Contrasena)
+      // );
+
       setLoadingUsuarioCreateOrUpdate(true);
       let usuarioUpdate = await update(usuario.IdUsuario.toString(), {
         Nombres: usuario.Nombres,
@@ -272,10 +292,11 @@ const Usuario = () => {
           ? new Date(usuario.FechaNacimiento)
           : null,
         Email: usuario.Email,
-        Contrasena: usuario.Contrasena,
+        // Contrasena: hashedPassword,
         Celular: usuario.Celular,
         Genero: usuario.Genero,
         RazonSocial: usuario.RazonSocial,
+        Direccion: usuario.Direccion,
         IdTipoIdentificacion: usuario.IdTipoIdentificacion,
         NroIdentificacion: usuario.NroIdentificacion,
         IdTipoUsuario: usuario.IdTipoUsuario,
@@ -542,6 +563,7 @@ const Usuario = () => {
 
     _usuario[name] = e.value;
     setUsuario(_usuario);
+    console.log(usuario);
   };
 
   const onInputChange = (
@@ -739,10 +761,10 @@ const Usuario = () => {
   };
 
   // templates to column tipoUsuario
-  const tipoUsuarioBodyTemplate = (rowData: TipoUsuarioEntity) => {
+  const tipoUsuarioBodyTemplate = (rowData: UsuarioEntity) => {
     return (
       <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.Descripcion}</p>
+        <p className="text-sm m-0">{rowData?.TipoUsuario?.Descripcion}</p>
       </div>
     );
   };
@@ -756,10 +778,10 @@ const Usuario = () => {
         <MultiSelect
           value={options.value}
           options={tiposUsuario}
-          itemTemplate={(option: TipoUsuarioEntity) => {
+          itemTemplate={(option: UsuarioEntity) => {
             return (
               <div className="flex align-items-center gap-2">
-                <span>{option.Descripcion}</span>
+                <span>{option?.TipoUsuario?.Descripcion}</span>
               </div>
             );
           }}
@@ -779,7 +801,7 @@ const Usuario = () => {
   const rolBodyTemplate = (rowData: UsuarioEntity) => {
     return (
       <div className="flex align-items-center gap-2">
-        <p className="text-sm m-0">{rowData.Rol.Descripcion}</p>
+        <p className="text-sm m-0">{rowData?.Rol?.Descripcion || ""}</p>
       </div>
     );
   };
@@ -981,6 +1003,7 @@ const Usuario = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

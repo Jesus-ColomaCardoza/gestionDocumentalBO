@@ -11,6 +11,7 @@ export interface UsuarioEntity {
   Contrasena: string;
   Celular: string;
   Genero: string;
+  Direccion: string;
   RazonSocial: string;
   IdTipoIdentificacion: number;
   TipoIdentificacion: {
@@ -38,7 +39,7 @@ export interface UsuarioEntity {
     IdArea: number;
     Descripcion: string;
   };
-  Activo: boolean;
+  Activo: boolean | null;
   CreadoEl: Fecha;
   CreadoPor: string;
   ModificadoEl: Fecha;
@@ -64,13 +65,14 @@ export interface UsuarioCreate {
   Celular?: string;
   Genero: string;
   RazonSocial?: string;
+  Direccion?: string;
   IdTipoIdentificacion?: number;
   NroIdentificacion?: string;
   IdTipoUsuario?: number;
   IdRol?: string;
   IdCargo?: number;
   IdArea?: number;
-  Activo: boolean;
+  Activo: boolean | null;
   CreadoEl?: Date | string;
   CreadoPor?: string;
   CodigoConfirmacion?: string;
@@ -86,21 +88,22 @@ export interface UsuarioCreate {
 export interface UsuarioUpdate {
   IdUsuario?: number;
   Nombres?: string;
-  ApellidoPaterno?: string; 
+  ApellidoPaterno?: string;
   ApellidoMaterno: string;
   FechaNacimiento?: Fecha;
   Email?: string;
-  Contrasena?: string;
+  // Contrasena?: string;
   Celular?: string;
   Genero?: string;
   RazonSocial?: string;
+  Direccion?: string;
   IdTipoIdentificacion?: number;
   NroIdentificacion?: string;
   IdTipoUsuario?: number;
   IdRol?: string;
   IdCargo?: number;
   IdArea?: number;
-  Activo?: boolean;
+  Activo?: boolean | null;
   ModificadoEl?: Date | string;
   ModificadoPor?: string;
   CodigoConfirmacion?: string;

@@ -31,10 +31,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Rol = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseRol();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -104,7 +107,11 @@ const Rol = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -570,6 +577,7 @@ const Rol = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

@@ -66,7 +66,7 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
   return (
     <Dialog
       visible={props.usuarioDialog.state}
-      style={{ width: "32rem" }}
+      style={{ width: "50rem" }}
       breakpoints={{ "960px": "75vw", "641px": "90vw" }}
       header="Usuario Detalles"
       modal
@@ -74,251 +74,385 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
       footer={usuarioDialogFooter}
       onHide={props.hideDialog}
     >
-      <div className="field">
-        <label htmlFor="Nombres" className="font-bold">
-          Nombres
-        </label>
-        <InputText
-          id="Nombres"
-          value={props.usuario.Nombres}
-          onChange={(e) => props.onInputChange(e, "Nombres")}
-          autoFocus
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.Nombres,
-          })}
-        />
-        {props.submitted && !props.usuario.Nombres && (
-          <small className="p-error">Nombres is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="ApellidoPaterno" className="font-bold">
-          Apellido Paterno
-        </label>
-        <InputText
-          id="ApellidoPaterno"
-          value={props.usuario.ApellidoPaterno}
-          onChange={(e) => props.onInputChange(e, "ApellidoPaterno")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.ApellidoPaterno,
-          })}
-        />
-        {props.submitted && !props.usuario.ApellidoPaterno && (
-          <small className="p-error">ApellidoPaterno is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="ApellidoMaterno" className="font-bold">
-          Apellido Materno
-        </label>
-        <InputText
-          id="ApellidoMaterno"
-          value={props.usuario.ApellidoMaterno}
-          onChange={(e) => props.onInputChange(e, "ApellidoMaterno")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.ApellidoMaterno,
-          })}
-        />
-        {props.submitted && !props.usuario.ApellidoMaterno && (
-          <small className="p-error">ApellidoMaterno is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="Email" className="font-bold">
-          Email
-        </label>
-        <InputText
-          id="Email"
-          value={props.usuario.Email}
-          onChange={(e) => props.onInputChange(e, "Email")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.Email,
-          })}
-        />
-        {props.submitted && !props.usuario.Email && (
-          <small className="p-error">Email is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="Contrasena" className="font-bold">
-          Contrasena
-        </label>
-        <InputText
-          id="Contrasena"
-          value={props.usuario.Contrasena}
-          onChange={(e) => props.onInputChange(e, "Contrasena")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.Contrasena,
-          })}
-        />
-        {props.submitted && !props.usuario.Contrasena && (
-          <small className="p-error">Contrasena is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="Celular" className="font-bold">
-          Celular
-        </label>
-        <InputText
-          id="Celular"
-          value={props.usuario.Celular}
-          onChange={(e) => props.onInputChange(e, "Celular")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.Celular,
-          })}
-        />
-        {props.submitted && !props.usuario.Celular && (
-          <small className="p-error">Celular is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="RazonSocial" className="font-bold">
-          Razon Social
-        </label>
-        <InputText
-          id="RazonSocial"
-          value={props.usuario.RazonSocial}
-          onChange={(e) => props.onInputChange(e, "RazonSocial")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.RazonSocial,
-          })}
-        />
-        {props.submitted && !props.usuario.RazonSocial && (
-          <small className="p-error">RazonSocial is required.</small>
-        )}
-      </div>
-
-      <div className="field">
-        <label htmlFor="TipoIdentificacion" className="font-bold">
-          Tipo Identificacion
-        </label>
-        <Dropdown
-          value={props.usuario.TipoIdentificacion}
-          onChange={(e) => {
-            props.onDropdownChange(
-              e,
-              "IdTipoIdentificacion",
-              "TipoIdentificacion"
-            );
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
           }}
-          options={props.tiposIdentificacion}
-          optionLabel="Descripcion"
-          filter
-          placeholder="Seleccionar Tipo Identificacion"
-          className="w-full"
-          showClear
-        />
-        {props.submitted && !props.usuario.IdTipoIdentificacion && (
-          <small className="p-error">TipoIdentificacion is required.</small>
-        )}
+        >
+          <div className="field">
+            <label htmlFor="Nombres" className="font-bold">
+              Nombres
+            </label>
+            <InputText
+              id="Nombres"
+              value={props.usuario.Nombres}
+              onChange={(e) => props.onInputChange(e, "Nombres")}
+              autoFocus
+              className={classNames({
+                "p-invalid": props.submitted && !props.usuario.Nombres,
+              })}
+            />
+            {props.submitted && !props.usuario.Nombres && (
+              <small className="p-error">Nombres is required.</small>
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="ApellidoPaterno" className="font-bold">
+              Apellido Paterno
+            </label>
+            <InputText
+              id="ApellidoPaterno"
+              value={props.usuario.ApellidoPaterno}
+              onChange={(e) => props.onInputChange(e, "ApellidoPaterno")}
+              className={classNames({
+                "p-invalid": props.submitted && !props.usuario.ApellidoPaterno,
+              })}
+            />
+            {props.submitted && !props.usuario.ApellidoPaterno && (
+              <small className="p-error">ApellidoPaterno is required.</small>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="NroIdentificacion" className="font-bold">
-          Nro Identificacion
-        </label>
-        <InputText
-          id="NroIdentificacion"
-          value={props.usuario.NroIdentificacion}
-          onChange={(e) => props.onInputChange(e, "NroIdentificacion")}
-          className={classNames({
-            "p-invalid": props.submitted && !props.usuario.NroIdentificacion,
-          })}
-        />
-        {props.submitted && !props.usuario.NroIdentificacion && (
-          <small className="p-error">NroIdentificacion is required.</small>
-        )}
+      {/* <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        ></div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        ></div>
+      </div> */}
+
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="ApellidoMaterno" className="font-bold">
+              Apellido Materno
+            </label>
+            <InputText
+              id="ApellidoMaterno"
+              value={props.usuario.ApellidoMaterno}
+              onChange={(e) => props.onInputChange(e, "ApellidoMaterno")}
+              className={classNames({
+                "p-invalid": props.submitted && !props.usuario.ApellidoMaterno,
+              })}
+            />
+            {props.submitted && !props.usuario.ApellidoMaterno && (
+              <small className="p-error">ApellidoMaterno is required.</small>
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="Email" className="font-bold">
+              Email
+            </label>
+            <InputText
+              id="Email"
+              value={props.usuario.Email}
+              onChange={(e) => props.onInputChange(e, "Email")}
+              className={classNames({
+                "p-invalid": props.submitted && !props.usuario.Email,
+              })}
+            />
+            {props.submitted && !props.usuario.Email && (
+              <small className="p-error">Email is required.</small>
+            )}
+          </div>
+        </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="TipoUsuario" className="font-bold">
-          Tipo Usuario
-        </label>
-        <Dropdown
-          value={props.usuario.TipoUsuario}
-          onChange={(e) => {
-            props.onDropdownChange(e, "IdTipoUsuario", "TipoUsuario");
-          }}
-          options={props.tiposUsuario}
-          optionLabel="Descripcion"
-          filter
-          placeholder="Seleccionar Tipo Usuario"
-          className="w-full"
-          showClear
-        />
-        {props.submitted && !props.usuario.IdTipoUsuario && (
-          <small className="p-error">TipoUsuario is required.</small>
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        {props.usuarioDialog.type == "create" && (
+          <div
+            style={{
+              width: "50%",
+            }}
+          >
+            <div className="field">
+              <label htmlFor="Contrasena" className="font-bold">
+                Contrasena
+              </label>
+              <InputText
+                id="Contrasena"
+                value={props.usuario.Contrasena}
+                onChange={(e) => props.onInputChange(e, "Contrasena")}
+                className={classNames({
+                  "p-invalid": props.submitted && !props.usuario.Contrasena,
+                })}
+              />
+              {props.submitted && !props.usuario.Contrasena && (
+                <small className="p-error">Contrasena is required.</small>
+              )}
+            </div>
+          </div>
         )}
-      </div>
-      <div className="field">
-        <label htmlFor="Rol" className="font-bold">
-          Rol
-        </label>
-        <Dropdown
-          value={props.usuario.Rol}
-          onChange={(e) => {
-            props.onDropdownChange(e, "IdRol", "Rol");
+
+        <div
+          style={{
+            width: "50%",
           }}
-          options={props.roles}
-          optionLabel="Descripcion"
-          filter
-          placeholder="Seleccionar Rol"
-          className="w-full"
-          showClear
-        />
-        {props.submitted && !props.usuario.IdRol && (
-          <small className="p-error">Rol is required.</small>
-        )}
-      </div>
-      <div className="field">
-        <label htmlFor="Cargo" className="font-bold">
-          Cargo
-        </label>
-        <Dropdown
-          value={props.usuario.Cargo}
-          onChange={(e) => {
-            props.onDropdownChange(e, "IdCargo", "Cargo");
-          }}
-          options={props.cargos}
-          optionLabel="Descripcion"
-          filter
-          placeholder="Seleccionar Cargo"
-          className="w-full"
-          showClear
-        />
-        {props.submitted && !props.usuario.IdCargo && (
-          <small className="p-error">Cargo is required.</small>
-        )}
+        >
+          <div className="field">
+            <label htmlFor="Celular" className="font-bold">
+              Celular
+            </label>
+            <InputText
+              id="Celular"
+              value={props.usuario.Celular}
+              onChange={(e) => props.onInputChange(e, "Celular")}
+              // className={classNames({
+              //   "p-invalid": props.submitted && !props.usuario.Celular,
+              // })}
+            />
+            {/* {props.submitted && !props.usuario.Celular && (
+              <small className="p-error">Celular is required.</small>
+            )} */}
+          </div>
+        </div>
       </div>
 
-      <div className="field">
-        <label htmlFor="Area" className="font-bold">
-          Area
-        </label>
-        <Dropdown
-          value={props.usuario.Area}
-          onChange={(e) => {
-            props.onDropdownChange(e, "IdArea", "Area");
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
           }}
-          options={props.areas}
-          optionLabel="Descripcion"
-          filter
-          placeholder="Seleccionar Area"
-          className="w-full"
-          showClear
-        />
-        {props.submitted && !props.usuario.IdArea && (
-          <small className="p-error">Area is required.</small>
-        )}
+        >
+          <div className="field">
+            <label htmlFor="Direccion" className="font-bold">
+              Dirección
+            </label>
+            <InputText
+              id="Direccion"
+              value={props.usuario.Direccion}
+              onChange={(e) => props.onInputChange(e, "Direccion")}
+              // className={classNames({
+              //   "p-invalid": props.submitted && !props.usuario.Direccion,
+              // })}
+            />
+            {/* {props.submitted && !props.usuario.Direccion && (
+              <small className="p-error">Direccion is required.</small>
+            )} */}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="RazonSocial" className="font-bold">
+              Razon Social
+            </label>
+            <InputText
+              id="RazonSocial"
+              value={props.usuario.RazonSocial}
+              onChange={(e) => props.onInputChange(e, "RazonSocial")}
+              // className={classNames({
+              //   "p-invalid": props.submitted && !props.usuario.RazonSocial,
+              // })}
+            />
+            {/* {props.submitted && !props.usuario.RazonSocial && (
+              <small className="p-error">RazonSocial is required.</small>
+            )} */}
+          </div>
+        </div>
       </div>
 
-      <div className="field">
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="TipoIdentificacion" className="font-bold">
+              Tipo Identificacion
+            </label>
+            <Dropdown
+              value={props.usuario.TipoIdentificacion}
+              onChange={(e) => {
+                props.onDropdownChange(
+                  e,
+                  "IdTipoIdentificacion",
+                  "TipoIdentificacion"
+                );
+              }}
+              options={props.tiposIdentificacion}
+              optionLabel="Descripcion"
+              filter
+              placeholder="Seleccionar"
+              className="w-full"
+              showClear
+            />
+            {props.submitted && props.usuario.IdTipoIdentificacion == 0 && (
+              <small className="p-error">TipoIdentificacion is required.</small>
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="NroIdentificacion" className="font-bold">
+              Nro Identificacion
+            </label>
+            <InputText
+              id="NroIdentificacion"
+              value={props.usuario.NroIdentificacion}
+              onChange={(e) => props.onInputChange(e, "NroIdentificacion")}
+              // className={classNames({
+              //   "p-invalid":
+              //     props.submitted && !props.usuario.NroIdentificacion,
+              // })}
+            />
+            {/* {props.submitted && !props.usuario.NroIdentificacion && (
+              <small className="p-error">NroIdentificacion is required.</small>
+            )} */}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="TipoUsuario" className="font-bold">
+              Tipo Usuario
+            </label>
+            <Dropdown
+              value={props.usuario.TipoUsuario}
+              onChange={(e) => {
+                props.onDropdownChange(e, "IdTipoUsuario", "TipoUsuario");
+              }}
+              options={props.tiposUsuario}
+              optionLabel="Descripcion"
+              filter
+              placeholder="Seleccionar"
+              className="w-full"
+              showClear
+            />
+            {props.submitted && props.usuario.IdTipoUsuario == 0 && (
+              <small className="p-error">TipoUsuario is required.</small>
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="Rol" className="font-bold">
+              Rol
+            </label>
+            <Dropdown
+              value={props.usuario.Rol}
+              onChange={(e) => {
+                props.onDropdownChange(e, "IdRol", "Rol");
+              }}
+              options={props.roles}
+              optionLabel="Descripcion"
+              filter
+              placeholder="Seleccionar"
+              className="w-full"
+              showClear
+            />
+            {props.submitted && props.usuario.IdRol == "" && (
+              <small className="p-error">Rol is required.</small>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="Area" className="font-bold">
+              Area
+            </label>
+            <Dropdown
+              value={props.usuario.Area}
+              onChange={(e) => {
+                props.onDropdownChange(e, "IdArea", "Area");
+              }}
+              options={props.areas}
+              optionLabel="Descripcion"
+              filter
+              placeholder="Seleccionar"
+              className="w-full"
+              showClear
+            />
+            {props.submitted && props.usuario.IdArea == 0 && (
+              <small className="p-error">Area is required.</small>
+            )}
+          </div>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label htmlFor="Cargo" className="font-bold">
+              Cargo
+            </label>
+            <Dropdown
+              value={props.usuario.Cargo}
+              onChange={(e) => {
+                props.onDropdownChange(e, "IdCargo", "Cargo");
+              }}
+              options={props.cargos}
+              optionLabel="Descripcion"
+              filter
+              placeholder="Seleccionar"
+              className="w-full"
+              showClear
+            />
+            {props.submitted && props.usuario.IdCargo == 0 && (
+              <small className="p-error">Cargo is required.</small>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* <div className="field">
         <label htmlFor="CodigoConfirmacion" className="font-bold">
           Codigo Confirmacion
         </label>
@@ -334,6 +468,7 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
           <small className="p-error">CodigoConfirmacion is required.</small>
         )}
       </div>
+
       <div className="field">
         <label htmlFor="CodigoConfirmacionExp" className="font-bold">
           Codigo Confirmacion Exp
@@ -350,8 +485,9 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
         {props.submitted && !props.usuario.CodigoConfirmacionExp && (
           <small className="p-error">CodigoConfirmacionExp is required.</small>
         )}
-      </div>
-      <div className="field">
+      </div> */}
+
+      {/* <div className="field">
         <label htmlFor="FotoPerfilNombre" className="font-bold">
           Foto Perfil Nombre
         </label>
@@ -367,6 +503,7 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
           <small className="p-error">FotoPerfilNombre is required.</small>
         )}
       </div>
+
       <div className="field">
         <label htmlFor="FotoPerfilBase64" className="font-bold">
           Foto Perfil Base64
@@ -382,65 +519,83 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
         {props.submitted && !props.usuario.FotoPerfilBase64 && (
           <small className="p-error">FotoPerfilBase64 is required.</small>
         )}
-      </div>
-      <div className="field">
-        <label className="mb-3 font-bold">Género</label>
-        <div className="formgrid grid">
-          <div className="field-radiobutton col-6">
-            <RadioButton
-              inputId="GeneroM"
-              name="GeneroM"
-              value={"M"}
-              onChange={(e) => {
-                props.onRadioChange(e, "Genero");
-              }}
-              checked={props.usuario.Genero === "M"}
-            />
-            <label htmlFor="GeneroM">Masculino</label>
+      </div> */}
+
+      <div className="flex flex-row " style={{ gap: "1rem" }}>
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          <div className="field">
+            <label className="mb-3 font-bold">Género</label>
+            <div className="formgrid grid">
+              <div className="field-radiobutton col-6">
+                <RadioButton
+                  inputId="GeneroM"
+                  name="GeneroM"
+                  value={"M"}
+                  onChange={(e) => {
+                    props.onRadioChange(e, "Genero");
+                  }}
+                  checked={props.usuario.Genero === "M"}
+                />
+                <label htmlFor="GeneroM">Masculino</label>
+              </div>
+              <div className="field-radiobutton col-6">
+                <RadioButton
+                  inputId="GeneroF"
+                  name="GeneroF"
+                  value={"F"}
+                  onChange={(e) => {
+                    props.onRadioChange(e, "Genero");
+                  }}
+                  checked={props.usuario.Genero === "F"}
+                />
+                <label htmlFor="GeneroF">Femenino</label>
+              </div>
+            </div>
           </div>
-          <div className="field-radiobutton col-6">
-            <RadioButton
-              inputId="GeneroF"
-              name="GeneroF"
-              value={"F"}
-              onChange={(e) => {
-                props.onRadioChange(e, "Genero");
-              }}
-              checked={props.usuario.Genero === "F"}
-            />
-            <label htmlFor="GeneroF">Femenino</label>
+        </div>
+
+        <div
+          style={{
+            width: "50%",
+          }}
+        >
+          {" "}
+          <div className="field">
+            <label className="mb-3 font-bold">Activo</label>
+            <div className="formgrid grid">
+              <div className="field-radiobutton col-6">
+                <RadioButton
+                  inputId="Activot"
+                  name="Activot"
+                  value={true}
+                  onChange={(e) => {
+                    props.onRadioChange(e, "Activo");
+                  }}
+                  checked={props.usuario.Activo === true}
+                />
+                <label htmlFor="Activot">True</label>
+              </div>
+              <div className="field-radiobutton col-6">
+                <RadioButton
+                  inputId="Activof"
+                  name="Activof"
+                  value={false}
+                  onChange={(e) => {
+                    props.onRadioChange(e, "Activo");
+                  }}
+                  checked={props.usuario.Activo === false}
+                />
+                <label htmlFor="Activof">False</label>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="field">
-        <label className="mb-3 font-bold">Activo</label>
-        <div className="formgrid grid">
-          <div className="field-radiobutton col-6">
-            <RadioButton
-              inputId="Activot"
-              name="Activot"
-              value={true}
-              onChange={(e) => {
-                props.onRadioChange(e, "Activo");
-              }}
-              checked={props.usuario.Activo === true}
-            />
-            <label htmlFor="Activot">True</label>
-          </div>
-          <div className="field-radiobutton col-6">
-            <RadioButton
-              inputId="Activof"
-              name="Activof"
-              value={false}
-              onChange={(e) => {
-                props.onRadioChange(e, "Activo");
-              }}
-              checked={props.usuario.Activo === false}
-            />
-            <label htmlFor="Activof">False</label>
-          </div>
-        </div>
-      </div>
+
       {/* 
       <div className="field">
               <label htmlFor="description" className="font-bold">

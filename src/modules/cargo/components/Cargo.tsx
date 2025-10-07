@@ -31,10 +31,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Cargo = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseCargo();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -104,7 +107,11 @@ const Cargo = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -217,7 +224,9 @@ const Cargo = () => {
 
       if (cargoRemove?.message.msgId == 0 && cargoRemove.registro) {
         setCargos(
-          cargos?.filter((cargo) => cargo.IdCargo !== cargoRemove?.registro?.IdCargo)
+          cargos?.filter(
+            (cargo) => cargo.IdCargo !== cargoRemove?.registro?.IdCargo
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -568,6 +577,7 @@ const Cargo = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

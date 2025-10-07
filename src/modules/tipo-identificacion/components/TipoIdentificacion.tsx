@@ -17,7 +17,11 @@ import {
 
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyTipoIdentificacion } from "../utils/Constants";
+import {
+  columns,
+  defaultFilters,
+  emptyTipoIdentificacion,
+} from "../utils/Constants";
 
 import TipoIdentificacionRemove from "./TipoIdentificacionRemove";
 import TipoIdentificacionesRemove from "./TipoIdentificacionesRemove";
@@ -28,10 +32,13 @@ import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import UseTipoIdentificacion from "../hooks/UseTipoIdentificacion";
 import TipoIdentificacionCreateOrUpdate from "./TipoIdentificacionCreateOrUpdate";
 import { TipoIdentificacionEntity } from "../interfaces/TipoIdentificacionInterface";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const TipoIdentificacion = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseTipoIdentificacion();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -51,14 +58,20 @@ const TipoIdentificacion = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingTipoIdentificacionCreateOrUpdate, setLoadingTipoIdentificacionCreateOrUpdate] =
-    useState<boolean>(false);
+  const [
+    loadingTipoIdentificacionCreateOrUpdate,
+    setLoadingTipoIdentificacionCreateOrUpdate,
+  ] = useState<boolean>(false);
 
-  const [tipoIdentificacion, setTipoIdentificacion] = useState<TipoIdentificacionEntity>(emptyTipoIdentificacion);
+  const [tipoIdentificacion, setTipoIdentificacion] =
+    useState<TipoIdentificacionEntity>(emptyTipoIdentificacion);
 
-  const [tipoIdentificaciones, setTipoIdentificaciones] = useState<TipoIdentificacionEntity[]>([]);
+  const [tipoIdentificaciones, setTipoIdentificaciones] = useState<
+    TipoIdentificacionEntity[]
+  >([]);
 
-  const [selectedTipoIdentificaciones, setSelectedTipoIdentificaciones] = useState<TipoIdentificacionEntity[]>([]);
+  const [selectedTipoIdentificaciones, setSelectedTipoIdentificaciones] =
+    useState<TipoIdentificacionEntity[]>([]);
 
   const [tipoIdentificacionDialog, setTipoIdentificacionDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -67,9 +80,13 @@ const TipoIdentificacion = () => {
     state: false,
   });
 
-  const [removeTipoIdentificacionDialog, setRemoveTipoIdentificacionDialog] = useState<boolean>(false);
+  const [removeTipoIdentificacionDialog, setRemoveTipoIdentificacionDialog] =
+    useState<boolean>(false);
 
-  const [removeTipoIdentificacionesDialog, setRemoveTipoIdentificacionesDialog] = useState<boolean>(false);
+  const [
+    removeTipoIdentificacionesDialog,
+    setRemoveTipoIdentificacionesDialog,
+  ] = useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -101,7 +118,11 @@ const TipoIdentificacion = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -111,7 +132,10 @@ const TipoIdentificacion = () => {
     const tipoIdentificacionesFindAll = await findAll();
     setLoading(false);
 
-    if (tipoIdentificacionesFindAll?.message.msgId == 0 && tipoIdentificacionesFindAll.registro) {
+    if (
+      tipoIdentificacionesFindAll?.message.msgId == 0 &&
+      tipoIdentificacionesFindAll.registro
+    ) {
       setTipoIdentificaciones(
         Array.isArray(tipoIdentificacionesFindAll.registro)
           ? tipoIdentificacionesFindAll.registro?.map((af) => {
@@ -152,8 +176,14 @@ const TipoIdentificacion = () => {
       });
       setLoadingTipoIdentificacionCreateOrUpdate(false);
 
-      if (tipoIdentificacionCreate?.message.msgId == 0 && tipoIdentificacionCreate.registro) {
-        setTipoIdentificaciones([...tipoIdentificaciones, tipoIdentificacionCreate.registro]);
+      if (
+        tipoIdentificacionCreate?.message.msgId == 0 &&
+        tipoIdentificacionCreate.registro
+      ) {
+        setTipoIdentificaciones([
+          ...tipoIdentificaciones,
+          tipoIdentificacionCreate.registro,
+        ]);
         toast.current?.show({
           severity: "success",
           detail: `${tipoIdentificacionCreate.message.msgTxt}`,
@@ -176,16 +206,23 @@ const TipoIdentificacion = () => {
     setSubmitted(true);
     if (tipoIdentificacion.IdTipoIdentificacion) {
       setLoadingTipoIdentificacionCreateOrUpdate(true);
-      let tipoIdentificacionUpdate = await update(tipoIdentificacion.IdTipoIdentificacion.toString(), {
-        Descripcion: tipoIdentificacion.Descripcion,
-        Activo: tipoIdentificacion.Activo,
-      });
+      let tipoIdentificacionUpdate = await update(
+        tipoIdentificacion.IdTipoIdentificacion.toString(),
+        {
+          Descripcion: tipoIdentificacion.Descripcion,
+          Activo: tipoIdentificacion.Activo,
+        }
+      );
       setLoadingTipoIdentificacionCreateOrUpdate(false);
 
-      if (tipoIdentificacionUpdate?.message.msgId == 0 && tipoIdentificacionUpdate.registro) {
+      if (
+        tipoIdentificacionUpdate?.message.msgId == 0 &&
+        tipoIdentificacionUpdate.registro
+      ) {
         setTipoIdentificaciones(
           tipoIdentificaciones?.map((tipoIdentificacion) =>
-            tipoIdentificacion.IdTipoIdentificacion === tipoIdentificacionUpdate?.registro?.IdTipoIdentificacion
+            tipoIdentificacion.IdTipoIdentificacion ===
+            tipoIdentificacionUpdate?.registro?.IdTipoIdentificacion
               ? { ...tipoIdentificacion, ...tipoIdentificacionUpdate.registro }
               : tipoIdentificacion
           )
@@ -210,11 +247,20 @@ const TipoIdentificacion = () => {
 
   const removeTipoIdentificacion = async () => {
     if (tipoIdentificacion.IdTipoIdentificacion) {
-      let tipoIdentificacionRemove = await remove(tipoIdentificacion.IdTipoIdentificacion.toString());
+      let tipoIdentificacionRemove = await remove(
+        tipoIdentificacion.IdTipoIdentificacion.toString()
+      );
 
-      if (tipoIdentificacionRemove?.message.msgId == 0 && tipoIdentificacionRemove.registro) {
+      if (
+        tipoIdentificacionRemove?.message.msgId == 0 &&
+        tipoIdentificacionRemove.registro
+      ) {
         setTipoIdentificaciones(
-          tipoIdentificaciones?.filter((tipoIdentificacion) => tipoIdentificacion.IdTipoIdentificacion !== tipoIdentificacionRemove?.registro?.IdTipoIdentificacion)
+          tipoIdentificaciones?.filter(
+            (tipoIdentificacion) =>
+              tipoIdentificacion.IdTipoIdentificacion !==
+              tipoIdentificacionRemove?.registro?.IdTipoIdentificacion
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -236,7 +282,8 @@ const TipoIdentificacion = () => {
 
   const removeSelectedTipoIdentificaciones = () => {
     let _tipoIdentificaciones = tipoIdentificaciones.filter(
-      (val: TipoIdentificacionEntity) => !selectedTipoIdentificaciones?.includes(val)
+      (val: TipoIdentificacionEntity) =>
+        !selectedTipoIdentificaciones?.includes(val)
     );
 
     setTipoIdentificaciones(_tipoIdentificaciones);
@@ -262,7 +309,9 @@ const TipoIdentificacion = () => {
     setTipoIdentificacionDialog({ type: "create", state: true });
   };
 
-  const showUpdateTipoIdentificacionDialog = (tipoIdentificacion: TipoIdentificacionEntity) => {
+  const showUpdateTipoIdentificacionDialog = (
+    tipoIdentificacion: TipoIdentificacionEntity
+  ) => {
     setTipoIdentificacion({ ...tipoIdentificacion });
     setTipoIdentificacionDialog({ type: "update", state: true });
   };
@@ -275,7 +324,9 @@ const TipoIdentificacion = () => {
     setRemoveTipoIdentificacionesDialog(false);
   };
 
-  const confirmRemoveTipoIdentificacion = (tipoIdentificacion: TipoIdentificacionEntity) => {
+  const confirmRemoveTipoIdentificacion = (
+    tipoIdentificacion: TipoIdentificacionEntity
+  ) => {
     setTipoIdentificacion(tipoIdentificacion);
     setRemoveTipoIdentificacionDialog(true);
   };
@@ -565,6 +616,7 @@ const TipoIdentificacion = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",
@@ -715,7 +767,9 @@ const TipoIdentificacion = () => {
         updateTipoIdentificacion={updateTipoIdentificacion}
         onInputChange={onInputChange}
         onActivoChange={onActivoChange}
-        loadingTipoIdentificacionCreateOrUpdate={loadingTipoIdentificacionCreateOrUpdate}
+        loadingTipoIdentificacionCreateOrUpdate={
+          loadingTipoIdentificacionCreateOrUpdate
+        }
       />
 
       <TipoIdentificacionRemove
@@ -728,7 +782,9 @@ const TipoIdentificacion = () => {
       <TipoIdentificacionesRemove
         tipoIdentificacion={tipoIdentificacion}
         removeTipoIdentificacionesDialog={removeTipoIdentificacionesDialog}
-        hideRemoveTipoIdentificacionesDialog={hideRemoveTipoIdentificacionesDialog}
+        hideRemoveTipoIdentificacionesDialog={
+          hideRemoveTipoIdentificacionesDialog
+        }
         removeSelectedTipoIdentificaciones={removeSelectedTipoIdentificaciones}
       />
     </div>

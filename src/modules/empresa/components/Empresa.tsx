@@ -31,10 +31,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Empresa = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseEmpresa();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -70,9 +73,11 @@ const Empresa = () => {
     state: false,
   });
 
-  const [removeEmpresaDialog, setRemoveEmpresaDialog] = useState<boolean>(false);
+  const [removeEmpresaDialog, setRemoveEmpresaDialog] =
+    useState<boolean>(false);
 
-  const [removeEmpresasDialog, setRemoveEmpresasDialog] = useState<boolean>(false);
+  const [removeEmpresasDialog, setRemoveEmpresasDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -104,7 +109,11 @@ const Empresa = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -157,7 +166,7 @@ const Empresa = () => {
         RazonSocial: empresa.RazonSocial,
         // UrlBase: empresa.UrlBase,
         // FormatoLogo: empresa.FormatoLogo,
-        // NombreLogo: empresa.NombreLogo, 
+        // NombreLogo: empresa.NombreLogo,
         // SizeLogo: empresa.SizeLogo,
         // UrlLogo: empresa.UrlLogo,
         LogoNombre: empresa.LogoNombre,
@@ -199,7 +208,7 @@ const Empresa = () => {
         RazonSocial: empresa.RazonSocial,
         // UrlBase: empresa.UrlBase,
         // FormatoLogo: empresa.FormatoLogo,
-        // NombreLogo: empresa.NombreLogo, 
+        // NombreLogo: empresa.NombreLogo,
         // SizeLogo: empresa.SizeLogo,
         // UrlLogo: empresa.UrlLogo,
         LogoNombre: empresa.LogoNombre,
@@ -241,7 +250,10 @@ const Empresa = () => {
 
       if (empresaRemove?.message.msgId == 0 && empresaRemove.registro) {
         setEmpresas(
-          empresas?.filter((empresa) => empresa.IdEmpresa !== empresaRemove?.registro?.IdEmpresa)
+          empresas?.filter(
+            (empresa) =>
+              empresa.IdEmpresa !== empresaRemove?.registro?.IdEmpresa
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -592,6 +604,7 @@ const Empresa = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

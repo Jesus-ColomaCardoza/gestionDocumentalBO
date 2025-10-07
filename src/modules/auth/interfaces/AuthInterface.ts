@@ -11,6 +11,9 @@ export interface UserAuth {
   ApellidoMaterno: string;
   UrlFotoPerfil: string;
   Email: string;
+  Celular: string,
+  Direccion: string,
+  NroIdentificacion: string,
   Cargo: {
     IdCargo: number;
     Descripcion: string;
@@ -53,6 +56,9 @@ export interface OutVerifyTokenAuth {
     ApellidoMaterno: string;
     UrlFotoPerfil: string;
     Email: string;
+    Celular: string,
+    Direccion: string,
+    NroIdentificacion: string,
     Cargo: {
       IdCargo: number;
       Descripcion: string;

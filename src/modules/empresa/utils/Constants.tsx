@@ -6,7 +6,7 @@ import { EmpresaEntity} from "../interfaces/EmpresaInterface";
 export const columns: ColumnMeta[] = [
   {
     field: "IdEmpresa",
-    header: "IdEmpresa",
+    header: "Id",
     dataType: "numeric",
     width: "5%",
     show: true,
@@ -69,7 +69,7 @@ export const columns: ColumnMeta[] = [
     header: "FormatoLogo",
     dataType: "text",
     width: "5%",
-    show: true,
+    show: false,
     filterPlaceholder: "Buscar por Formato Logo",
   },
     {
@@ -78,7 +78,7 @@ export const columns: ColumnMeta[] = [
     header: "NombretoLogo",
     dataType: "text",
     width: "10%",
-    show: true,
+    show: false,
     filterPlaceholder: "Buscar por Nombre Logo",
   },
   {
@@ -96,7 +96,7 @@ export const columns: ColumnMeta[] = [
     header: "UrlLogo",
     dataType: "text",
     width: "20%",
-    show: true,
+    show: false,
     filterPlaceholder: "Buscar por Url Logo",
   },
   {

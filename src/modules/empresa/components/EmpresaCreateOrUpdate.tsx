@@ -138,7 +138,7 @@ const EmpresaCreateOrUpdate = (props: EmpresaCreateOrUpdateProps) => {
           <small className="p-error">Celular is required.</small>
         )}
       </div>
-      <div className="field">
+      {/* <div className="field">
         <label htmlFor="LogoNombre" className="font-bold">
           Logo Nombre
         </label>
@@ -154,8 +154,8 @@ const EmpresaCreateOrUpdate = (props: EmpresaCreateOrUpdateProps) => {
         {props.submitted && !props.empresa.LogoNombre && (
           <small className="p-error">LogoNombre is required.</small>
         )}
-      </div>
-      <div className="field">
+      </div> */}
+      {/* <div className="field">
         <label htmlFor="LogoBase64" className="font-bold">
           LogoBase64
         </label>
@@ -171,7 +171,7 @@ const EmpresaCreateOrUpdate = (props: EmpresaCreateOrUpdateProps) => {
         {props.submitted && !props.empresa.LogoBase64 && (
           <small className="p-error">LogoBase64 is required.</small>
         )}
-      </div>
+      </div> */}
       <div className="field">
         <label className="mb-3 font-bold">Activo</label>
         <div className="formgrid grid">

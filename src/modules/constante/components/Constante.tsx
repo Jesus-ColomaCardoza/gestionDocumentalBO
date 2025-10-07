@@ -32,10 +32,13 @@ import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { InputNumberChangeEvent } from "primereact/inputnumber";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Constante = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseConstante();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -62,7 +65,9 @@ const Constante = () => {
 
   const [constantes, setConstantes] = useState<ConstanteEntity[]>([]);
 
-  const [selectedConstantes, setSelectedConstantes] = useState<ConstanteEntity[]>([]);
+  const [selectedConstantes, setSelectedConstantes] = useState<
+    ConstanteEntity[]
+  >([]);
 
   const [constanteDialog, setConstanteDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -71,9 +76,11 @@ const Constante = () => {
     state: false,
   });
 
-  const [removeConstanteDialog, setRemoveConstanteDialog] = useState<boolean>(false);
+  const [removeConstanteDialog, setRemoveConstanteDialog] =
+    useState<boolean>(false);
 
-  const [removeConstantesDialog, setRemoveConstantesDialog] = useState<boolean>(false);
+  const [removeConstantesDialog, setRemoveConstantesDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -105,7 +112,11 @@ const Constante = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -226,7 +237,10 @@ const Constante = () => {
 
       if (constanteRemove?.message.msgId == 0 && constanteRemove.registro) {
         setConstantes(
-          constantes?.filter((constante) => constante.IdConstante !== constanteRemove?.registro?.IdConstante)
+          constantes?.filter(
+            (constante) =>
+              constante.IdConstante !== constanteRemove?.registro?.IdConstante
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -348,14 +362,14 @@ const Constante = () => {
   };
 
   const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
-      const val = e.value ?? null;
-  
-      setConstante((prev) => ({
-        ...prev,
-        [name]: val,
-      }));
-    };
-  
+    const val = e.value ?? null;
+
+    setConstante((prev) => ({
+      ...prev,
+      [name]: val,
+    }));
+  };
+
   // const onInputTextConstanteChange = (
   //   e: React.ChangeEvent<HTMLTextConstanteElement>,
   //   name: string
@@ -586,6 +600,7 @@ const Constante = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

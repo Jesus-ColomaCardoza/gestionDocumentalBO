@@ -267,183 +267,187 @@ const SideBar = (props: SideBarProps) => {
             </ul>
           </li>
         </ul>
-        <ul className="list-none px-2">
-          <li>
-            <StyleClass
-              nodeRef={btnRef5}
-              selector="@next"
-              enterFromClassName="hidden"
-              enterActiveClassName="slidedown"
-              leaveToClassName="hidden"
-              leaveActiveClassName="slideup"
-            >
-              <div
-                ref={btnRef5}
-                className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
+        {(userAuth?.Rol.IdRol == "SUPER_ADMIN" ||
+          userAuth?.Rol.IdRol == "ADMIN") && (
+          <ul className="list-none px-2">
+            <li>
+              <StyleClass
+                nodeRef={btnRef5}
+                selector="@next"
+                enterFromClassName="hidden"
+                enterActiveClassName="slidedown"
+                leaveToClassName="hidden"
+                leaveActiveClassName="slideup"
               >
-                <span className="font-medium">Archivado</span>
-                <i className="pi pi-chevron-down"></i>
-                <Ripple />
-              </div>
-            </StyleClass>
-            <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
-              <li>
-                <Link
-                  to={"../archivado/archivador"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                <div
+                  ref={btnRef5}
+                  className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
                 >
-                  <i className="pi pi-file mr-2"></i>
-                  <span className="font-medium text-sm">Archivadores</span>
+                  <span className="font-medium">Archivado</span>
+                  <i className="pi pi-chevron-down"></i>
                   <Ripple />
-                </Link>
-              </li>
-            </ul>
-          </li>
-        </ul>
-        <ul className="list-none px-2 ">
-          <li>
-            <StyleClass
-              nodeRef={btnRef3}
-              selector="@next"
-              enterFromClassName="hidden"
-              enterActiveClassName="slidedown"
-              leaveToClassName="hidden"
-              leaveActiveClassName="slideup"
-            >
-              <div
-                ref={btnRef3}
-                className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
+                </div>
+              </StyleClass>
+              <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
+                <li>
+                  <Link
+                    to={"../archivado/archivador"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-file mr-2"></i>
+                    <span className="font-medium text-sm">Archivadores</span>
+                    <Ripple />
+                  </Link>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        )}
+        {userAuth?.Rol.IdRol == "SUPER_ADMIN" && (
+          <ul className="list-none px-2 ">
+            <li>
+              <StyleClass
+                nodeRef={btnRef3}
+                selector="@next"
+                enterFromClassName="hidden"
+                enterActiveClassName="slidedown"
+                leaveToClassName="hidden"
+                leaveActiveClassName="slideup"
               >
-                <span className="font-medium">Mantenimiento</span>
-                <i className="pi pi-chevron-down"></i>
-                <Ripple />
-              </div>
-            </StyleClass>
-            <ul className="list-none p-0 m-0 ml-2 hidden overflow-hidden">
-              {/* <ul className="list-none p-0 m-0  overflow-hidden"> */}
-              <li>
-                <Link
-                  to={"../mantenimiento/usuario"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                <div
+                  ref={btnRef3}
+                  className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
                 >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Usuario</span>
+                  <span className="font-medium">Mantenimiento</span>
+                  <i className="pi pi-chevron-down"></i>
                   <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/empresa"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Empresa</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/constante"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Constante</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/area"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Area</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/cargo"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Cargo</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/estado"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Estado</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/esquema_estado"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Esquema Estado</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/rol"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Rol</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/tipo_documento"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Tipo Documento</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/tipo_usuario"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Tipo Usuario</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/tipo_tramite"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">Tipo Tramite</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../mantenimiento/tipo_identificacion"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-table mr-2"></i>
-                  <span className="font-medium text-sm">
-                    Tipo Identificacion
-                  </span>
-                  <Ripple />
-                </Link>
-              </li>
-              {/* <li>
+                </div>
+              </StyleClass>
+              <ul className="list-none p-0 m-0 ml-2 hidden overflow-hidden">
+                {/* <ul className="list-none p-0 m-0  overflow-hidden"> */}
+                <li>
+                  <Link
+                    to={"../mantenimiento/usuario"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Usuario</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/empresa"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Empresa</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/constante"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Constante</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/area"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Area</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/cargo"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Cargo</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/estado"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Estado</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/esquema_estado"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Esquema Estado</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/rol"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Rol</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/tipo_documento"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Tipo Documento</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/tipo_usuario"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Tipo Usuario</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/tipo_tramite"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">Tipo Tramite</span>
+                    <Ripple />
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"../mantenimiento/tipo_identificacion"}
+                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  >
+                    <i className="pi pi-table mr-2"></i>
+                    <span className="font-medium text-sm">
+                      Tipo Identificacion
+                    </span>
+                    <Ripple />
+                  </Link>
+                </li>
+                {/* <li>
                 <a className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full">
                   <i className="pi pi-bookmark mr-2"></i>
                   <span className="font-medium">Bookmarks</span>
@@ -552,9 +556,10 @@ const SideBar = (props: SideBarProps) => {
                   <Ripple />
                 </a>
               </li> */}
-            </ul>
-          </li>
-        </ul>
+              </ul>
+            </li>
+          </ul>
+        )}
         {/* <ul className="list-none px-2">
           <li>
             <StyleClass

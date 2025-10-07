@@ -25,7 +25,7 @@ import { FileManagerEntity } from "../../file-manager/interfaces/FileMangerInter
 import { Tooltip } from "primereact/tooltip";
 import UseFileManager from "../../file-manager/hooks/UseFileManger";
 import { useAuth } from "../../auth/context/AuthContext";
-import { MAX_FILE_SIZE } from "../../utils/Constants";
+import { filterBodyRequest, MAX_FILE_SIZE } from "../../utils/Constants";
 import { formatFileSize } from "../../utils/Methods";
 import TramiteDestinosModal from "./TramiteDestinosModal";
 import {
@@ -293,7 +293,19 @@ const TramiteRecibidoAtendido = () => {
   // actions CRUD - Remitente (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllRemitenteCombox = async () => {
     setLoading(true);
-    const remitentesFindAll = await findAllRemitentes();
+    const remitentesFindAll = await findAllRemitentes({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "0",
+          operador: "EQ",
+          tipo: "other",
+          valor1: "",
+          valor2: "",
+        },
+      ],
+    });
     setLoading(false);
 
     if (remitentesFindAll?.message.msgId == 0 && remitentesFindAll.registro) {
@@ -1492,7 +1504,7 @@ const TramiteRecibidoAtendido = () => {
         setTramiteDestinosErrors={setTramiteDestinosErrors}
         movimiento={movimiento}
         areas={areas}
-        remitentes={remitentes}
+        remitentesDestino={remitentes}
         setMovimiento={setMovimiento}
         onInputTextChange={onInputTextChange}
         onDropdownChangeMovimiento={onDropdownChangeMovimiento}

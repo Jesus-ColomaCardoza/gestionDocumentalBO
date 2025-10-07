@@ -31,10 +31,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Area = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseArea();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -572,6 +575,7 @@ const Area = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

@@ -31,10 +31,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const TipoUsuario = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseTipoUsuario();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -54,14 +57,19 @@ const TipoUsuario = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingTipoUsuarioCreateOrUpdate, setLoadingTipoUsuarioCreateOrUpdate] =
-    useState<boolean>(false);
+  const [
+    loadingTipoUsuarioCreateOrUpdate,
+    setLoadingTipoUsuarioCreateOrUpdate,
+  ] = useState<boolean>(false);
 
-  const [tipoUsuario, setTipoUsuario] = useState<TipoUsuarioEntity>(emptyTipoUsuario);
+  const [tipoUsuario, setTipoUsuario] =
+    useState<TipoUsuarioEntity>(emptyTipoUsuario);
 
   const [tipoUsuarios, setTipoUsuarios] = useState<TipoUsuarioEntity[]>([]);
 
-  const [selectedTipoUsuarios, setSelectedTipoUsuarios] = useState<TipoUsuarioEntity[]>([]);
+  const [selectedTipoUsuarios, setSelectedTipoUsuarios] = useState<
+    TipoUsuarioEntity[]
+  >([]);
 
   const [tipoUsuarioDialog, setTipoUsuarioDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -70,9 +78,11 @@ const TipoUsuario = () => {
     state: false,
   });
 
-  const [removeTipoUsuarioDialog, setRemoveTipoUsuarioDialog] = useState<boolean>(false);
+  const [removeTipoUsuarioDialog, setRemoveTipoUsuarioDialog] =
+    useState<boolean>(false);
 
-  const [removeTipoUsuariosDialog, setRemoveTipoUsuariosDialog] = useState<boolean>(false);
+  const [removeTipoUsuariosDialog, setRemoveTipoUsuariosDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -104,7 +114,11 @@ const TipoUsuario = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -114,7 +128,10 @@ const TipoUsuario = () => {
     const tipoUsuariosFindAll = await findAll();
     setLoading(false);
 
-    if (tipoUsuariosFindAll?.message.msgId == 0 && tipoUsuariosFindAll.registro) {
+    if (
+      tipoUsuariosFindAll?.message.msgId == 0 &&
+      tipoUsuariosFindAll.registro
+    ) {
       setTipoUsuarios(
         Array.isArray(tipoUsuariosFindAll.registro)
           ? tipoUsuariosFindAll.registro?.map((af) => {
@@ -179,16 +196,20 @@ const TipoUsuario = () => {
     setSubmitted(true);
     if (tipoUsuario.IdTipoUsuario) {
       setLoadingTipoUsuarioCreateOrUpdate(true);
-      let tipoUsuarioUpdate = await update(tipoUsuario.IdTipoUsuario.toString(), {
-        Descripcion: tipoUsuario.Descripcion,
-        Activo: tipoUsuario.Activo,
-      });
+      let tipoUsuarioUpdate = await update(
+        tipoUsuario.IdTipoUsuario.toString(),
+        {
+          Descripcion: tipoUsuario.Descripcion,
+          Activo: tipoUsuario.Activo,
+        }
+      );
       setLoadingTipoUsuarioCreateOrUpdate(false);
 
       if (tipoUsuarioUpdate?.message.msgId == 0 && tipoUsuarioUpdate.registro) {
         setTipoUsuarios(
           tipoUsuarios?.map((tipoUsuario) =>
-            tipoUsuario.IdTipoUsuario === tipoUsuarioUpdate?.registro?.IdTipoUsuario
+            tipoUsuario.IdTipoUsuario ===
+            tipoUsuarioUpdate?.registro?.IdTipoUsuario
               ? { ...tipoUsuario, ...tipoUsuarioUpdate.registro }
               : tipoUsuario
           )
@@ -213,11 +234,17 @@ const TipoUsuario = () => {
 
   const removeTipoUsuario = async () => {
     if (tipoUsuario.IdTipoUsuario) {
-      let tipoUsuarioRemove = await remove(tipoUsuario.IdTipoUsuario.toString());
+      let tipoUsuarioRemove = await remove(
+        tipoUsuario.IdTipoUsuario.toString()
+      );
 
       if (tipoUsuarioRemove?.message.msgId == 0 && tipoUsuarioRemove.registro) {
         setTipoUsuarios(
-          tipoUsuarios?.filter((tipoUsuario) => tipoUsuario.IdTipoUsuario !== tipoUsuarioRemove?.registro?.IdTipoUsuario)
+          tipoUsuarios?.filter(
+            (tipoUsuario) =>
+              tipoUsuario.IdTipoUsuario !==
+              tipoUsuarioRemove?.registro?.IdTipoUsuario
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -568,6 +595,7 @@ const TipoUsuario = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

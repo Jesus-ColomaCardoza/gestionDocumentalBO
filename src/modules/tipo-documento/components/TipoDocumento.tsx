@@ -23,7 +23,11 @@ import {
 } from "../interfaces/TipoDocumentoInterface";
 import { classNames } from "primereact/utils";
 import { Toast } from "primereact/toast";
-import { columns, defaultFilters, emptyTipoDocumento } from "../utils/Constants";
+import {
+  columns,
+  defaultFilters,
+  emptyTipoDocumento,
+} from "../utils/Constants";
 import TipoDocumentoCreateOrUpdate from "./TipoDocumentoCreateOrUpdate";
 import TipoDocumentoRemove from "./TipoDocumentoRemove";
 import TipoDocumentosRemove from "./TipoDocumentosRemove";
@@ -31,10 +35,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const TipoDocumento = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseTipoDocumento();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -54,14 +61,21 @@ const TipoDocumento = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingTipoDocumentoCreateOrUpdate, setLoadingTipoDocumentoCreateOrUpdate] =
-    useState<boolean>(false);
+  const [
+    loadingTipoDocumentoCreateOrUpdate,
+    setLoadingTipoDocumentoCreateOrUpdate,
+  ] = useState<boolean>(false);
 
-  const [tipoDocumento, setTipoDocumento] = useState<TipoDocumentoEntity>(emptyTipoDocumento);
+  const [tipoDocumento, setTipoDocumento] =
+    useState<TipoDocumentoEntity>(emptyTipoDocumento);
 
-  const [tipoDocumentos, setTipoDocumentos] = useState<TipoDocumentoEntity[]>([]);
+  const [tipoDocumentos, setTipoDocumentos] = useState<TipoDocumentoEntity[]>(
+    []
+  );
 
-  const [selectedTipoDocumentos, setSelectedTipoDocumentos] = useState<TipoDocumentoEntity[]>([]);
+  const [selectedTipoDocumentos, setSelectedTipoDocumentos] = useState<
+    TipoDocumentoEntity[]
+  >([]);
 
   const [tipoDocumentoDialog, setTipoDocumentoDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -70,9 +84,11 @@ const TipoDocumento = () => {
     state: false,
   });
 
-  const [removeTipoDocumentoDialog, setRemoveTipoDocumentoDialog] = useState<boolean>(false);
+  const [removeTipoDocumentoDialog, setRemoveTipoDocumentoDialog] =
+    useState<boolean>(false);
 
-  const [removeTipoDocumentosDialog, setRemoveTipoDocumentosDialog] = useState<boolean>(false);
+  const [removeTipoDocumentosDialog, setRemoveTipoDocumentosDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -104,7 +120,11 @@ const TipoDocumento = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -114,7 +134,10 @@ const TipoDocumento = () => {
     const tipoDocumentosFindAll = await findAll();
     setLoading(false);
 
-    if (tipoDocumentosFindAll?.message.msgId == 0 && tipoDocumentosFindAll.registro) {
+    if (
+      tipoDocumentosFindAll?.message.msgId == 0 &&
+      tipoDocumentosFindAll.registro
+    ) {
       setTipoDocumentos(
         Array.isArray(tipoDocumentosFindAll.registro)
           ? tipoDocumentosFindAll.registro?.map((af) => {
@@ -155,7 +178,10 @@ const TipoDocumento = () => {
       });
       setLoadingTipoDocumentoCreateOrUpdate(false);
 
-      if (tipoDocumentoCreate?.message.msgId == 0 && tipoDocumentoCreate.registro) {
+      if (
+        tipoDocumentoCreate?.message.msgId == 0 &&
+        tipoDocumentoCreate.registro
+      ) {
         setTipoDocumentos([...tipoDocumentos, tipoDocumentoCreate.registro]);
         toast.current?.show({
           severity: "success",
@@ -179,16 +205,23 @@ const TipoDocumento = () => {
     setSubmitted(true);
     if (tipoDocumento.IdTipoDocumento) {
       setLoadingTipoDocumentoCreateOrUpdate(true);
-      let tipoDocumentoUpdate = await update(tipoDocumento.IdTipoDocumento.toString(), {
-        Descripcion: tipoDocumento.Descripcion,
-        Activo: tipoDocumento.Activo,
-      });
+      let tipoDocumentoUpdate = await update(
+        tipoDocumento.IdTipoDocumento.toString(),
+        {
+          Descripcion: tipoDocumento.Descripcion,
+          Activo: tipoDocumento.Activo,
+        }
+      );
       setLoadingTipoDocumentoCreateOrUpdate(false);
 
-      if (tipoDocumentoUpdate?.message.msgId == 0 && tipoDocumentoUpdate.registro) {
+      if (
+        tipoDocumentoUpdate?.message.msgId == 0 &&
+        tipoDocumentoUpdate.registro
+      ) {
         setTipoDocumentos(
           tipoDocumentos?.map((tipoDocumento) =>
-            tipoDocumento.IdTipoDocumento === tipoDocumentoUpdate?.registro?.IdTipoDocumento
+            tipoDocumento.IdTipoDocumento ===
+            tipoDocumentoUpdate?.registro?.IdTipoDocumento
               ? { ...tipoDocumento, ...tipoDocumentoUpdate.registro }
               : tipoDocumento
           )
@@ -213,11 +246,20 @@ const TipoDocumento = () => {
 
   const removeTipoDocumento = async () => {
     if (tipoDocumento.IdTipoDocumento) {
-      let tipoDocumentoRemove = await remove(tipoDocumento.IdTipoDocumento.toString());
+      let tipoDocumentoRemove = await remove(
+        tipoDocumento.IdTipoDocumento.toString()
+      );
 
-      if (tipoDocumentoRemove?.message.msgId == 0 && tipoDocumentoRemove.registro) {
+      if (
+        tipoDocumentoRemove?.message.msgId == 0 &&
+        tipoDocumentoRemove.registro
+      ) {
         setTipoDocumentos(
-          tipoDocumentos?.filter((tipoDocumento) => tipoDocumento.IdTipoDocumento !== tipoDocumentoRemove?.registro?.IdTipoDocumento)
+          tipoDocumentos?.filter(
+            (tipoDocumento) =>
+              tipoDocumento.IdTipoDocumento !==
+              tipoDocumentoRemove?.registro?.IdTipoDocumento
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -265,7 +307,9 @@ const TipoDocumento = () => {
     setTipoDocumentoDialog({ type: "create", state: true });
   };
 
-  const showUpdateTipoDocumentoDialog = (tipoDocumento: TipoDocumentoEntity) => {
+  const showUpdateTipoDocumentoDialog = (
+    tipoDocumento: TipoDocumentoEntity
+  ) => {
     setTipoDocumento({ ...tipoDocumento });
     setTipoDocumentoDialog({ type: "update", state: true });
   };
@@ -568,6 +612,7 @@ const TipoDocumento = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

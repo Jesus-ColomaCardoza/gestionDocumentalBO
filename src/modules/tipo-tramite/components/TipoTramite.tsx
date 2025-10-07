@@ -31,10 +31,13 @@ import { RadioButtonChangeEvent } from "primereact/radiobutton";
 import { formatDate } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const TipoTramite = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseTipoTramite();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -54,14 +57,19 @@ const TipoTramite = () => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [loadingTipoTramiteCreateOrUpdate, setLoadingTipoTramiteCreateOrUpdate] =
-    useState<boolean>(false);
+  const [
+    loadingTipoTramiteCreateOrUpdate,
+    setLoadingTipoTramiteCreateOrUpdate,
+  ] = useState<boolean>(false);
 
-  const [tipoTramite, setTipoTramite] = useState<TipoTramiteEntity>(emptyTipoTramite);
+  const [tipoTramite, setTipoTramite] =
+    useState<TipoTramiteEntity>(emptyTipoTramite);
 
   const [tipoTramites, setTipoTramites] = useState<TipoTramiteEntity[]>([]);
 
-  const [selectedTipoTramites, setSelectedTipoTramites] = useState<TipoTramiteEntity[]>([]);
+  const [selectedTipoTramites, setSelectedTipoTramites] = useState<
+    TipoTramiteEntity[]
+  >([]);
 
   const [tipoTramiteDialog, setTipoTramiteDialog] = useState<{
     type?: "create" | "update" | undefined;
@@ -70,9 +78,11 @@ const TipoTramite = () => {
     state: false,
   });
 
-  const [removeTipoTramiteDialog, setRemoveTipoTramiteDialog] = useState<boolean>(false);
+  const [removeTipoTramiteDialog, setRemoveTipoTramiteDialog] =
+    useState<boolean>(false);
 
-  const [removeTipoTramitesDialog, setRemoveTipoTramitesDialog] = useState<boolean>(false);
+  const [removeTipoTramitesDialog, setRemoveTipoTramitesDialog] =
+    useState<boolean>(false);
 
   // templates to component Toolbar
   const items: MenuItem[] = [
@@ -104,7 +114,11 @@ const TipoTramite = () => {
 
   const endContent = (
     <>
-      <SplitButton label="Aceptar" model={items} icon="pi pi-check"></SplitButton>
+      <SplitButton
+        label="Aceptar"
+        model={items}
+        icon="pi pi-check"
+      ></SplitButton>
     </>
   );
 
@@ -114,7 +128,10 @@ const TipoTramite = () => {
     const tipoTramitesFindAll = await findAll();
     setLoading(false);
 
-    if (tipoTramitesFindAll?.message.msgId == 0 && tipoTramitesFindAll.registro) {
+    if (
+      tipoTramitesFindAll?.message.msgId == 0 &&
+      tipoTramitesFindAll.registro
+    ) {
       setTipoTramites(
         Array.isArray(tipoTramitesFindAll.registro)
           ? tipoTramitesFindAll.registro?.map((af) => {
@@ -179,16 +196,20 @@ const TipoTramite = () => {
     setSubmitted(true);
     if (tipoTramite.IdTipoTramite) {
       setLoadingTipoTramiteCreateOrUpdate(true);
-      let tipoTramiteUpdate = await update(tipoTramite.IdTipoTramite.toString(), {
-        Descripcion: tipoTramite.Descripcion,
-        Activo: tipoTramite.Activo,
-      });
+      let tipoTramiteUpdate = await update(
+        tipoTramite.IdTipoTramite.toString(),
+        {
+          Descripcion: tipoTramite.Descripcion,
+          Activo: tipoTramite.Activo,
+        }
+      );
       setLoadingTipoTramiteCreateOrUpdate(false);
 
       if (tipoTramiteUpdate?.message.msgId == 0 && tipoTramiteUpdate.registro) {
         setTipoTramites(
           tipoTramites?.map((tipoTramite) =>
-            tipoTramite.IdTipoTramite === tipoTramiteUpdate?.registro?.IdTipoTramite
+            tipoTramite.IdTipoTramite ===
+            tipoTramiteUpdate?.registro?.IdTipoTramite
               ? { ...tipoTramite, ...tipoTramiteUpdate.registro }
               : tipoTramite
           )
@@ -213,11 +234,17 @@ const TipoTramite = () => {
 
   const removeTipoTramite = async () => {
     if (tipoTramite.IdTipoTramite) {
-      let tipoTramiteRemove = await remove(tipoTramite.IdTipoTramite.toString());
+      let tipoTramiteRemove = await remove(
+        tipoTramite.IdTipoTramite.toString()
+      );
 
       if (tipoTramiteRemove?.message.msgId == 0 && tipoTramiteRemove.registro) {
         setTipoTramites(
-          tipoTramites?.filter((tipoTramite) => tipoTramite.IdTipoTramite !== tipoTramiteRemove?.registro?.IdTipoTramite)
+          tipoTramites?.filter(
+            (tipoTramite) =>
+              tipoTramite.IdTipoTramite !==
+              tipoTramiteRemove?.registro?.IdTipoTramite
+          )
         );
         toast.current?.show({
           severity: "success",
@@ -568,6 +595,7 @@ const TipoTramite = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",

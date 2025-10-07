@@ -624,26 +624,31 @@ const TramitePendiente = () => {
             color: "#fff",
           }}
         />
-        <Button
-          type="button"
-          onClick={() => {
-            navigate("../tramite/recibido/externo");
-          }}
-          size="small"
-          style={{
-            padding: "0",
-            width: "10rem",
-            height: "2rem",
-            margin: "auto 0",
-            background: "#293",
-            border: "none",
-          }}
-        >
-          <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
-            <i className="pi pi-eject text-sm"></i>
-            <span>Recibir Externo</span>
-          </span>
-        </Button>
+        {(userAuth?.Rol.IdRol == "SUPER_ADMIN" ||
+          userAuth?.Rol.IdRol == "ADMIN" ||
+          userAuth?.Area?.IdArea === 30) && (
+          <Button
+            type="button"
+            onClick={() => {
+              navigate("../tramite/recibido/externo");
+            }}
+            size="small"
+            style={{
+              padding: "0",
+              width: "10rem",
+              height: "2rem",
+              margin: "auto 0",
+              background: "#293",
+              border: "none",
+            }}
+          >
+            <span className="flex justify-content-between gap-2 align-items-center m-auto text-white">
+              <i className="pi pi-eject text-sm"></i>
+              <span>Recibir Externo</span>
+            </span>
+          </Button>
+        )}
+
         <Button
           type="button"
           onClick={() => {

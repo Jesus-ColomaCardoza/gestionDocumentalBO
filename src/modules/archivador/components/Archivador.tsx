@@ -28,10 +28,13 @@ import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { columns, defaultFilters, emptyArchivador } from "../utils/Constants";
 import ArchivadoresRemove from "./ArchivadoresRemove";
 import { InputNumberChangeEvent } from "primereact/inputnumber";
+import { useAuth } from "../../auth/context/AuthContext";
 
 const Archivador = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseArchivador();
+
+  const { userAuth } = useAuth()!;
 
   //useRefs
   const toast = useRef<Toast>(null);
@@ -596,6 +599,7 @@ const Archivador = () => {
         />
         <Button
           icon="pi pi-trash"
+          disabled={!(userAuth?.Area?.IdArea == 11)}
           severity="danger"
           style={{
             width: "2rem",
