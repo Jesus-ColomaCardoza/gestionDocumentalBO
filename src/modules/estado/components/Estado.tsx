@@ -128,7 +128,19 @@ const Estado = () => {
   // actions CRUD - Estado (create, read, update, remove) -> (create, findAll-findOne, update, remove)
   const findAllEstado = async () => {
     setLoading(true);
-    const estadosFindAll = await findAll();
+    const estadosFindAll = await findAll({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "0",
+          operador: "EQ",
+          tipo: "other",
+          valor1: "",
+          valor2: "",
+        },
+      ],
+    });
     setLoading(false);
 
     if (estadosFindAll?.message.msgId == 0 && estadosFindAll.registro) {

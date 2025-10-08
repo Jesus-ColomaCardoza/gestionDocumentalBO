@@ -819,7 +819,17 @@ const TramiteRecibidoExterno = () => {
             >
               <Button
                 type="button"
-                onClick={showFileManagerDialog}
+                onClick={() => {
+                  if (selectedDigitalFiles.length < 1) {
+                    showFileManagerDialog();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Ya tiene un archivo digital seleccionado`,
+                      life: 3000,
+                    });
+                  }
+                }}
                 size="small"
                 severity="secondary"
                 style={{
@@ -839,7 +849,15 @@ const TramiteRecibidoExterno = () => {
               <Button
                 type="button"
                 onClick={() => {
-                  loadFilesRef.current?.click();
+                  if (selectedDigitalFiles?.length < 1) {
+                    loadFilesRef.current?.click();
+                  } else {
+                    toast.current?.show({
+                      severity: "info",
+                      detail: `Ya tiene un archivo digital seleccionado`,
+                      life: 3000,
+                    });
+                  }
                 }}
                 size="small"
                 style={{

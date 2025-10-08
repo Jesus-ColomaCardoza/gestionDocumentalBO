@@ -298,7 +298,11 @@ export const defaultFilters: DataTableFilterMeta = {
   "Rol.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
   "Cargo.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
   "Area.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
-  "TipoUsuario.Descripcion": { value: null, matchMode: FilterMatchMode.IN },
+  "TipoUsuario.Descripcion": {
+    // value: ["Natural"],
+    value: null,
+    matchMode: FilterMatchMode.IN,
+  },
   CodigoConfirmacion: {
     operator: FilterOperator.AND,
     constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],

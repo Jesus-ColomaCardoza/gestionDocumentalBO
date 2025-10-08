@@ -43,3 +43,17 @@ export interface CombinationsFilters {
   cantidad_max: string;
   Language: string;
 }
+
+// {
+//   cantidad_max: "0",
+//   Language: "ES",
+//   filters: [
+//     {
+//       campo: "0",
+//       operador: "EQ",
+//       tipo: "other",
+//       valor1: "",
+//       valor2: "",
+//     },
+//   ],
+// }

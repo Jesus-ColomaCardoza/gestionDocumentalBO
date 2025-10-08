@@ -44,7 +44,7 @@ import { useAuth } from "../../auth/context/AuthContext";
 const Usuario = () => {
   // custom hooks
   const { create, findAll, findOne, update, remove } = UseUsuario();
-  
+
   const { userAuth } = useAuth()!;
 
   const { findAll: findAllTipoIdentificacion } = UseTipoIdentificacion();
@@ -778,10 +778,10 @@ const Usuario = () => {
         <MultiSelect
           value={options.value}
           options={tiposUsuario}
-          itemTemplate={(option: UsuarioEntity) => {
+          itemTemplate={(option: TipoUsuarioEntity) => {
             return (
               <div className="flex align-items-center gap-2">
-                <span>{option?.TipoUsuario?.Descripcion}</span>
+                <span>{option?.Descripcion}</span>
               </div>
             );
           }}

@@ -26,6 +26,33 @@ export interface DocumentoEntity {
   ModificadoEl?: Fecha;
   ModificadoPor?: string;
 }
+export interface DocumentoDetailsEntity {
+  IdDocumento: number;
+  Folios: number;
+  FechaEmision: Date;
+  UrlDocumento: string;
+  CreadoEl: Date;
+  Asunto: string;
+  CodigoReferenciaDoc: string;
+  Observaciones: string;
+  Visible: boolean;
+  Anexo: {
+    Titulo: string;
+    CreadoEl: Date;
+    IdAnexo: number;
+    UrlAnexo: string;
+  }[];
+  TipoDocumento: {
+    Descripcion: string;
+    IdTipoDocumento: number;
+  };
+  Usuario: {
+    IdUsuario: number;
+    Nombres: string;
+    ApellidoPaterno: string;
+    ApellidoMaterno: string;
+  };
+}
 export interface DocumentoCreate {
   IdDocumento?: number;
   CodigoReferencia?: string;
@@ -42,7 +69,7 @@ export interface DocumentoCreate {
   IdTramite?: number;
   IdUsuario?: number;
   FirmaDigital: boolean | null;
-  IdCarpeta?: number | null ;
+  IdCarpeta?: number | null;
   Categoria: "MF" | "FA" | "FS" | undefined;
   IdEstado?: number;
   Activo?: boolean;
@@ -65,7 +92,7 @@ export interface DocumentoUpdate {
   IdTramite?: number;
   IdUsuario?: number;
   FirmaDigital?: boolean;
-  IdCarpeta?: number | null ;
+  IdCarpeta?: number | null;
   Categoria?: "MF" | "FA" | "FS" | undefined;
   IdEstado?: number;
   Activo?: boolean;
@@ -79,4 +106,8 @@ export interface DocumentoOut {
 export interface DocumentosOut {
   message: Message;
   registro?: DocumentoEntity[];
+}
+export interface DocumentoDetailsOut {
+  message: Message;
+  registro?: DocumentoDetailsEntity;
 }

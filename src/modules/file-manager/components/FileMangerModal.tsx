@@ -23,7 +23,7 @@ import {
 import { Toast } from "primereact/toast";
 import { columns, defaultFilters, emptyFileManager } from "../utils/Constants";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
-import { formatDate } from "../../utils/Methods";
+import { formatDate, getColorById } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { Menu } from "primereact/menu";
@@ -50,6 +50,9 @@ import {
 import { useAuth } from "../../auth/context/AuthContext";
 import { Dialog } from "primereact/dialog";
 import { Dropdown } from "primereact/dropdown";
+import UseEstado from "../../estado/hooks/UseEstado";
+import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
+import { colors } from "../../utils/Constants";
 
 type FileManagerModalProps = {
   submitted: boolean;
@@ -78,6 +81,8 @@ const FileManagerModal = (props: FileManagerModalProps) => {
     removeDocumento,
   } = UseFileManager();
 
+  const { findAll: findAllEstado } = UseEstado();
+
   const { create, remove } = UseFile();
 
   const { findAllTree } = UseCarpeta();
@@ -93,6 +98,10 @@ const FileManagerModal = (props: FileManagerModalProps) => {
   const [selectedFileMoved, setSelectedFileMoved] = useState<
     string | TreeMultipleSelectionKeys | TreeCheckboxSelectionKeys | null
   >(null);
+
+  const [estados, setEstados] = useState<
+    Pick<EstadoEntity, "IdEstado" | "Descripcion">[]
+  >([]);
 
   const [selectedFilesUpload, setSelectedFilesUpload] = useState<File[]>([]);
 
@@ -589,6 +598,37 @@ const FileManagerModal = (props: FileManagerModalProps) => {
     }
   };
 
+  // actions CRUD - Tipo Usuario (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllEstadoCombox = async () => {
+    setLoading(true);
+    const estadoFindAll = await findAllEstado({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdEsquemaEstado",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: "1",
+          valor2: "",
+        },
+      ],
+    });
+    setLoading(false);
+
+    if (estadoFindAll?.message.msgId == 0 && estadoFindAll.registro) {
+      setEstados(
+        Array.isArray(estadoFindAll.registro)
+          ? estadoFindAll.registro?.map((af) => {
+              return {
+                IdEstado: af.IdEstado,
+                Descripcion: af.Descripcion,
+              };
+            })
+          : []
+      );
+    }
+  };
   // templates to dialogs
   // carpeta
   const hideCarpetaDialog = () => {
@@ -1032,23 +1072,59 @@ const FileManagerModal = (props: FileManagerModalProps) => {
 
   // templates to column Estado
   const estadoBodyTemplate = (rowData: FileManagerEntity) => {
-    return <p className="text-sm m-0">{rowData.Estado?.Descripcion}</p>;
+    const bgColor = getColorById(rowData.Estado?.IdEstado ?? 0);
+
+    return (
+      <div style={{ padding: "0 1em" }}>
+        <p
+          className="flex justify-content-center align-items-center px-2 py-1 text-sm"
+          style={{
+            backgroundColor: bgColor,
+            color: "#fff",
+            borderRadius: "7px",
+          }}
+        >
+          {rowData.Estado?.Descripcion}
+        </p>
+      </div>
+    );
   };
 
   const estadoFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <Calendar
-        value={options.value ? new Date(options.value) : null}
-        onChange={(e) => {
-          options.filterCallback(e.value, options.index);
-        }}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-        showIcon
-      />
+      <>
+        <div className="mb-3 text-sm w-12rem">Estado Picker</div>
+        <MultiSelect
+          value={options.value}
+          options={estados}
+          itemTemplate={(option: EstadoEntity) => {
+            const bgColor = getColorById(option?.IdEstado ?? 0);
+
+            return (
+              <div
+                className="flex align-items-center px-2 py-1"
+                style={{
+                  backgroundColor: bgColor,
+                  color: "#fff",
+                  borderRadius: "7px",
+                }}
+              >
+                {" "}
+                <span>{option?.Descripcion}</span>
+              </div>
+            );
+          }}
+          onChange={(e: MultiSelectChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+          optionLabel="Descripcion"
+          optionValue="Descripcion"
+          placeholder="Seleccionar"
+          className="p-column-filter"
+        />
+      </>
     );
   };
 
@@ -1259,6 +1335,19 @@ const FileManagerModal = (props: FileManagerModalProps) => {
                 // setItemsMenuActionsFM(getItemsMenuActionsFM(rowData));
                 // menuActionsFM.current?.toggle(event);
 
+                // we validate estado , it must to be Adjuntado(4) or Archivado(5)
+                if (
+                  rowData?.Estado.IdEstado === 4 ||
+                  rowData?.Estado.IdEstado === 5
+                ) {
+                  toastx.current?.show({
+                    severity: "error",
+                    detail: `Este archivo ya ha sido adjuntado o archivado`,
+                    life: 4000,
+                  });
+                  return;
+                }
+
                 // we verify that this file doesn't select before
                 const repeatedDigitalFile = props.selectedDigitalFiles.filter(
                   (df) => df.IdFM == rowData.IdFM
@@ -1308,6 +1397,10 @@ const FileManagerModal = (props: FileManagerModalProps) => {
       IdCarpeta: null,
       Categoria: "MF",
     });
+  }, []);
+
+  useEffect(() => {
+    findAllEstadoCombox();
   }, []);
 
   ////////////////////////////////////7
@@ -1438,6 +1531,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
                     key={col.field}
                     field={col.field}
                     filterField={col.filterField}
+                    showFilterMatchModes={false}
                     sortField={col.filterField}
                     header={col.header}
                     dataType={col.dataType}
@@ -1446,7 +1540,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
                     filter
                     filterPlaceholder={col.filterPlaceholder}
                     body={estadoBodyTemplate}
-                    // filterElement={modifiadoElFilterTemplate}
+                    filterElement={estadoFilterTemplate}
                   />
                 );
               } else if (col.field == "FechaEmision") {

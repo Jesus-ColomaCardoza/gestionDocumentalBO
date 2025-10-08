@@ -612,26 +612,7 @@ const TramiteSeguimiento = () => {
                 style={{ display: "none" }}
               />
             </div>
-
-            {/* <div className="flex flex-row py-1 px-4" style={{ gap: "1rem" }}>
-              <div
-                style={{
-                  width: "100%",
-                }}
-              >
-                <label
-                  className="block text-900 text-sm font-medium mb-2"
-                >
-                  Archivo digital
-                </label>
-                <span
-                  className="block text-900 text-xs  mb-2"
-                >
-                  Archivo digital
-                </span>
-              </div>
-            </div> */}
-
+            
             <div
               className="flex flex-row pt-3 pb-1 px-3"
               style={{ gap: "1rem" }}
@@ -778,12 +759,13 @@ const TramiteSeguimiento = () => {
                               textDecoration: "none",
                               color: "var(--text-color)",
                             }}
-                            href={`${doc.Documento.UrlDocumento}`}
+                            // href={`${doc.Documento.UrlDocumento}`}
                             // href={`${URL.createObjectURL(doc)}`}
-                            // onClick={() => {
-                            //   const url = URL.createObjectURL(doc);
-                            //   console.log(url);
-                            // }}
+                            onClick={() => {
+                              navigate(
+                                `../tramite/documento/${doc?.Documento?.IdDocumento}`
+                              );
+                            }}
                             target="_blank"
                           >
                             {doc.Documento

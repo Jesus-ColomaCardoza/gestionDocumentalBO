@@ -740,10 +740,10 @@ const TramiteEmitidoNuevo = () => {
         }
       />
 
-      <div className="flex flex-row flex-wrap justify-content-between">
+      <div className="flex flex-column lg:flex-row flex-wrap gap-2 justify-content-between">
         <div
-          className="flex flex-column flex-wrap gap-1  border-solid border-1 border-gray-500 border-round-md"
-          style={{ width: "49%" }}
+          className="flex flex-column flex-wrap gap-1 border-solid border-1 border-gray-500 border-round-md"
+          style={{ minWidth: "49%" }}
         >
           <div className="flex flex-row justify-content-between align-items-center pb-3 mb-3  py-2 px-4 border-bottom-1 border-gray-500">
             <label
@@ -1139,7 +1139,7 @@ const TramiteEmitidoNuevo = () => {
 
         <div
           className="flex flex-column justify-content-between border-solid border-1 border-gray-500 border-round-md"
-          style={{ width: "49%" }}
+          style={{ minWidth: "49%" }}
         >
           <div className="flex flex-column gap-3">
             <div className="flex flex-row align-items-center py-3 mb-3 px-4 border-bottom-1 border-gray-500">

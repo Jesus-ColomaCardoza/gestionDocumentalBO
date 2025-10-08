@@ -49,3 +49,25 @@ export const filterSpanish = {
   cancel: "Cancelar",
 };
 
+export const colors = [
+  "#00838F", // Cian oscuro
+  "#1E88E5", // Azul
+  "#8E24AA", // Púrpura
+  "#F4511E", // Naranja rojizo
+  "#43A047", // Verde
+  "#5E35B1", // Violeta
+  "#3949AB", // Azul intenso
+  "#039BE5", // Celeste
+  "#E53935", // Rojo
+  "#00ACC1", // Turquesa
+  "#00897B", // Verde azulado
+  "#7CB342", // Verde lima
+  "#D81B60", // Rosa fuerte
+  "#C0CA33", // Amarillo verdoso
+  "#FDD835", // Amarillo
+  "#FB8C00", // Naranja
+  "#6D4C41", // Marrón
+  "#757575", // Gris
+  "#546E7A", // Azul grisáceo
+  "#AD1457", // Magenta oscuro
+];

@@ -630,6 +630,13 @@ const TipoDocumento = () => {
     findAllTipoDocumento();
   }, []);
 
+  // const handleColReorder = (e: any) => {
+  //   const reordered = e.columns.filter(
+  //     (col: any) => col.columnKey !== "__selector"
+  //   );
+  //   setTipoDocumentos(reordered);
+  // };
+
   return (
     <div className="card">
       <Toast ref={toast} position={"bottom-right"} />
@@ -645,6 +652,12 @@ const TipoDocumento = () => {
       />
 
       <DataTable
+        // reorderableColumns
+        // reorderableRows={false}
+        // onColReorder={handleColReorder}
+
+
+        resizableColumns
         value={tipoDocumentos}
         sortMode="multiple"
         removableSort
@@ -683,6 +696,8 @@ const TipoDocumento = () => {
           selectionMode="multiple"
           exportable={false}
           headerStyle={{ width: "0%" }}
+          reorderable={false}
+          // columnKey="__selector"
         />
         {visibleColumns.map((col) => {
           if (col.field == "Activo") {

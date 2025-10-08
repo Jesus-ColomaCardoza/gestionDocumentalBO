@@ -336,13 +336,12 @@ const TramiteEmitido = () => {
         className="hover:underline hover:text-blue-500"
         onClick={() => {
           //call endpoint findone
-          //navigate tramite/seguimiento
-          // navigate(
-          //   `../tramite/seguimiento/${rowData.IdTramite}/${rowData.Movimiento?.IdMovimiento}`
-          // );
+          navigate(
+            `../tramite/seguimiento/${rowData.IdTramite}/${rowData.Movimiento?.[0]?.IdMovimiento}`
+          );
         }}
       >
-        {rowData.IdTramite.toString().padStart(6, "0")}
+        {rowData.IdTramite.toString().padStart(8, "0")}
       </span>
     );
   };

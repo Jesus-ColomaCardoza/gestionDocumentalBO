@@ -67,8 +67,9 @@ export const defaultFilters: DataTableFilterMeta = {
     constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
   },
   "Estado.Descripcion": {
-    operator: FilterOperator.AND,
-    constraints: [{ value: null, matchMode: FilterMatchMode.CONTAINS }],
+    // value: null,
+    value: ["Nuevo","Sin Firmar","Firmado"],
+    matchMode: FilterMatchMode.IN,
   },
   FechaEmision: {
     operator: FilterOperator.AND,

@@ -3,6 +3,9 @@
  *
  * @param {any[]} args
  */
+
+import { colors } from "./Constants";
+
 /*
 \x1b[4m → Subrayado
 \x1b[30m → Negro
@@ -65,3 +68,9 @@ export const formatFileSize = (sizeInBytes: number): string => {
 export const delay = (ms: number): Promise<void> => {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
+
+export const getColorById = (id: number) => {
+  // Usa módulo para evitar overflow si hay más de 20 estados
+  const index = id % colors.length;
+  return colors[index];
+};

@@ -1,5 +1,6 @@
 import {
   DocumentoCreate,
+  DocumentoDetailsOut,
   DocumentoOut,
   DocumentosOut,
   DocumentoUpdate,
@@ -51,6 +52,19 @@ const UseDocumento = () => {
     }
   };
 
+  const findOneDetails = async (
+    id: string
+  ): Promise<DocumentoDetailsOut | undefined> => {
+    try {
+      const documento = await axios.get<DocumentoDetailsOut>(
+        `${VITE_API_URL_GDS + DOCUMENTO.FIND_ONE_DETAILS + id}`
+      );
+      return documento.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const update = async (
     id: string,
     documentoUpdate: DocumentoUpdate
@@ -81,6 +95,7 @@ const UseDocumento = () => {
     create,
     findAll,
     findOne,
+    findOneDetails,
     update,
     remove,
   };

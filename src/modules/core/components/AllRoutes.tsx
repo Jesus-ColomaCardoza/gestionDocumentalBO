@@ -53,7 +53,7 @@ const AllRoutes = () => {
               <Route path="firma_digital/archivos_digitales" element={<FileManager />}></Route>
 
               <Route path="tramite/seguimiento/:id/:id2" element={<TramiteSeguimiento/>}></Route>
-              <Route path="tramite/documento" element={<TramiteDocumento/>}></Route>
+              <Route path="tramite/documento/:id" element={<TramiteDocumento/>}></Route>
               <Route path="tramite/pendiente" element={<TramitePendiente />}></Route>
               <Route path="tramite/recibido" element={<TramiteRecibido />}></Route>
               <Route path="tramite/recibido/externo" element={<TramiteRecibidoExterno />}></Route>
