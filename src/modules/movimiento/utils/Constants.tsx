@@ -9,7 +9,7 @@ export let emptyMovimiento: MovimientoEntity = {
   Copia: false,
   FirmaDigital: false,
   IdMovimientoPadre: null,
-  NombreResponsable: "",
+  NombreResponsable: undefined,//change
   Activo: true,
   CreadoEl: new Date(),
   CreadoPor: "",
