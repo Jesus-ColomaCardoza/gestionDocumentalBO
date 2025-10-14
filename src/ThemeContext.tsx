@@ -68,7 +68,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, [primeReact]);
 
   useEffect(() => {
-    themeLink.href = `/node_modules/primeflex/themes/primeone-${themePrimeFlex}.css`;
+    themeLink.href = `/themes/themesprimeflex/primeone-${themePrimeFlex}.css`;
     setThemePrimeFlex(themePrimeFlex);
     localStorage.setItem("theme-flex-react", themePrimeFlex);
   }, [themePrimeFlex]);

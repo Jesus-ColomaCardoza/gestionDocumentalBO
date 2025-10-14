@@ -218,7 +218,6 @@ const TramitePendiente = () => {
       tramitesFindAllPendientes.registro
     ) {
       const currentDate = new Date();
-      console.log(currentDate.toLocaleString());
 
       setTramitesPendientes(
         Array.isArray(tramitesFindAllPendientes.registro)
