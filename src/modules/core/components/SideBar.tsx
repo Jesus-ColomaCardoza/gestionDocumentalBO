@@ -117,7 +117,7 @@ const SideBar = (props: SideBarProps) => {
 
           {/* text logo */}
           <span className="font-semibold text-2xl" style={{ color: "#D63939" }}>
-            MDSMF
+            SIGED FAIQUE
           </span>
         </span>
 

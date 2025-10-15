@@ -8,6 +8,7 @@ import { ForgotPasswordAuth } from "../interfaces/AuthInterface";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../../ThemeContext";
+import fondo from "../../../assets/img/fondo.jpeg";
 
 const ForgotPassword = () => {
   // variables and constants
@@ -61,7 +62,12 @@ const ForgotPassword = () => {
       }
       style={{
         height: "100dvh",
-        margin: "0 2em",
+        backgroundImage: `url(${fondo})`,
+        // backgroundPosition: "contain",
+        backgroundSize: "100% 100%", // ¡Esto deforma la imagen!
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+        width: "100%",
       }}
     >
       <div className="flex flex-column align-items-center justify-content-center">
@@ -128,6 +134,11 @@ const ForgotPassword = () => {
 
             <Button
               className="w-full p-2 text-md flex justify-content-center gap-1"
+              style={{
+                backgroundColor: "#D63939",
+                borderColor: "#D63939",
+                color: "#fff",
+              }}
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) forgotPassword(forgotPasswordData);

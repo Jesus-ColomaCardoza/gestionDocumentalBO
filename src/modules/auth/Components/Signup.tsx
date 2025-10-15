@@ -13,6 +13,7 @@ import { Dropdown, DropdownChangeEvent } from "primereact/dropdown";
 import UseArea from "../../area/hooks/UseArea";
 import { AreaEntity } from "../../area/interfaces/AreaInterface";
 import { useTheme } from "../../../ThemeContext";
+import fondo from "../../../assets/img/fondo.jpeg";
 
 const Signup = () => {
   // variables and constants
@@ -46,7 +47,7 @@ const Signup = () => {
   const { findAll } = UseArea();
 
   const { themePrimeFlex, switchTheme } = useTheme();
-  
+
   // functions
   const validateForm = () => {
     const fieldErrors: Partial<SignupAuth> = {};
@@ -137,7 +138,12 @@ const Signup = () => {
       }
       style={{
         height: "100dvh",
-        margin: "0 2em",
+        backgroundImage: `url(${fondo})`,
+        // backgroundPosition: "contain",
+        backgroundSize: "100% 100%", // ¡Esto deforma la imagen!
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+        width: "100%",
       }}
     >
       <div className="flex flex-column align-items-center justify-content-center">
@@ -485,6 +491,11 @@ const Signup = () => {
 
             <Button
               className="w-full p-2 text-md flex justify-content-center gap-1"
+              style={{
+                backgroundColor: "#D63939",
+                borderColor: "#D63939",
+                color: "#fff",
+              }}
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) {
@@ -503,7 +514,8 @@ const Signup = () => {
               <Link
                 to={"../login"}
                 className="font-medium no-underline ml-2 text-right cursor-pointer text-xs"
-                style={{ color: "var(--primary-color)" }}
+                // style={{ color: "var(--primary-color)" }}
+                style={{ color: "#D63939" }}
               >
                 Inicia sesión aquí
               </Link>

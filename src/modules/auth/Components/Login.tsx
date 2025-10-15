@@ -11,12 +11,13 @@ import { useAuth } from "../context/AuthContext";
 import { Link } from "react-router-dom";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { useTheme } from "../../../ThemeContext";
+import fondo from "../../../assets/img/fondo.jpeg";
 
 const Login = () => {
   // variables and constants
   const loginAuth: LoginAuth = {
-    Email: "",
-    Contrasena: "",
+    Email: "admin@gmail.com",
+    Contrasena: "admin",
   };
 
   const remenberMeSGD = localStorage.getItem("remenberMeSGD");
@@ -69,6 +70,11 @@ const Login = () => {
     }
   }, []);
 
+  const checkboxStyle = {
+    "--primary-color": "#D63939",
+    "--check-color": "white",
+  } as React.CSSProperties;
+
   return (
     <div
       className={
@@ -76,13 +82,26 @@ const Login = () => {
       }
       style={{
         height: "100dvh",
-        // background:"#383636ff",
+        backgroundImage: `url(${fondo})`,
+        // backgroundPosition: "contain",
+        backgroundSize: "100% 100%", // ¡Esto deforma la imagen!
+        backgroundRepeat: "no-repeat",
+        minHeight: "100vh",
+        width: "100%",
       }}
     >
       <div className="flex flex-column align-items-center justify-content-center">
         {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
         <div className="my-5">
-          <Card className="w-full py-3 px-2" style={{ borderRadius: "10px", border:`${themePrimeFlex === "light" ? "1px solid #e9e9e9ff" :"none"}` }}>
+          <Card
+            className="w-full py-3 px-2"
+            style={{
+              borderRadius: "10px",
+              border: `${
+                themePrimeFlex === "light" ? "1px solid #e9e9e9ff" : "none"
+              }`,
+            }}
+          >
             <div className="text-center mb-3">
               {/* <img
                 src="/demo/images/login/avatar.png"
@@ -181,7 +200,12 @@ const Login = () => {
                   }}
                   placeholder="Ingresa tu contraseña"
                   toggleMask
-                  inputClassName="w-full sm:w-18rem md:w-18rem "
+                  inputClassName="w-full p-inputtext-sm sm:w-18rem md:w-18rem "
+                  inputStyle={{
+                    borderTopLeftRadius:0,
+                    borderBottomLeftRadius:0,
+                    fontSize: "1rem",
+                  }}
                   className="p-inputtext-sm"
                   feedback={false}
                 ></Password>
@@ -207,23 +231,56 @@ const Login = () => {
 
             <div className="flex align-items-center justify-content-between mb-4 gap-5">
               <div className="flex align-items-center">
-                <Checkbox
-                  inputId="rememberme1"
-                  checked={checked}
-                  onChange={(e) => {
-                    setChecked(e.checked ?? false);
-
-                    if (e.checked) {
-                      localStorage.setItem(
-                        "remenberMeSGD",
-                        JSON.stringify(loginAuthData)
-                      );
-                    } else {
-                      localStorage.removeItem("remenberMeSGD");
-                    }
-                  }}
-                  className="mr-2"
-                ></Checkbox>
+                <div className="flex align-items-center" style={checkboxStyle}>
+                  <input
+                    type="checkbox"
+                    id="rememberme1"
+                    checked={checked}
+                    onChange={(e) => {
+                      setChecked(e.target.checked ?? false);
+                      if (e.target.checked) {
+                        localStorage.setItem(
+                          "remenberMeSGD",
+                          JSON.stringify(loginAuthData)
+                        );
+                      } else {
+                        localStorage.removeItem("remenberMeSGD");
+                      }
+                    }}
+                    className="mr-2 custom-checkbox"
+                    style={{
+                      appearance: "none",
+                      WebkitAppearance: "none",
+                      width: "20px",
+                      height: "20px",
+                      // border: "2px solid #ddd",
+                      borderRadius: "6px",
+                      backgroundColor: checked
+                        ? "var(--primary-color)"
+                        : themePrimeFlex === "light"
+                        ? "#e9e9e9ff"
+                        : "#111827",
+                      cursor: "pointer",
+                      position: "relative",
+                    }}
+                  />
+                  <style>{`
+                  .custom-checkbox:checked::after {
+                    content: '';
+                    position: absolute;
+                    left: 7px;
+                    top: 2px;
+                    width: 5px;
+                    height: 10px;
+                    border: solid var(--check-color);
+                    border-width: 0 2px 2px 0;
+                    transform: rotate(45deg);
+                  }
+                  .custom-checkbox:hover {
+                    border-color: var(--primary-color);
+                  }
+                `}</style>
+                </div>
                 <label className="text-xs" htmlFor="rememberme1">
                   Recordar credenciales
                 </label>
@@ -232,7 +289,10 @@ const Login = () => {
               <Link
                 to={"../forgot_password"}
                 className="font-medium no-underline ml-2 text-right cursor-pointer text-xs"
-                style={{ color: "var(--primary-color)" }}
+                // style={{ color: "var(--primary-color)" }}
+                style={{
+                  color: "#D63939",
+                }}
               >
                 ¿Olvidé mi contraseña?
               </Link>
@@ -240,6 +300,11 @@ const Login = () => {
 
             <Button
               className="w-full p-2 text-md flex justify-content-center gap-1"
+              style={{
+                backgroundColor: "#D63939",
+                borderColor: "#D63939",
+                color: "#fff",
+              }}
               loading={loadingAuth}
               onClick={() => {
                 if (validateForm()) login(loginAuthData);
@@ -255,7 +320,10 @@ const Login = () => {
               <Link
                 to={"../signup"}
                 className="font-medium no-underline ml-2 text-right cursor-pointer text-xs"
-                style={{ color: "var(--primary-color)" }}
+                style={{
+                  color: "#D63939",
+                }}
+                // style={{ color: "var(--primary-color)" }}
               >
                 Registrate aquí
               </Link>
