@@ -66,7 +66,7 @@ export interface UsuarioCreate {
   Genero: string;
   RazonSocial?: string;
   Direccion?: string;
-  IdTipoIdentificacion?: number;
+  IdTipoIdentificacion?: number|null;
   NroIdentificacion?: string;
   IdTipoUsuario?: number;
   IdRol?: string;

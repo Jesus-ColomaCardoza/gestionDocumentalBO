@@ -213,7 +213,7 @@ const Usuario = () => {
       usuario.Email.trim() &&
       usuario.Contrasena.trim() &&
       // usuario.Genero.trim() &&
-      usuario.IdTipoIdentificacion != 0 &&
+      // usuario.IdTipoIdentificacion != 0 &&
       usuario.IdTipoUsuario != 0 &&
       usuario.IdRol != "" &&
       usuario.IdCargo != 0 &&
@@ -237,7 +237,10 @@ const Usuario = () => {
         Genero: usuario.Genero,
         RazonSocial: usuario.RazonSocial,
         Direccion: usuario.Direccion,
-        IdTipoIdentificacion: usuario.IdTipoIdentificacion,
+        IdTipoIdentificacion:
+          usuario.IdTipoIdentificacion == 0
+            ? null
+            : usuario.IdTipoIdentificacion,
         NroIdentificacion: usuario.NroIdentificacion,
         IdTipoUsuario: usuario.IdTipoUsuario,
         IdRol: usuario.IdRol,
