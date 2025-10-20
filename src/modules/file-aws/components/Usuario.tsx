@@ -208,8 +208,8 @@ const Usuario = () => {
     setSubmitted(true);
     if (
       usuario.Nombres.trim() &&
-      // usuario.ApellidoPaterno.trim() &&
-      // usuario.ApellidoMaterno.trim() &&
+      usuario.ApellidoPaterno.trim() &&
+      usuario.ApellidoMaterno.trim() &&
       usuario.Email.trim() &&
       usuario.Contrasena.trim() &&
       // usuario.Genero.trim() &&

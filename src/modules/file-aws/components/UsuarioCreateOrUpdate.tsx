@@ -112,13 +112,13 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
               id="ApellidoPaterno"
               value={props.usuario.ApellidoPaterno}
               onChange={(e) => props.onInputChange(e, "ApellidoPaterno")}
-              // className={classNames({
-              //   "p-invalid": props.submitted && !props.usuario.ApellidoPaterno,
-              // })}
+              className={classNames({
+                "p-invalid": props.submitted && !props.usuario.ApellidoPaterno,
+              })}
             />
-            {/* {props.submitted && !props.usuario.ApellidoPaterno && (
+            {props.submitted && !props.usuario.ApellidoPaterno && (
               <small className="p-error">ApellidoPaterno is required.</small>
-            )} */}
+            )}
           </div>
         </div>
       </div>
@@ -151,13 +151,13 @@ const UsuarioCreateOrUpdate = (props: UsuarioCreateOrUpdateProps) => {
               id="ApellidoMaterno"
               value={props.usuario.ApellidoMaterno}
               onChange={(e) => props.onInputChange(e, "ApellidoMaterno")}
-              // className={classNames({
-              //   "p-invalid": props.submitted && !props.usuario.ApellidoMaterno,
-              // })}
+              className={classNames({
+                "p-invalid": props.submitted && !props.usuario.ApellidoMaterno,
+              })}
             />
-            {/* {props.submitted && !props.usuario.ApellidoMaterno && (
+            {props.submitted && !props.usuario.ApellidoMaterno && (
               <small className="p-error">ApellidoMaterno is required.</small>
-            )} */}
+            )}
           </div>
         </div>
 

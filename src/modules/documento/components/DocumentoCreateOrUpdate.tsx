@@ -266,7 +266,7 @@ const DocumentoCreateOrUpdate = (props: DocumentoCreateOrUpdateProps) => {
                 : "none"
             } `,
           }}
-          maxFileSize={2000000}
+          maxFileSize={2000000}//20MB
           onUpload={onTemplateUpload}
           onSelect={onTemplateSelect}
           onError={onTemplateClear}

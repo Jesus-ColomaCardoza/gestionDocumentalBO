@@ -629,6 +629,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
       );
     }
   };
+  
   // templates to dialogs
   // carpeta
   const hideCarpetaDialog = () => {

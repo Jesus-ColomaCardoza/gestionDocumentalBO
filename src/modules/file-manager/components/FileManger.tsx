@@ -23,7 +23,7 @@ import {
 import { Toast } from "primereact/toast";
 import { columns, defaultFilters, emptyFileManager } from "../utils/Constants";
 import { RadioButtonChangeEvent } from "primereact/radiobutton";
-import { formatDate } from "../../utils/Methods";
+import { formatDate, getColorById } from "../../utils/Methods";
 import { Calendar } from "primereact/calendar";
 import EmptyMessageData from "../../utils/shared/EmptyMessageData";
 import { Menu } from "primereact/menu";
@@ -48,6 +48,8 @@ import {
   TreeMultipleSelectionKeys,
 } from "primereact/tree";
 import { useAuth } from "../../auth/context/AuthContext";
+import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
+import UseEstado from "../../estado/hooks/UseEstado";
 
 const FileManager = () => {
   // custom hooks
@@ -68,6 +70,8 @@ const FileManager = () => {
 
   const { findAllTree } = UseCarpeta();
 
+  const { findAll: findAllEstado } = UseEstado();
+
   //useRefs
   const toastx = useRef<Toast>(null);
 
@@ -76,6 +80,10 @@ const FileManager = () => {
   const menuActionsFM = useRef<Menu>(null);
 
   //useStates
+  const [estados, setEstados] = useState<
+    Pick<EstadoEntity, "IdEstado" | "Descripcion">[]
+  >([]);
+
   const [selectedFileMoved, setSelectedFileMoved] = useState<
     string | TreeMultipleSelectionKeys | TreeCheckboxSelectionKeys | null
   >(null);
@@ -406,7 +414,7 @@ const FileManager = () => {
           Categoria: titleFM?.id,
           IdEstado: 1, // set at diagram state
           Activo: documento.Activo,
-          FechaEmision:new Date().toISOString(),
+          FechaEmision: new Date().toISOString(),
         });
 
         setLoadingDocumentoCreateOrUpdate(false);
@@ -574,6 +582,38 @@ const FileManager = () => {
 
       setSelectedFileMoved(null);
       setMoveFileManagerDialog(false);
+    }
+  };
+
+  // actions CRUD - Tipo Usuario (create, read, update, remove) -> (create, findAll-findOne, update, remove)
+  const findAllEstadoCombox = async () => {
+    setLoading(true);
+    const estadoFindAll = await findAllEstado({
+      cantidad_max: "0",
+      Language: "ES",
+      filters: [
+        {
+          campo: "IdEsquemaEstado",
+          operador: "EQ",
+          tipo: "numeric2",
+          valor1: "1",
+          valor2: "",
+        },
+      ],
+    });
+    setLoading(false);
+
+    if (estadoFindAll?.message.msgId == 0 && estadoFindAll.registro) {
+      setEstados(
+        Array.isArray(estadoFindAll.registro)
+          ? estadoFindAll.registro?.map((af) => {
+              return {
+                IdEstado: af.IdEstado,
+                Descripcion: af.Descripcion,
+              };
+            })
+          : []
+      );
     }
   };
 
@@ -974,23 +1014,59 @@ const FileManager = () => {
 
   // templates to column Estado
   const estadoBodyTemplate = (rowData: FileManagerEntity) => {
-    return <p className="text-sm m-0">{rowData.Estado?.Descripcion}</p>;
+    const bgColor = getColorById(rowData.Estado?.IdEstado ?? 0);
+
+    return (
+      <div style={{ padding: "0 1em" }}>
+        <p
+          className="flex justify-content-center align-items-center px-2 py-1 text-sm"
+          style={{
+            backgroundColor: bgColor,
+            color: "#fff",
+            borderRadius: "7px",
+          }}
+        >
+          {rowData.Estado?.Descripcion}
+        </p>
+      </div>
+    );
   };
 
   const estadoFilterTemplate = (
     options: ColumnFilterElementTemplateOptions
   ) => {
     return (
-      <Calendar
-        value={options.value ? new Date(options.value) : null}
-        onChange={(e) => {
-          options.filterCallback(e.value, options.index);
-        }}
-        dateFormat="mm/dd/yy"
-        placeholder="mm/dd/yyyy"
-        mask="99/99/9999"
-        showIcon
-      />
+      <>
+        <div className="mb-3 text-sm w-12rem">Estado Picker</div>
+        <MultiSelect
+          value={options.value}
+          options={estados}
+          itemTemplate={(option: EstadoEntity) => {
+            const bgColor = getColorById(option?.IdEstado ?? 0);
+
+            return (
+              <div
+                className="flex align-items-center px-2 py-1"
+                style={{
+                  backgroundColor: bgColor,
+                  color: "#fff",
+                  borderRadius: "7px",
+                }}
+              >
+                {" "}
+                <span>{option?.Descripcion}</span>
+              </div>
+            );
+          }}
+          onChange={(e: MultiSelectChangeEvent) =>
+            options.filterCallback(e.value)
+          }
+          optionLabel="Descripcion"
+          optionValue="Descripcion"
+          placeholder="Seleccionar"
+          className="p-column-filter"
+        />
+      </>
     );
   };
 
@@ -1217,6 +1293,10 @@ const FileManager = () => {
     });
   }, []);
 
+  useEffect(() => {
+    findAllEstadoCombox();
+  }, []);
+
   return (
     <div className="">
       <Toast ref={toastx} position={"bottom-right"} />
@@ -1402,6 +1482,7 @@ const FileManager = () => {
                     key={col.field}
                     field={col.field}
                     filterField={col.filterField}
+                    showFilterMatchModes={false}
                     sortField={col.filterField}
                     header={col.header}
                     dataType={col.dataType}
@@ -1410,7 +1491,7 @@ const FileManager = () => {
                     filter
                     filterPlaceholder={col.filterPlaceholder}
                     body={estadoBodyTemplate}
-                    // filterElement={modifiadoElFilterTemplate}
+                    filterElement={estadoFilterTemplate}
                   />
                 );
               } else if (col.field == "FechaEmision") {
