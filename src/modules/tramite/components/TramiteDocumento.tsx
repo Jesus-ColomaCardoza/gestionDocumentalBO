@@ -6,6 +6,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import UseDocumento from "../../documento/hooks/UseDocumento";
 import { DocumentoDetailsEntity } from "../../documento/interfaces/DocumentoInterface";
 import { formatDate } from "../../utils/Methods";
+import notFoundDocumentDark from "../../../assets/img/not-found-document-dark.svg"
+import notFoundDocumentLight from "../../../assets/img/not-found-document-light.svg"
 
 const TramiteDocumento = () => {
   // custom hooks
@@ -109,11 +111,10 @@ const TramiteDocumento = () => {
                 </label>
                 <span className="block text-900 text-xs mb-2">
                   {(
-                    documento?.Usuario?.Nombres||"" +
-                    " " +
-                    documento?.Usuario?.ApellidoPaterno||"" +
-                    " " +
-                    documento?.Usuario?.ApellidoMaterno||""
+                    documento?.Usuario?.Nombres ||
+                    "" + " " + documento?.Usuario?.ApellidoPaterno ||
+                    "" + " " + documento?.Usuario?.ApellidoMaterno ||
+                    ""
                   ).toUpperCase()}{" "}
                 </span>
               </div>
@@ -291,13 +292,29 @@ const TramiteDocumento = () => {
           </div>
 
           <div style={{ height: "100%", border: "none" }}>
-            <iframe
-              src={`${documento?.UrlDocumento}`}
-              title="Visor PDF"
-              width="100%"
-              height="100%"
-              style={{ border: "none" }}
-            ></iframe>
+            {documento?.UrlDocumento != null ? (
+              <iframe
+                src={`${documento?.UrlDocumento}`}
+                title="Visor PDF"
+                width="100%"
+                height="100%"
+                style={{ border: "none" }}
+              ></iframe>
+            ):(
+              <div style={{
+                padding:"6em",
+                display: "flex",
+                justifyContent: "center",
+                margin:"auto",
+                objectFit:"contain",
+              }}>
+                <img style={{
+                  maxWidth:"100%",
+               
+                }} src={themePrimeFlex === "dark" ? notFoundDocumentDark : notFoundDocumentLight} alt="Not found document" />
+
+              </div>
+            )}
           </div>
         </div>
       </div>

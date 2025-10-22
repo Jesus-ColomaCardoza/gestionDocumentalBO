@@ -50,6 +50,7 @@ import {
 import { useAuth } from "../../auth/context/AuthContext";
 import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
 import UseEstado from "../../estado/hooks/UseEstado";
+import DocumentoFirmar from "../../documento/components/DocumentoFirmar";
 
 const FileManager = () => {
   // custom hooks
@@ -148,6 +149,9 @@ const FileManager = () => {
     useState<boolean>(false);
 
   const [removeDocumentoDialog, setRemoveDocumentoDialog] =
+    useState<boolean>(false);
+
+  const [firmarDocumentoDialog, setFirmarDocumentoDialog] =
     useState<boolean>(false);
 
   const [moveFileManagerDialog, setMoveFileManagerDialog] =
@@ -672,6 +676,15 @@ const FileManager = () => {
     setRemoveDocumentoDialog(true);
   };
 
+  const hideFirmarDocumentoDialog = () => {
+    setFirmarDocumentoDialog(false);
+  };
+
+  const showFirmarDocumentoDialog = (fileManager: FileManagerEntity) => {
+    setFileManager({ ...fileManager });
+    setFirmarDocumentoDialog(true);
+  };
+
   //tree
   const showMoveFileManagerDialog = async (fileManager: FileManagerEntity) => {
     setFileManager({ ...fileManager });
@@ -1018,16 +1031,18 @@ const FileManager = () => {
 
     return (
       <div style={{ padding: "0 1em" }}>
-        <p
-          className="flex justify-content-center align-items-center px-2 py-1 text-sm"
-          style={{
-            backgroundColor: bgColor,
-            color: "#fff",
-            borderRadius: "7px",
-          }}
-        >
-          {rowData.Estado?.Descripcion}
-        </p>
+        {rowData.Estado?.Descripcion != null && (
+          <p
+            className="flex justify-content-center align-items-center px-2 py-1 text-sm"
+            style={{
+              backgroundColor: bgColor,
+              color: "#fff",
+              borderRadius: "7px",
+            }}
+          >
+            {rowData.Estado?.Descripcion}
+          </p>
+        )}
       </div>
     );
   };
@@ -1244,7 +1259,14 @@ const FileManager = () => {
                 showMoveFileManagerDialog(rowData);
               },
             },
-            { label: "Firmar", icon: "pi pi-pen-to-square", disabled: true },
+            {
+              label: "Firmar",
+              icon: "pi pi-pen-to-square",
+              command: () => {
+                showFirmarDocumentoDialog(rowData);
+              },
+              // disabled: true,
+            },
             { label: "Ver Firmas", icon: "pi pi-list-check", disabled: true },
             { label: "Compartir", icon: "pi pi-user-plus", disabled: true },
           ]
@@ -1574,6 +1596,13 @@ const FileManager = () => {
         removeDocumentoDialog={removeDocumentoDialog}
         hideRemoveDocumentoDialog={hideRemoveDocumentoDialog}
         removeDocumento={removeDocumentoFileManager}
+      />
+
+      <DocumentoFirmar
+        fileManager={fileManager}
+        firmarDocumentoDialog={firmarDocumentoDialog}
+        hideFirmarDocumentoDialog={hideFirmarDocumentoDialog}
+        // removeDocumento={removeDocumentoFileManager}
       />
 
       <FileManagerMove

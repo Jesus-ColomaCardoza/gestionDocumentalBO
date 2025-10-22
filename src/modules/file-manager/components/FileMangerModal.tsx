@@ -629,7 +629,7 @@ const FileManagerModal = (props: FileManagerModalProps) => {
       );
     }
   };
-  
+
   // templates to dialogs
   // carpeta
   const hideCarpetaDialog = () => {
@@ -1077,16 +1077,18 @@ const FileManagerModal = (props: FileManagerModalProps) => {
 
     return (
       <div style={{ padding: "0 1em" }}>
-        <p
-          className="flex justify-content-center align-items-center px-2 py-1 text-sm"
-          style={{
-            backgroundColor: bgColor,
-            color: "#fff",
-            borderRadius: "7px",
-          }}
-        >
-          {rowData.Estado?.Descripcion}
-        </p>
+        {rowData.Estado?.Descripcion != null && (
+          <p
+            className="flex justify-content-center align-items-center px-2 py-1 text-sm"
+            style={{
+              backgroundColor: bgColor,
+              color: "#fff",
+              borderRadius: "7px",
+            }}
+          >
+            {rowData.Estado?.Descripcion}
+          </p>
+        )}
       </div>
     );
   };

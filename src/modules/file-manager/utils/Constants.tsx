@@ -68,7 +68,7 @@ export const defaultFilters: DataTableFilterMeta = {
   },
   "Estado.Descripcion": {
     // value: null,
-    value: ["Nuevo","Sin Firmar","Firmado"],
+    value: ["Nuevo","Sin Firmar","Firmado",null],//revisar to modal
     matchMode: FilterMatchMode.IN,
   },
   FechaEmision: {
