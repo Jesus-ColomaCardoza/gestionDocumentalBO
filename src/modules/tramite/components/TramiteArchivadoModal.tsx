@@ -22,7 +22,10 @@ type TramiteArchivadoModalProps = {
   tramiteArchivarDialog: boolean;
   selectedTramitesRecibidos: TramiteRecibidoEntity[];
   tramiteRecibido: TramiteRecibidoEntity;
-  archivadores: Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">[];
+  archivadores: Pick<
+    ArchivadorEntity,
+    "IdArchivador" | "Descripcion" | "Nombre"
+  >[];
   setArchivador: Dispatch<
     SetStateAction<
       Pick<ArchivadorEntity, "IdArchivador" | "Descripcion"> | null | undefined
@@ -215,14 +218,14 @@ const TramiteArchivadoModal = (props: TramiteArchivadoModalProps) => {
                   const value = e.value || "";
 
                   props.setArchivador(value);
-                  
+
                   props.setTramiteArchivadosErrors((prev: any) => ({
                     ...prev,
                     ["archivador"]: undefined,
                   }));
                 }}
                 options={props.archivadores}
-                optionLabel="Descripcion"
+                optionLabel="Nombre"
                 filter
                 placeholder="Seleccionar archivador"
                 className="w-full flex flex-row align-items-center p-inputtext-sm"

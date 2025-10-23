@@ -16,17 +16,9 @@ export const columns: ColumnMeta[] = [
     field: "Ano",
     header: "Año",
     dataType: "numeric",
-    width: "30%",
-    show: true,
-    filterPlaceholder: "Buscar por Año",
-  },
-  {
-    field: "Descripcion",
-    header: "Descripcion",
-    dataType: "text",
     width: "10%",
     show: true,
-    filterPlaceholder: "Buscar por Descripcion",
+    filterPlaceholder: "Buscar por Año",
   },
   {
     field: "Nombre",
@@ -35,6 +27,14 @@ export const columns: ColumnMeta[] = [
     width: "30%",
     show: true,
     filterPlaceholder: "Buscar por Nombre",
+  },
+  {
+    field: "Descripcion",
+    header: "Descripcion",
+    dataType: "text",
+    width: "20%",
+    show: true,
+    filterPlaceholder: "Buscar por Descripcion",
   },
   {
     field: "NroTramites",

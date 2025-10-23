@@ -127,7 +127,7 @@ const TramiteRecibido = () => {
   >([]);
 
   const [archivadores, setArchivadores] = useState<
-    Pick<ArchivadorEntity, "IdArchivador" | "Descripcion">[]
+    Pick<ArchivadorEntity, "IdArchivador" | "Descripcion" |"Nombre">[]
   >([]);
 
   const [archivador, setArchivador] = useState<Pick<
@@ -943,6 +943,7 @@ const TramiteRecibido = () => {
               return {
                 IdArchivador: af.IdArchivador,
                 Descripcion: af.Descripcion,
+                Nombre: af.Nombre,
               };
             })
           : []

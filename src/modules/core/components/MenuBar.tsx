@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "../../../ThemeContext";
 import { Menubar } from "primereact/menubar";
 import { Badge } from "primereact/badge";
@@ -6,6 +6,7 @@ import { Avatar } from "primereact/avatar";
 import { Button } from "primereact/button";
 import { useAuth } from "../../auth/context/AuthContext";
 import { useEffect } from "react";
+import logo from "./../../../assets/img/logo.png";
 
 type MenuBarProps = {
   visible?: boolean;
@@ -16,6 +17,8 @@ const MenuBar = (props: MenuBarProps) => {
   const { themePrimeFlex, switchTheme } = useTheme();
 
   const { logout } = useAuth()!;
+
+  const navigate = useNavigate();
 
   const itemRenderer = (item: any) => (
     <Link
@@ -50,8 +53,6 @@ const MenuBar = (props: MenuBarProps) => {
     </div>
   );
 
-
-
   const itemRenderer3 = (item: any) => (
     <div
       className={`flex align-items-center  p-menuitem-link px-3 py-2  ${
@@ -74,9 +75,12 @@ const MenuBar = (props: MenuBarProps) => {
     },
 
     {
-      label: "Login",
+      label: "Home",
       icon: "pi pi-home",
       url: "dashboard",
+      command: () => {
+        navigate("/dashboard");
+      },
       template: itemRenderer3,
     },
     {
@@ -145,7 +149,8 @@ const MenuBar = (props: MenuBarProps) => {
     <div className="flex align-items-center" style={{ width: "16.7rem" }}>
       <img
         alt="logo"
-        src="https://us.123rf.com/450wm/breizhatao/breizhatao2303/breizhatao230300075/200640330-flag-of-peru-painted-on-a-cinder-block-wall.jpg?ver=6"
+        src={logo}
+        // src="https://us.123rf.com/450wm/breizhatao/breizhatao2303/breizhatao230300075/200640330-flag-of-peru-painted-on-a-cinder-block-wall.jpg?ver=6"
         // src="https://images.teepublic.com/derived/production/designs/15223072_0/1603168989/i_p:c_000000,s_630,q_90.jpg"
         // src="https://res.cloudinary.com/teepublic/image/private/s--Tt6RHArX--/t_Resized%20Artwork/c_fit,g_north_west,h_954,w_954/co_000000,e_outline:48/co_000000,e_outline:inner_fill:48/co_ffffff,e_outline:48/co_ffffff,e_outline:inner_fill:48/co_bbbbbb,e_outline:3:1000/c_mpad,g_center,h_1260,w_1260/b_rgb:eeeeee/c_limit,f_auto,h_630,q_auto:good:420,w_630/v1603168989/production/designs/15223072_0.jpg"
         height="40"
