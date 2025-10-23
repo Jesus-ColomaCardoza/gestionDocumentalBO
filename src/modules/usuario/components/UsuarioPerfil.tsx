@@ -689,9 +689,9 @@ const UsuarioPerfil = () => {
               <div>
                 <Avatar
                   label={`${
-                    userAuth?.Nombres.split(" ")[0][0].toUpperCase() +
+                    userAuth?.Nombres?.split(" ")[0][0].toUpperCase() +
                     "" +
-                    userAuth?.ApellidoPaterno.split(" ")[0][0].toUpperCase()
+                    (userAuth?.ApellidoPaterno?.split(" ")[0][0]?.toUpperCase() || "SR")
                   }`}
                   image={`${userAuth?.UrlFotoPerfil}`}
                   shape="circle"

@@ -311,13 +311,13 @@ const TramiteSeguimiento = () => {
             <div style={{ width: "20%" }}>
               <Avatar
                 label={`${
-                  node?.data?.Tramite?.Remitente?.Nombres.split(
+                  node?.data?.Tramite?.Remitente?.Nombres?.split(
                     " "
-                  )[0][0].toUpperCase() +
+                  )[0][0]?.toUpperCase() +
                   "" +
-                  node?.data?.Tramite?.Remitente?.ApellidoPaterno.split(
+                  (node?.data?.Tramite?.Remitente?.ApellidoPaterno?.split(
                     " "
-                  )[0][0].toUpperCase()
+                  )[0][0]?.toUpperCase() || "SR")
                 }`}
                 image={`${""}`}
                 shape="circle"
