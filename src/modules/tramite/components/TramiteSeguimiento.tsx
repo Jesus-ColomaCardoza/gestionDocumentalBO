@@ -67,10 +67,10 @@ const TramiteSeguimiento = () => {
         iconEstatdo = "pi pi-calendar-clock";
         break;
       case 19:
-        iconEstatdo = "pi pi-info-circle";
-        break;
-      case 20:
         iconEstatdo = "pi pi-trash";
+        break;
+        case 20:
+        iconEstatdo = "pi pi-info-circle";
         break;
       default:
         iconEstatdo = "pi pi-clock";
