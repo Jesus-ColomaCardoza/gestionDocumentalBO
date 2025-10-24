@@ -13,6 +13,7 @@
     "@react-oauth/google": "^0.12.2",
     "@react-pdf-viewer/core": "^3.12.0",
     "@react-pdf-viewer/default-layout": "^3.12.0",
+    "@react-pdf-viewer/page-navigation": "^3.12.0",
     "@react-pdf-viewer/theme": "^3.12.0",
     "axios": "^1.8.4",
     "date-fns": "^4.1.0",

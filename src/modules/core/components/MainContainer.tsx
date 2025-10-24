@@ -142,6 +142,10 @@ const MainContainer = ({ visible }: MainContainerProps) => {
                       label="Nuevo Trámite"
                       icon="pi pi-plus"
                       className="mb-2 justify-content-start"
+                      style={{
+                        color:"#fff",
+                        border:"none"
+                      }}
                       onClick={() => navigate("../tramite/emitido/nuevo")}
                     />
                     {/* <Button
@@ -154,8 +158,11 @@ const MainContainer = ({ visible }: MainContainerProps) => {
                     <Button
                       label="Archivos Digitales"
                       icon="pi pi-folder-open"
-                      severity="help"
-                      className="mb-2 justify-content-start"
+                      className="mb-2 justify-content-start bg-green-500"
+                      style={{
+                        color:"#fff",
+                        border:"none"
+                      }}
                       onClick={() =>
                         navigate("../firma_digital/archivos_digitales")
                       }
@@ -163,8 +170,11 @@ const MainContainer = ({ visible }: MainContainerProps) => {
                     <Button
                       label="Trámites Pendientes"
                       icon="pi pi-info-circle"
-                      severity="success"
-                      className="mb-2 justify-content-start"
+                      className="mb-2 justify-content-start bg-orange-500"
+                      style={{
+                        color:"#fff",
+                        border:"none"
+                      }}
                       onClick={() => navigate("../tramite/pendiente")}
                     />
                     {/* <Button

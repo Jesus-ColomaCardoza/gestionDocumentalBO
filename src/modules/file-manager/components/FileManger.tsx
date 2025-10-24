@@ -1307,13 +1307,15 @@ const FileManager = () => {
 
   //useEffects
   useEffect(() => {
-    setTitleFM({ id: "MF", title: "Mis archivos" });
-    findAllMyFilesFileManager({
-      IdUsuario: userAuth?.IdUsuario,
-      IdCarpeta: null,
-      Categoria: "MF",
-    });
-  }, []);
+    if (userAuth?.IdUsuario) {
+      setTitleFM({ id: "MF", title: "Mis archivos" });
+      findAllMyFilesFileManager({
+        IdUsuario: userAuth?.IdUsuario,
+        IdCarpeta: null,
+        Categoria: "MF",
+      });
+    }
+  }, [userAuth?.IdUsuario]);
 
   useEffect(() => {
     findAllEstadoCombox();

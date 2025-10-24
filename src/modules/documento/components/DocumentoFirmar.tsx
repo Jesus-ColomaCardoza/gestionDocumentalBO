@@ -1,14 +1,27 @@
+// https://react-pdf-viewer.dev
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { DocumentoEntity } from "../interfaces/DocumentoInterface";
 import { InputText } from "primereact/inputtext";
 import { Worker, Viewer, SpecialZoomLevel } from "@react-pdf-viewer/core";
-import { defaultLayoutPlugin } from "@react-pdf-viewer/default-layout";
+import {
+  defaultLayoutPlugin,
+  ToolbarSlot,
+} from "@react-pdf-viewer/default-layout";
 import { PDFDocument, rgb } from "pdf-lib";
 import { useState, useRef, useEffect } from "react";
 import { FileManagerEntity } from "../../file-manager/interfaces/FileMangerInterface";
+import {
+  pageNavigationPlugin,
+  RenderCurrentPageLabelProps,
+  RenderGoToPageProps,
+} from "@react-pdf-viewer/page-navigation";
+
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
+
+import "@react-pdf-viewer/core/lib/styles/index.css";
+import "@react-pdf-viewer/page-navigation/lib/styles/index.css";
 
 import { themePlugin } from "@react-pdf-viewer/theme";
 import { useTheme } from "../../../ThemeContext";
@@ -48,6 +61,21 @@ const DocumentoFirmar = (props: DocumentoFirmarProps) => {
   const viewerRef = useRef<HTMLDivElement>(null);
   const signatureRef = useRef<HTMLDivElement>(null);
   const pageRef = useRef<HTMLDivElement>(null);
+  const pageNavigationPluginInstance = pageNavigationPlugin();
+
+  const {
+    CurrentPageLabel,
+    CurrentPageInput,
+    GoToFirstPageButton,
+    GoToLastPageButton,
+    GoToNextPageButton,
+    GoToPreviousPage,
+    GoToFirstPage,
+    GoToNextPage,
+    GoToLastPage,
+  } = pageNavigationPluginInstance;
+
+  const [currentPage, setCurrentPage] = useState(0);
 
   const themePluginInstance = themePlugin();
   const defaultLayoutPluginInstance = defaultLayoutPlugin();
@@ -222,7 +250,8 @@ const DocumentoFirmar = (props: DocumentoFirmarProps) => {
 
       const pdfDoc = await PDFDocument.load(pdfBytes);
       const pages = pdfDoc.getPages();
-      const firstPage = pages[0];
+      const firstPage = pages[currentPage];
+
       const { width: pdfWidth, height: pdfHeight } = firstPage.getSize();
 
       const signatureImageBytes = await fetch(logo).then((res) =>
@@ -239,7 +268,8 @@ const DocumentoFirmar = (props: DocumentoFirmarProps) => {
       const clampedX = Math.max(0, Math.min(relativeX, pdfDimensions.width));
       const clampedY = Math.max(0, Math.min(relativeY, pdfDimensions.height));
 
-      const posX = ((clampedX / pdfDimensions.width) * pdfWidth - imgWidth / 2)-90;// 90 test value to coincidir
+      const posX =
+        (clampedX / pdfDimensions.width) * pdfWidth - imgWidth / 2 - 90; // 90 test value to coincidir
       const posY =
         pdfHeight -
         (clampedY / pdfDimensions.height) * pdfHeight -
@@ -354,93 +384,234 @@ const DocumentoFirmar = (props: DocumentoFirmarProps) => {
       modal
       onHide={props.hideFirmarDocumentoDialog}
     >
+      <div
+        style={{
+          alignItems: "center",
+          backgroundColor: "#eeeeee",
+          borderBottom: "1px solid rgba(0, 0, 0, 0.3)",
+          display: "none",
+          justifyContent: "center",
+          padding: "8px",
+        }}
+      >
+        <CurrentPageLabel>
+          {(props: RenderCurrentPageLabelProps) => {
+            setCurrentPage(props.currentPage);
+            return <></>;
+          }}
+        </CurrentPageLabel>
+      </div>
+
       <div>
         <div
-          ref={viewerRef}
-          onClick={handleContainerClick}
           style={{
-            position: "relative",
-            border: "none",
-            marginTop: "1rem",
-            height: "70vh",
-            overflow: "auto",
-            cursor: dragging ? "grabbing" : "crosshair",
+            border: `1px ${themePrimeFlex === "dark" ? "#1A1A1A" : "#e7e2e2ff"} solid`,
           }}
         >
-          {props.fileManager.UrlFM && (
-            <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-              <Viewer
-                fileUrl={props.fileManager.UrlFM}
-                plugins={[defaultLayoutPluginInstance, themePluginInstance]}
-                theme={themePrimeFlex === "dark" ? "dark" : "light"}
-                defaultScale={SpecialZoomLevel.PageFit}
-              />
-            </Worker>
-          )}
-
-          {signature && (
-            <div
-              ref={signatureRef}
-              onMouseDown={handleSignatureMouseDown}
-              style={{
-                position: "absolute",
-                left: signature.x,
-                top: signature.y,
-                transform: "translate(-50%, -50%)",
-                border: "2px dashed #007ad9",
-                padding: "10px",
-                backgroundColor: "rgba(255,255,255,0.95)",
-                borderRadius: "8px",
-                cursor: dragging ? "grabbing" : "grab",
-                userSelect: "none",
-                zIndex: 1000,
-                maxWidth: "200px",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-              }}
-              className="flex flex-row"
-            >
-              <div className="flex justify-content-center align-items-center mr-1">
-                <img
-                  src={logo}
-                  alt="Logo Firma"
-                  style={{
-                    width: "45px",
-                    height: "45px",
-                    display: "block",
-                    margin: "0 auto",
-                  }}
-                />
-              </div>
-              <div
-                className="flex flex-column justify-content-center"
-                style={{
-                  fontSize: "8px",
-                }}
-              >
-                <span style={{ color: "#000", fontSize: ".3rem" }}>
-                  {"Firmado digitalmente por:"}
-                </span>
-                <span style={{ color: "#000", fontSize: ".3rem" }}>
-                  {firmante.Nombre}
-                </span>
-                <span style={{ color: "#000", fontSize: ".3rem" }}>
-                  {firmante.NroIdentidad}
-                </span>
-                <span style={{ color: "#333", fontSize: ".3rem" }}>
-                  {"Motivo: " + firmante.Motivo}
-                </span>
-                <span style={{ color: "#666", fontSize: ".3rem" }}>
-                  {"Fecha: " + formatDate(new Date())}
-                </span>
-                <span style={{ color: "#333", fontSize: ".3rem" }}>
-                  {"Cargo: " + firmante.Cargo}
-                </span>
-                <span style={{ color: "#333", fontSize: ".3rem" }}>
-                  {firmante.Entidad}
-                </span>
-              </div>
+          <div
+            style={{
+              alignItems: "center",
+              backgroundColor: `${
+                themePrimeFlex === "dark" ? "#1A1A1A" : "#FFFFFF"
+              }`,
+              borderBottom: "1px solid rgba(0, 0, 0, 0.1)",
+              display: "flex",
+              justifyContent: "center",
+              padding: "4px",
+            }}
+          >
+            <div style={{ padding: "0px 2px", color: "#fff" }}>
+              <GoToFirstPage>
+                {(props: RenderGoToPageProps) => (
+                  <button
+                    style={{
+                      backgroundColor: "#357edd",
+                      border: "none",
+                      borderRadius: "4px",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "8px",
+                    }}
+                    onClick={props.onClick}
+                  >
+                    <i className="pi pi-step-backward"></i>
+                  </button>
+                )}
+              </GoToFirstPage>
             </div>
-          )}
+            <div style={{ padding: "0px 2px" }}>
+              <GoToPreviousPage>
+                {(props: RenderGoToPageProps) => (
+                  <button
+                    style={{
+                      backgroundColor: "#357edd",
+                      border: "none",
+                      borderRadius: "4px",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "8px",
+                    }}
+                    // It will be disabled if the current page is the first page
+                    disabled={props.isDisabled}
+                    onClick={props.onClick}
+                  >
+                    <i className="pi pi-caret-left"></i>
+                  </button>
+                )}
+              </GoToPreviousPage>{" "}
+            </div>
+            <div
+              style={{
+                padding: "0px 2px",
+                width: "100px",
+                textAlign: "center",
+              }}
+            >
+              <CurrentPageLabel>
+                {(props: RenderCurrentPageLabelProps) => (
+                  <span
+                    style={{
+                      color: `${
+                        themePrimeFlex === "dark" ? "#f5f5f5" : "#1A1A1A"
+                      }`,
+                    }}
+                  >
+                    Pag. {props.currentPage + 1} de {props.numberOfPages}
+                  </span>
+                )}
+              </CurrentPageLabel>
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              <GoToNextPage>
+                {(props: RenderGoToPageProps) => (
+                  <button
+                    style={{
+                      backgroundColor: "#357edd",
+                      border: "none",
+                      borderRadius: "4px",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "8px",
+                    }}
+                    // It will be disabled if we are already at the last page
+                    disabled={props.isDisabled}
+                    onClick={props.onClick}
+                  >
+                    <i className="pi pi-caret-right"></i>
+                  </button>
+                )}
+              </GoToNextPage>{" "}
+            </div>
+            <div style={{ padding: "0px 2px" }}>
+              <GoToLastPage>
+                {(props: RenderGoToPageProps) => (
+                  <button
+                    style={{
+                      backgroundColor: "#357edd",
+                      border: "none",
+                      borderRadius: "4px",
+                      color: "#ffffff",
+                      cursor: "pointer",
+                      padding: "8px",
+                    }}
+                    onClick={props.onClick}
+                  >
+                    <i className="pi pi-step-forward"></i>
+                  </button>
+                )}
+              </GoToLastPage>{" "}
+            </div>
+          </div>
+          <div
+            ref={viewerRef}
+            onClick={handleContainerClick}
+            style={{
+              position: "relative",
+              border: "none",
+              height: "65vh",
+              overflow: "auto",
+              cursor: dragging ? "grabbing" : "crosshair",
+            }}
+          >
+            {props.fileManager.UrlFM && (
+              <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                <Viewer
+                  fileUrl={props.fileManager.UrlFM}
+                  plugins={[
+                    // defaultLayoutPluginInstance,
+                    themePluginInstance,
+                    pageNavigationPluginInstance,
+                  ]}
+                  theme={themePrimeFlex === "dark" ? "dark" : "light"}
+                  defaultScale={SpecialZoomLevel.PageFit}
+                />
+              </Worker>
+            )}
+
+            {signature && (
+              <div
+                ref={signatureRef}
+                onMouseDown={handleSignatureMouseDown}
+                style={{
+                  position: "absolute",
+                  left: signature.x,
+                  top: signature.y,
+                  transform: "translate(-50%, -50%)",
+                  border: "2px dashed #007ad9",
+                  padding: "10px",
+                  backgroundColor: "rgba(255,255,255,0.95)",
+                  borderRadius: "8px",
+                  cursor: dragging ? "grabbing" : "grab",
+                  userSelect: "none",
+                  zIndex: 1000,
+                  maxWidth: "200px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+                }}
+                className="flex flex-row"
+              >
+                <div className="flex justify-content-center align-items-center mr-1">
+                  <img
+                    src={logo}
+                    alt="Logo Firma"
+                    style={{
+                      width: "45px",
+                      height: "45px",
+                      display: "block",
+                      margin: "0 auto",
+                    }}
+                  />
+                </div>
+                <div
+                  className="flex flex-column justify-content-center"
+                  style={{
+                    fontSize: "8px",
+                  }}
+                >
+                  <span style={{ color: "#000", fontSize: ".3rem" }}>
+                    {"Firmado digitalmente por:"}
+                  </span>
+                  <span style={{ color: "#000", fontSize: ".3rem" }}>
+                    {firmante.Nombre}
+                  </span>
+                  <span style={{ color: "#000", fontSize: ".3rem" }}>
+                    {firmante.NroIdentidad}
+                  </span>
+                  <span style={{ color: "#333", fontSize: ".3rem" }}>
+                    {"Motivo: " + firmante.Motivo}
+                  </span>
+                  <span style={{ color: "#666", fontSize: ".3rem" }}>
+                    {"Fecha: " + formatDate(new Date())}
+                  </span>
+                  <span style={{ color: "#333", fontSize: ".3rem" }}>
+                    {"Cargo: " + firmante.Cargo}
+                  </span>
+                  <span style={{ color: "#333", fontSize: ".3rem" }}>
+                    {firmante.Entidad}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="mt-3 flex gap-3">
