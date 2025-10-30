@@ -29,6 +29,28 @@ const UseFile = () => {
     }
   };
 
+  const update = async (
+    // carpetaCreate: CarpetaCreate,
+    formData: FormData
+  ): Promise<FileOut | undefined> => {
+    try {
+      const file = await axios.post<FileOut>(
+        `${VITE_API_URL_GDS + FILE.UPDATE}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return file.data;
+    } catch (error: any) {
+      console.log(error);
+      message.setMessage(1, "Error: Error interno en el servidor");
+      return { message: message };
+    }
+  };
+
   const remove = async (
     fileRemove: FileRemove
   ): Promise<FileOut | undefined> => {
@@ -45,6 +67,7 @@ const UseFile = () => {
 
   return {
     create,
+    update,
     remove,
   };
 };

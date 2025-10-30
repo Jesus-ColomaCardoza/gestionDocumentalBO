@@ -76,21 +76,29 @@ const Login = () => {
   } as React.CSSProperties;
 
   return (
-    <div
-      className={
-        "flex align-items-center justify-content-center overflow-hidden"
-      }
-      style={{
-        height: "100dvh",
-        backgroundImage: `url(${fondo})`,
-        // backgroundPosition: "contain",
-        backgroundSize: "100% 100%", // ¡Esto deforma la imagen!
-        backgroundRepeat: "no-repeat",
-        minHeight: "100vh",
-        width: "100%",
-      }}
-    >
-      <div className="flex flex-column align-items-center justify-content-center">
+    <>
+      <div
+        className={
+          "flex align-items-center justify-content-center overflow-hidden"
+        }
+        style={{
+          height: "100dvh",
+          backgroundImage: `url(${fondo})`,
+          opacity: "0.4",
+          // backgroundPosition: "contain",
+          backgroundSize: "100% 100%", // ¡Esto deforma la imagen!
+          backgroundRepeat: "no-repeat",
+          width: "100%",
+          position: "absolute",
+          zIndex: "-1",
+        }}
+      ></div>
+      <div
+        className="flex flex-column align-items-center justify-content-center"
+        style={{
+          height: "100dvh",
+        }}
+      >
         {/* <img src={""} alt="Sakai logo" className="mb-5 w-6rem flex-shrink-0" /> */}
         <div className="my-5">
           <Card
@@ -202,8 +210,8 @@ const Login = () => {
                   toggleMask
                   inputClassName="w-full p-inputtext-sm sm:w-18rem md:w-18rem "
                   inputStyle={{
-                    borderTopLeftRadius:0,
-                    borderBottomLeftRadius:0,
+                    borderTopLeftRadius: 0,
+                    borderBottomLeftRadius: 0,
                     fontSize: "1rem",
                   }}
                   className="p-inputtext-sm"
@@ -331,7 +339,7 @@ const Login = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

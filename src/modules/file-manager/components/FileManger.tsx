@@ -1602,6 +1602,9 @@ const FileManager = () => {
 
       <DocumentoFirmar
         fileManager={fileManager}
+        setFileManager={setFileManager}
+        fileManagers={fileManagers}
+        setFileManagers={setFileManagers}
         firmarDocumentoDialog={firmarDocumentoDialog}
         hideFirmarDocumentoDialog={hideFirmarDocumentoDialog}
         // removeDocumento={removeDocumentoFileManager}
