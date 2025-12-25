@@ -51,6 +51,7 @@ import { useAuth } from "../../auth/context/AuthContext";
 import { EstadoEntity } from "../../estado/interfaces/EstadoInterface";
 import UseEstado from "../../estado/hooks/UseEstado";
 import DocumentoFirmar from "../../documento/components/DocumentoFirmar";
+import { InputNumberChangeEvent } from "primereact/inputnumber";
 
 const FileManager = () => {
   // custom hooks
@@ -751,6 +752,15 @@ const FileManager = () => {
     _documento[name] = val;
 
     setDocumento(_documento);
+  };
+
+  const onInputNumberChange = (e: InputNumberChangeEvent, name: string) => {
+    const val = e.value ?? null;
+
+    setDocumento((prev) => ({
+      ...prev,
+      [name]: val,
+    }));
   };
 
   // templates to component DataTable

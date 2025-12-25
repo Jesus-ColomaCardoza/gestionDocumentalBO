@@ -2,30 +2,55 @@ import { Message } from "../../utils/Interfaces";
 
 type Fecha = Date | string | null;
 export interface DocumentoEntity {
-  IdDocumento: number;
+  IdDocumento?: number;
   CodigoReferencia?: string;
-  Titulo: string;
+  Titulo?: string;
   Descripcion?: string;
   Folios?: number;
-  FechaEmision: Fecha;
+  FechaEmision?: Fecha;
   FormatoDocumento?: string;
   NombreDocumento?: string;
-  UrlDocumento: string;
+  UrlDocumento?: string;
   SizeDocumento?: number;
   UrlBase?: string;
   IdTipoDocumento?: number;
   IdTramite?: number;
-  IdUsuario: number;
-  FirmaDigital: boolean | null;
-  IdCarpeta: number;
-  Categoria: "MF" | "FA" | "FS" | undefined;
-  IdEstado: number;
+  IdUsuario?: number;
+  FirmaDigital?: boolean | null;
+  IdCarpeta?: number;
+  Categoria?: "MF" | "FA" | "FS" | undefined;
+  IdEstado?: number;
   Activo?: boolean;
   CreadoEl?: Fecha;
   CreadoPor?: string;
   ModificadoEl?: Fecha;
   ModificadoPor?: string;
 }
+
+export interface DocumentoAwsEntity {
+  IdDocumento?: number
+  Titulo?: string;
+  UrlDocumento?: string;
+  FechaEmision?: Fecha;
+  SizeDocumento?: number;
+  IdEstado?: number;
+
+
+
+
+  IdArea?: number;
+  Area?: {
+    IdArea: number;
+    Descripcion: string;
+  };
+  Folios?: number;
+  IdTipoDocumento?: number;
+  TipoDocumento?: {
+    IdTipoDocumento: number;
+    Descripcion: string;
+  };
+}
+
 export interface DocumentoDetailsEntity {
   IdDocumento: number;
   Folios: number;
@@ -68,9 +93,9 @@ export interface DocumentoCreate {
   IdTipoDocumento?: number;
   IdTramite?: number;
   IdUsuario?: number;
-  FirmaDigital: boolean | null;
+  FirmaDigital?: boolean | null;
   IdCarpeta?: number | null;
-  Categoria: "MF" | "FA" | "FS" | undefined;
+  Categoria?: "MF" | "FA" | "FS" | undefined;
   IdEstado?: number;
   Activo?: boolean;
   CreadoEl?: Date | string;

@@ -1,4 +1,7 @@
-import { DocumentoEntity } from "../interfaces/DocumentoInterface";
+import {
+  DocumentoAwsEntity,
+  DocumentoEntity,
+} from "../interfaces/DocumentoInterface";
 
 export let emptyDocumento: DocumentoEntity = {
   IdDocumento: 0,
@@ -24,4 +27,18 @@ export let emptyDocumento: DocumentoEntity = {
   CreadoPor: "",
   ModificadoEl: new Date(),
   ModificadoPor: "",
+};
+
+export let emptyDocumentoAws: DocumentoAwsEntity = {
+  IdArea: 0,
+  Area: {
+    IdArea: 0,
+    Descripcion: "",
+  },
+  Folios: 0,
+  IdTipoDocumento: 0,
+  TipoDocumento: {
+    IdTipoDocumento: 0,
+    Descripcion: "",
+  },
 };

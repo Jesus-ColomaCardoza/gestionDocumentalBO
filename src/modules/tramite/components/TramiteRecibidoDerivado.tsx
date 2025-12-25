@@ -329,8 +329,7 @@ const TramiteRecibidoDerivado = () => {
               : [tramiteRecibido],
 
           //data documento
-          CodigoReferenciaDoc:
-            tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc,
+          CodigoReferenciaDoc: tramiteRecibidoDerivadoCreate.CodigoReferenciaDoc,
           Asunto: tramiteRecibidoDerivadoCreate.Asunto,
           Observaciones: tramiteRecibidoDerivadoCreate.Observaciones,
           Folios: tramiteRecibidoDerivadoCreate.Folios,

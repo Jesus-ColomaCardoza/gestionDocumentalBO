@@ -151,17 +151,6 @@ const TipoDocumento = () => {
             })
           : []
       );
-      //   toast.current?.show({
-      //     severity: "success",
-      //     detail: `${tipoDocumentosFindAll.message.msgTxt}`,
-      //     life: 3000,
-      //   });
-      // } else if (tipoDocumentosFindAll?.message.msgId == 1) {
-      //   toast.current?.show({
-      //     severity: "error",
-      //     detail: `${tipoDocumentosFindAll.message.msgTxt}`,
-      //     life: 3000,
-      //   });
     }
 
     setLoading(false);

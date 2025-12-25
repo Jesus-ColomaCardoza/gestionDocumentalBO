@@ -31,6 +31,7 @@ import TramiteRecibidoExterno from "../../tramite/components/TramiteRecibidoExte
 import TramiteRecibidoAtendido from "../../tramite/components/TramiteRecibidoAtendido";
 import UsuarioPerfil from "../../usuario/components/UsuarioPerfil";
 import Archivador from "../../archivador/components/Archivador";
+import FileAws from "../../file-aws/components/FileAws";
 
 const AllRoutes = () => {
   return (
@@ -63,6 +64,9 @@ const AllRoutes = () => {
               <Route path="tramite/emitido" element={<TramiteEmitido />}></Route>
               <Route path="tramite/emitido/nuevo" element={<TramiteEmitidoNuevo />}></Route>
               
+              <Route path="archivado/archivador" element={<Archivador />}></Route>
+              <Route path="almacenamientos/digital_ocean" element={<FileAws />}></Route>
+              
               <Route path="mantenimiento/usuario" element={<Usuario />}></Route>
               <Route path="mantenimiento/empresa" element={<Empresa />}></Route>
               <Route path="mantenimiento/constante" element={<Constante />}></Route>
@@ -76,7 +80,7 @@ const AllRoutes = () => {
               <Route path="mantenimiento/tipo_tramite" element={<TipoTramite />}></Route>
               <Route path="mantenimiento/tipo_identificacion" element={<TipoIdentificacion />}></Route>
 
-              <Route path="archivado/archivador" element={<Archivador />}></Route>
+  
             </Route>
 
             <Route path="nofound" element={<NotFound />}></Route>

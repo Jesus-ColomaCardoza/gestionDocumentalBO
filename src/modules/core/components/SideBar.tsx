@@ -7,6 +7,13 @@ import "./../styles/Dashboard.css";
 import { useRef } from "react";
 import { Avatar } from "primereact/avatar";
 import { useAuth } from "../../auth/context/AuthContext";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faDigitalOcean,
+  faAws,
+  faGoogle,
+  faMicrosoft,
+} from "@fortawesome/free-brands-svg-icons";
 
 type SideBarProps = {
   visible?: boolean;
@@ -19,6 +26,7 @@ const SideBar = (props: SideBarProps) => {
   const btnRef3 = useRef<any>(null);
   const btnRef4 = useRef<any>(null);
   const btnRef5 = useRef<any>(null);
+  const btnRef6 = useRef<any>(null);
 
   const navigate = useNavigate();
 
@@ -269,39 +277,130 @@ const SideBar = (props: SideBarProps) => {
         </ul>
         {(userAuth?.Rol.IdRol == "SUPER_ADMIN" ||
           userAuth?.Rol.IdRol == "ADMIN") && (
-          <ul className="list-none px-2">
-            <li>
-              <StyleClass
-                nodeRef={btnRef5}
-                selector="@next"
-                enterFromClassName="hidden"
-                enterActiveClassName="slidedown"
-                leaveToClassName="hidden"
-                leaveActiveClassName="slideup"
-              >
-                <div
-                  ref={btnRef5}
-                  className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
+          <>
+            <ul className="list-none px-2">
+              <li>
+                <StyleClass
+                  nodeRef={btnRef5}
+                  selector="@next"
+                  enterFromClassName="hidden"
+                  enterActiveClassName="slidedown"
+                  leaveToClassName="hidden"
+                  leaveActiveClassName="slideup"
                 >
-                  <span className="font-medium">Archivado</span>
-                  <i className="pi pi-chevron-down"></i>
-                  <Ripple />
-                </div>
-              </StyleClass>
-              <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
-                <li>
-                  <Link
-                    to={"../archivado/archivador"}
-                    className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                  <div
+                    ref={btnRef5}
+                    className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
                   >
-                    <i className="pi pi-file mr-2"></i>
-                    <span className="font-medium text-sm">Archivadores</span>
+                    <span className="font-medium">Archivado</span>
+                    <i className="pi pi-chevron-down"></i>
                     <Ripple />
-                  </Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
+                  </div>
+                </StyleClass>
+                <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
+                  <li>
+                    <Link
+                      to={"../archivado/archivador"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                    >
+                      <i className="pi pi-file mr-2"></i>
+                      <span className="font-medium text-sm">Archivadores</span>
+                      <Ripple />
+                    </Link>
+                  </li>
+                </ul>
+              </li>
+            </ul>
+            <ul className="list-none px-2">
+              <li>
+                <StyleClass
+                  nodeRef={btnRef6}
+                  selector="@next"
+                  enterFromClassName="hidden"
+                  enterActiveClassName="slidedown"
+                  leaveToClassName="hidden"
+                  leaveActiveClassName="slideup"
+                >
+                  <div
+                    ref={btnRef6}
+                    className="p-ripple p-2 flex align-items-center justify-content-between cursor-pointer text-600 border-round hover:surface-100 transition-duration-150 transition-colors"
+                  >
+                    <span className="font-medium">Almacenamientos</span>
+                    <i className="pi pi-chevron-down"></i>
+                    <Ripple />
+                  </div>
+                </StyleClass>
+                <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
+                  <li>
+                    <Link
+                      to={"../almacenamientos/digital_ocean"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                    >
+                      <FontAwesomeIcon icon={faDigitalOcean} className="mr-2" />
+                      <span className="font-medium text-sm">Digital ocean</span>
+                      <Ripple />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      onClick={(e) => e.preventDefault()}
+                      tabIndex={-1}
+                      aria-disabled="true"
+                      style={{
+                        pointerEvents: "none",
+                        opacity: 0.5,
+                        cursor: "default",
+                        userSelect: "none",
+                      }}
+                      to={"../almacenamientos/digital_ocean"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                    >
+                      <FontAwesomeIcon icon={faAws} className="mr-2" />
+                      <span className="font-medium text-sm">Aws</span>
+                      <Ripple />
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      onClick={(e) => e.preventDefault()}
+                      tabIndex={-1}
+                      aria-disabled="true"
+                      style={{
+                        pointerEvents: "none",
+                        opacity: 0.5,
+                        cursor: "default",
+                        userSelect: "none",
+                      }}
+                      to={"../almacenamientos/digital_ocean"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                    >
+                      <FontAwesomeIcon icon={faGoogle} className="mr-2" />
+                      <span className="font-medium text-sm">Google</span>
+                      <Ripple />
+                    </Link>
+                  </li>
+                  {/* <li>
+                    <Link
+                      tabIndex={-1}
+                      aria-disabled="true"
+                      style={{
+                        pointerEvents: "none",
+                        opacity: 0.5,
+                        cursor: "default",
+                        userSelect: "none",
+                      }}
+                      to={"../almacenamientos/digital_ocean"}
+                      className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                    >
+                      <FontAwesomeIcon icon={faMicrosoft} className="mr-2" />
+                      <span className="font-medium text-sm">Azure</span>
+                      <Ripple />
+                    </Link>
+                  </li> */}
+                </ul>
+              </li>
+            </ul>
+          </>
         )}
         {userAuth?.Rol.IdRol == "SUPER_ADMIN" && (
           <ul className="list-none px-2 ">
@@ -626,7 +725,8 @@ const SideBar = (props: SideBarProps) => {
             label={`${
               userAuth?.Nombres?.split(" ")[0][0]?.toUpperCase() +
               "" +
-              (userAuth?.ApellidoPaterno?.split(" ")[0][0]?.toUpperCase() || "SR")
+              (userAuth?.ApellidoPaterno?.split(" ")[0][0]?.toUpperCase() ||
+                "SR")
             }`}
             image={`${userAuth?.UrlFotoPerfil}`}
             shape="circle"

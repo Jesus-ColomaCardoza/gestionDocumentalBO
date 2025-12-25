@@ -82,6 +82,12 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/tramite/emitido",
     "/tramite/emitido/nuevo",
 
+    //archivado
+    "/archivado/archivador", 
+
+    //almacenamiento
+    "/almacenamientos/digital_ocean", 
+  
     //mantenimiento
     "/mantenimiento/usuario",
     "/mantenimiento/empresa",
@@ -96,7 +102,6 @@ export const AuthProvider = ({ children }: AuthPoroviderProps) => {
     "/mantenimiento/tipo_identificacion",
 
     //otros
-    "/archivado/archivador", 
   ];
 
   //functions

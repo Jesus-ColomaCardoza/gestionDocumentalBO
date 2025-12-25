@@ -14,7 +14,7 @@ export interface FileEntity {
 }
 
 export interface FileRemove {
-  PublicUrl: string;
+  PublicUrl?: string;
 }
 
 export interface FileOut {
