@@ -127,7 +127,7 @@ const TramiteRecibido = () => {
   >([]);
 
   const [archivadores, setArchivadores] = useState<
-    Pick<ArchivadorEntity, "IdArchivador" | "Descripcion" |"Nombre">[]
+    Pick<ArchivadorEntity, "IdArchivador" | "Descripcion" | "Nombre">[]
   >([]);
 
   const [archivador, setArchivador] = useState<Pick<
@@ -718,6 +718,11 @@ const TramiteRecibido = () => {
               } else {
                 // retraso
                 tpoColor = "red";
+              }
+
+              if (af.HistorialMovimientoxEstado?.[0]?.Estado?.IdEstado == 17) {
+                //derivado
+                tpoColor = "blue";
               }
 
               return {
@@ -1501,6 +1506,15 @@ const TramiteRecibido = () => {
             className="pi pi-circle-fill"
             style={{
               color: themePrimeFlex === "light" ? "#ee0a3cff" : "#db3458ff",
+              fontSize: ".6rem",
+            }}
+          ></i>
+        )}
+        {rowData.Tpo == "blue" && (
+          <i
+            className="pi pi-circle-fill"
+            style={{
+              color: themePrimeFlex === "light" ? "#0a21eeff" : "#343cdbff",
               fontSize: ".6rem",
             }}
           ></i>

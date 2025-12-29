@@ -139,6 +139,13 @@ export interface TramitePendienteEntity {
     //   },
     // },
   }
+  HistorialMovimientoxEstado?: {
+    IdHistorialMxE?: number,
+    Estado?: {
+      IdEstado?: number,
+      Descripcion?: string,
+    }
+  }[]
 }
 export interface TramiteRecibidoEntity {
   IdMovimiento: number,

@@ -37,6 +37,8 @@ import { Toolbar } from "primereact/toolbar";
 import { Menu } from "primereact/menu";
 import UseTipoIdentificacion from "../../tipo-identificacion/hooks/UseTipoIdentificacion";
 import { TipoIdentificacionEntity } from "../../tipo-identificacion/interfaces/TipoIdentificacionInterface";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSignature } from "@fortawesome/free-solid-svg-icons";
 
 const TramiteRecibidoExterno = () => {
   // custom hooks
@@ -956,14 +958,15 @@ const TramiteRecibidoExterno = () => {
                       {/* icon trash */}
                       <div className="flex align-items-center justify-content-center pr-1">
                         <Tooltip target=".icon-bolt" />
-                        <i
-                          className="pi pi-bolt m-1 icon-bolt"
+                        <FontAwesomeIcon
                           style={{ color: "#559", fontSize: "1rem" }}
                           data-pr-tooltip="Firmar"
                           onClick={() => {
                             // code about signature a document
                           }}
-                        ></i>
+                          icon={faSignature}
+                          className="mr-2 icon-bolt"
+                        />
                         <i
                           className="pi pi-trash m-1"
                           style={{ color: "#559", fontSize: "1rem" }}
