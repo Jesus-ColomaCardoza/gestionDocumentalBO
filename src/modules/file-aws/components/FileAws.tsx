@@ -39,6 +39,7 @@ import DocumentoRemove from "../../documento/components/DocumentoRemove";
 import DocumentoAwsCreateOrUpdate from "../../documento/components/DocumentoAwsCreateOrUpdate";
 import { DropdownChangeEvent } from "primereact/dropdown";
 import UseFileAws from "../hooks/UseFileAws";
+import { Dialog } from "primereact/dialog";
 
 const FileAws = () => {
   // custom hooks
@@ -107,6 +108,14 @@ const FileAws = () => {
     state: boolean;
   }>({
     state: false,
+  });
+
+  const [viewDocumentoDialog, setViewDocumentoDialog] = useState<{
+    state: boolean;
+    url?: string;
+  }>({
+    state: false,
+    url: "",
   });
 
   const [formErrors, setFormErrors] = useState<any>({});
@@ -614,8 +623,12 @@ const FileAws = () => {
             <a
               className="hover:underline hover:text-red-300"
               style={{ textDecoration: "none", color: "var(--text-color)" }}
-              href={`${rowData.UrlFM}`}
-              target="_blank"
+              onClick={() => {
+                setViewDocumentoDialog({
+                  state: true,
+                  url: `${rowData.UrlFM}`,
+                });
+              }}
             >
               {rowData.Descripcion}
             </a>
@@ -999,6 +1012,29 @@ const FileAws = () => {
         hideRemoveDocumentoDialog={hideRemoveDocumentoDialog}
         removeDocumento={removeDocumentoFileManager}
       />
+
+      <Dialog
+        headerStyle={{
+          padding: ".5em",
+        }}
+        visible={viewDocumentoDialog.state}
+        style={{ width: "50%" }}
+        onHide={() => {
+          if (!viewDocumentoDialog) return;
+          setViewDocumentoDialog({
+            state: false,
+          });
+        }}
+      >
+        <embed
+          src={`${viewDocumentoDialog?.url}`}
+          type="application/pdf"
+          style={{
+            width: "100%",
+            height: "80vh",
+          }}
+        />
+      </Dialog>
     </div>
   );
 };

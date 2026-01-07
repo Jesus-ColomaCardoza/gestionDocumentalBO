@@ -211,26 +211,6 @@ const SideBar = (props: SideBarProps) => {
             </StyleClass>
             <ul className="list-none p-0 m-0 ml-2 overflow-hidden">
               <li>
-                <Link
-                  to={"../tramite/pendiente"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-file-export mr-2"></i>
-                  <span className="font-medium text-sm">Pendientes</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to={"../tramite/recibido"}
-                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
-                >
-                  <i className="pi pi-book mr-2"></i>
-                  <span className="font-medium text-sm">Recibidos</span>
-                  <Ripple />
-                </Link>
-              </li>
-              <li>
                 <StyleClass
                   nodeRef={btnRef4}
                   selector="@next"
@@ -271,6 +251,26 @@ const SideBar = (props: SideBarProps) => {
                     </Link>
                   </li>
                 </ul>
+              </li>
+              <li>
+                <Link
+                  to={"../tramite/pendiente"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-file-export mr-2"></i>
+                  <span className="font-medium text-sm">Pendientes</span>
+                  <Ripple />
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to={"../tramite/recibido"}
+                  className="p-ripple flex align-items-center cursor-pointer p-2 border-round text-700 hover:surface-100 transition-duration-150 transition-colors w-full custom"
+                >
+                  <i className="pi pi-book mr-2"></i>
+                  <span className="font-medium text-sm">Recibidos</span>
+                  <Ripple />
+                </Link>
               </li>
             </ul>
           </li>

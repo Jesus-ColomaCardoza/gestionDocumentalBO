@@ -476,6 +476,8 @@ const DocumentoFirmar = (props: DocumentoFirmarProps) => {
         props.fileManager.IdFM.split("_")[1].toString()
       );
 
+      formData.append("Firmar", "true");
+
       const fileSignature = await update(formData);
 
       if (fileSignature?.message.msgId == 0 && fileSignature.registro) {
@@ -495,7 +497,11 @@ const DocumentoFirmar = (props: DocumentoFirmarProps) => {
         props.setFileManagers(
           props.fileManagers.map((fm) =>
             fm.IdFM === props.fileManager.IdFM
-              ? { ...fm, UrlFM: fileSignature.registro?.url || "" }
+              ? {
+                  ...fm,
+                  UrlFM: fileSignature.registro?.url || "",
+                  Estado: { IdEstado: 3, Descripcion: "Firmado" },
+                }
               : fm
           )
         );
